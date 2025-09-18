@@ -18,6 +18,7 @@ from app.schemas.auth import Payload, RegisterRequest
 from app.services.auth_service import (
     authenticate_user,
     create_access_token,
+    get_password_hash,
 )
 from app.services.token_blacklist import add_token_to_blacklist
 
@@ -63,11 +64,13 @@ async def register(register_request: RegisterRequest, db: AsyncSession = Depends
         logger.warning(f"邮箱 {register_request.email} 已存在，抛出 400")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
 
+    hashed_password = get_password_hash(register_request.password)
+
     await repo.create_user(
         username=register_request.username,
         realname=register_request.realname,
         email=register_request.email,
-        password=register_request.password,
+        password=hashed_password,
         role=UserRole(register_request.role or "student"),
     )
 

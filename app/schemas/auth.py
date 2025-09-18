@@ -36,13 +36,18 @@ class RegisterRequest(BaseModel):
     注册请求体
     """
 
-    username: str = Field(..., description="用户名")
+    username: str = Field(..., description="用户名", examples=["Muika", "Moemu"])
     """用户名"""
-    realname: str = Field(..., description="真实姓名")
+    realname: str = Field(..., description="真实姓名", examples=["沐妮卡", "萌沐"])
     """真实姓名"""
-    email: str = Field(..., description="广金邮箱", pattern=r"^[a-zA-Z0-9._%+-]+@m\.gduf\.edu\.cn$")
+    email: str = Field(
+        ...,
+        description="广金邮箱",
+        pattern=r"^[a-zA-Z0-9._%+-]+@m\.gduf\.edu\.cn$",
+        examples=["240000000@m.gduf.edu.cn"],
+    )
     """广金邮箱"""
-    password: str = Field(..., min_length=6, description="密码，至少六位")
+    password: str = Field(..., min_length=6, description="密码，至少六位(明文)")
     """密码"""
-    role: Optional[str] = Field("student", description="用户角色，默认为 student")
+    role: str = Field(default="student", description="用户角色，默认为 student", examples=["student", "admin"])
     """用户角色"""
