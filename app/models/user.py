@@ -26,8 +26,6 @@ class User(Base):
 
     realname: Mapped[str] = mapped_column(String(10), nullable=False, comment="真实姓名")
     email: Mapped[str] = mapped_column(String(50), unique=True, nullable=False, comment="邮箱")
-    major: Mapped[str] = mapped_column(String(25), nullable=False, comment="专业")
-    grade: Mapped[str] = mapped_column(String(10), nullable=False, comment="年级")
 
     create_time: Mapped[datetime] = mapped_column(
         DateTime,

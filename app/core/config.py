@@ -31,8 +31,14 @@ class Config(BaseSettings):
     """密钥过期时间"""
 
     # 数据库配置
-    db_url: str = "aiosqlite+sqlite:///./database.db"
+    db_url: str = "sqlite+aiosqlite:///./database.db"
     """orm 数据库连接字符串"""
+
+    # Redis 配置
+    redis_host: str = "localhost"
+    """Redis 主机地址"""
+    redis_port: int = 6379
+    """Redis 端口号"""
 
 
 config = Config()
