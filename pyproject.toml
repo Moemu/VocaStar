@@ -9,8 +9,10 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "aiosqlite>=0.21.0",
+    "bcrypt>=4.3.0",
     "colorlog>=6.9.0",
     "fastapi>=0.116.2",
+    "httpx>=0.28.1",
     "passlib>=1.7.4",
     "pre-commit>=4.3.0",
     "pydantic>=2.11.9",
@@ -24,8 +26,44 @@ dependencies = [
     "uvicorn>=0.35.0",
 ]
 
+[project.optional-dependencies]
+test = [
+    "coverage>=7.10.6",
+    "coverage-badge>=1.1.2",
+    "pytest>=7.4.2",
+    "pytest-cov>=4.1.0",
+    "pytest-asyncio>=1.2.0",
+    "gevent==25.9.1",
+]
+
 [tool.black]
 line-length = 120
 
 [tool.isort]
 profile = "black"
+
+[tool.pytest.ini_options]
+pythonpath = "."
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+filterwarnings = [
+    "ignore::DeprecationWarning:pkg_resources.*",
+    "ignore:pkg_resources is deprecated as an API:UserWarning:passlib.pwd",
+]
+
+[tool.coverage.run]
+concurrency = ["gevent"]
+omit = [
+    "app/deps/sql.py",
+    "app/core/sql.py",
+    "app/main.py",
+]
+
+[tool.coverage.report]
+exclude_also = [
+    "logger.warning",
+    "logging.warning",
+    "raise HTTPException",
+    "raise credentials_exception",
+    "except IntegrityError",
+]
