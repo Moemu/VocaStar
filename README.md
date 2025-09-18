@@ -27,6 +27,24 @@ uv sync
 pip install .
 ```
 
+**运行**
+
+```shell
+uv run app.main:app --reload
+```
+
+或者
+
+```shell
+python -m app.main
+```
+
+## API 文档
+
+默认本地 FastAPI 文档: <http://127.0.0.1:8080/docs>
+
+APIFox 文档: <https://2v5c0iiid5.apifox.cn/>
+
 <!-- ## 文件树结构 -->
 
 <!-- ```
