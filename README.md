@@ -1,5 +1,11 @@
 # FinancialCareerCommunity Backend
 
+![Python](https://img.shields.io/badge/Python-3.12-blue)
+![Black CodeStyle](https://img.shields.io/badge/Code%20Style-Black-121110.svg)
+![wakatime](https://wakatime.com/badge/user/637d5886-8b47-4b82-9264-3b3b9d6add67/project/d6391b48-7f4e-46ad-94f1-34221f72a2ed.svg)
+[![Test and Coverage](https://github.com/Moemu/FinancialCareerCommunity/actions/workflows/pytest.yaml/badge.svg)](https://github.com/Moemu/FinancialCareerCommunity/actions/workflows/pytest.yaml)
+![coverage](./src/coverage.svg)
+
 别急，还没开始写.
 
 ## 快速开始
