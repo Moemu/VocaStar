@@ -3,8 +3,12 @@ name: Test and Coverage
 on:
   push:
     branches: [ main ]
+    paths:
+      - '**.py'
   pull_request:
     branches: [ main ]
+    paths:
+      - '**.py'
 
 jobs:
   test:
@@ -50,12 +54,21 @@ jobs:
         coverage xml
         coverage-badge -o src/coverage.svg -f
 
+    - name: Generate App Token
+      id: generate-token
+      uses: actions/create-github-app-token@v1
+      with:
+        app-id: ${{ secrets.APP_ID }}
+        private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
     - name: Commit coverage badge
+      env:
+        GH_TOKEN: ${{ steps.generate-token.outputs.token }}
       run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        git config user.name "MuiceAI[bot]"
+        git config user.email "216272510+muiceai[bot]@users.noreply.github.com"
         git add src/coverage.svg
 
-        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}
-        git commit -m "Update coverage badge" || echo "No changes to commit"
+        git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
+        git diff --cached --quiet || git commit -m "style: 🌸更新覆盖率标签喵喵~"
         git push
