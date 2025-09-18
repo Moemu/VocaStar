@@ -148,3 +148,5 @@ doc_build/
 
 # App
 Pages/
+*.db
+.vscode/
