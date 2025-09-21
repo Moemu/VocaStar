@@ -1,4 +1,5 @@
 from collections.abc import AsyncGenerator
+from uuid import uuid4
 
 import pytest_asyncio
 from database import close_db, get_db, init_test_db
@@ -8,6 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.deps.sql import get_db as get_sql_db
 from app.main import app
 from app.models.user import User, UserRole
+from app.repositories.profile import UserProfileRepository
+from app.repositories.test_record import UserTestRecordRepository
 from app.repositories.user import UserRepository
 from app.services.auth_service import get_password_hash
 
@@ -43,13 +46,24 @@ async def user_repo(database: AsyncSession) -> UserRepository:
 
 
 @pytest_asyncio.fixture
+async def profile_repo(database: AsyncSession) -> UserProfileRepository:
+    return UserProfileRepository(database)
+
+
+@pytest_asyncio.fixture
+async def test_record_repo(database: AsyncSession) -> UserTestRecordRepository:
+    return UserTestRecordRepository(database)
+
+
+@pytest_asyncio.fixture
 async def test_user(user_repo: UserRepository) -> User:
+    uuid = str(uuid4())
     hashed_password = get_password_hash("123456")
     user = await user_repo.create_user(
-        username="test_user",
+        username=f"test_{uuid}",
         password=hashed_password,
         realname="Test User",
-        email="test@m.gduf.edu.cn",
+        email=f"test_{uuid}@m.gduf.edu.cn",
         role=UserRole.student,
     )
     assert user
@@ -83,10 +97,10 @@ async def admin_client(async_client: AsyncClient, test_admin: User) -> AsyncClie
 
 
 @pytest_asyncio.fixture
-async def student_client(async_client: AsyncClient, test_student: User) -> AsyncClient:
+async def student_client(async_client: AsyncClient, test_user: User) -> AsyncClient:
     response = await async_client.post(
         "/api/auth/login",
-        data={"username": test_student.username, "password": "123456"},
+        data={"username": test_user.username, "password": "123456"},
         headers={"Content-Type": "application/x-www-form-urlencoded"},
     )
     assert response.status_code == 200
