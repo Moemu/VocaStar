@@ -70,5 +70,5 @@ jobs:
         git add src/coverage.svg
 
         git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
-        git diff --cached --quiet || git commit -m "style: 🌸更新覆盖率标签喵喵~"
+        git diff --cached --quiet || git commit -m "🌸更新覆盖率标签喵喵~"
         git push
