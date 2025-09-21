@@ -55,16 +55,17 @@ APIFox 文档: <https://2v5c0iiid5.apifox.cn/>
 | `/api/auth/register` | POST | 注册接口 |
 | `/api/auth/logout`   | POST | 登出接口 |
 
-**🚧 计划中/开发中**
-
 **用户相关**
 
-| API                       | 方法 | 说明         |
-| ------------------------- | ---- | ------------ |
-| `/api/user/resetpw`       | POST | 重置密码     |
-| `/api/user/profile`       | GET  | 获取用户信息 |
-| `/api/user/setprofile`    | POST | 设置用户信息 |
-| `/api/user/addtestrecord` | POST | 记录测评结果 |
+| API                       | 方法 | 说明             |
+| ------------------------- | ---- | ---------------- |
+| `/api/user/resetpw`       | POST | 重置密码         |
+| `/api/user/profile`       | GET  | 获取用户信息     |
+| `/api/user/setprofile`    | POST | 设置用户信息     |
+| `/api/user/testrecords`   | GET  | 获取用户测评结果 |
+| `/api/user/addtestrecord` | POST | 记录测评结果     |
+
+**🚧 计划中/开发中**
 
 **教务系统相关**
 
