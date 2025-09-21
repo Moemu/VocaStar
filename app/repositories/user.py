@@ -54,6 +54,8 @@ class UserRepository:
         :param role: 用户角色(student/admin)
         :param status: 用户状态(正常/禁用)
 
+        :raise IntegrityError: 用户名或邮箱已存在
+
         :return: 用户对象。失败则返回 None
         """
 
@@ -66,11 +68,8 @@ class UserRepository:
             status=status,
         )
 
-        try:
-            self.session.add(user)
-            await self.session.commit()
-        except IntegrityError:
-            return None
+        self.session.add(user)
+        await self.session.commit()
 
         return user
 
@@ -111,7 +110,7 @@ class UserRepository:
         修改用户密码
 
         :param user: 用户对象
-        :param new_password: 新密码
+        :param new_password: 新密码（已哈希）
         """
         user.password = new_password
         await self.session.commit()

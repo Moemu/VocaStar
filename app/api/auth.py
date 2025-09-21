@@ -6,6 +6,7 @@ import jwt
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from redis.asyncio import Redis
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import config
@@ -66,13 +67,17 @@ async def register(register_request: RegisterRequest, db: AsyncSession = Depends
 
     hashed_password = get_password_hash(register_request.password)
 
-    await repo.create_user(
-        username=register_request.username,
-        realname=register_request.realname,
-        email=register_request.email,
-        password=hashed_password,
-        role=UserRole(register_request.role or "student"),
-    )
+    try:
+        await repo.create_user(
+            username=register_request.username,
+            realname=register_request.realname,
+            email=register_request.email,
+            password=hashed_password,
+            role=UserRole(register_request.role or "student"),
+        )
+    except IntegrityError as e:
+        logger.error(f"注册用户 {register_request.username} 失败: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="用户名或邮箱已存在")
 
     logger.info(f"用户 {register_request.username} 注册成功")
     return {"msg": "User registered successfully"}
