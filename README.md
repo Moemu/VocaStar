@@ -65,14 +65,17 @@ APIFox 文档: <https://2v5c0iiid5.apifox.cn/>
 | `/api/user/testrecords`   | GET  | 获取用户测评结果 |
 | `/api/user/addtestrecord` | POST | 记录测评结果     |
 
+**教务系统相关(由于上游API原因暂不可用)**
+
+| API                | 方法   | 说明                     |
+| ------------------ | ------ | ------------------------ |
+| `/api/jwxt/info`   | GET    | 获取教务系统中的所有信息 |
+| `/api/jwxt/bind`   | POST   | 绑定教务系统             |
+| `/api/jwxt/sync`   | POST   | 从教务系统同步数据       |
+| `/api/jwxt/unbind` | DELETE | 解绑教务系统账号         |
+
 **🚧 计划中/开发中**
 
-**教务系统相关**
-
-| API                 | 方法 | 说明                     |
-| ------------------- | ---- | ------------------------ |
-| `/api/jwxt/getinfo` | GET  | 获取教务系统中的所有信息 |
-| `/api/jwxt/bind`    | POST | 绑定教务系统             |
 
 **信息内容相关**
 
