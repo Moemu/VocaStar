@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import auth, user
+from app.api import auth, jwxt, user
 from app.core.config import config
 from app.core.logger import logger
 from app.core.sql import close_db, load_db
@@ -35,10 +35,12 @@ app.add_middleware(
 # 注册 API 路由
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(user.router, prefix="/api/user", tags=["user"])
+app.include_router(jwxt.router, prefix="/api/jwxt", tags=["jwxt"])
 
 if __name__ == "__main__":
     import uvicorn
 
     logger.info(f"服务器地址: http://{config.host}:{config.port}")
     logger.info(f"FastAPI 文档地址: http://{config.host}:{config.port}/docs")
+    logger.info(f"OpenAPI JSON 地址: http://{config.host}:{config.port}/openapi.json")
     uvicorn.run(app, host=config.host, port=config.port)

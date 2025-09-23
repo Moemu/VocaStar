@@ -30,6 +30,14 @@ class Config(BaseSettings):
     expire_minutes: int = 60
     """密钥过期时间"""
 
+    # JWXT 配置
+    jwxt_encryption_key: str = "EWE1wl__6LIkWY1zNl5RS_ipky_bbYOf_8r5Tf4-e6E="
+    """JWXT密码加密密钥，建议使用32字节的随机字符串"""
+    jwxt_sync_interval_days: int = 90
+    """JWXT自动同步间隔天数，默认90天（一学期）"""
+    jwxt_api_timeout: int = 30
+    """JWXT外部API请求超时时间（秒）"""
+
     # 数据库配置
     db_url: str = "sqlite+aiosqlite:///./database.db"
     """orm 数据库连接字符串"""
