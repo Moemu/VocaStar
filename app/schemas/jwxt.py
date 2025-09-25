@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import Any, Optional, TypedDict
+from typing import Any, Optional
 
 from pydantic import BaseModel, Field
+from typing_extensions import TypedDict
 
 
 class JWXTUserInfoAPIResponse(TypedDict):

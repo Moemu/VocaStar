@@ -32,7 +32,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v4
       with:
-        python-version: '3.11'
+        python-version: '3.12'
 
     - name: Install dependencies
       run: |
@@ -70,5 +70,5 @@ jobs:
         git add src/coverage.svg
 
         git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git
-        git diff --cached --quiet || git commit -m "🌸更新覆盖率标签喵喵~"
+        git diff --cached --quiet || git commit -m "🌸 更新覆盖率标签喵喵~"
         git push
