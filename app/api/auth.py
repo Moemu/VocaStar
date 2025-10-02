@@ -70,10 +70,10 @@ async def register(register_request: RegisterRequest, db: AsyncSession = Depends
     try:
         await repo.create_user(
             username=register_request.username,
-            realname=register_request.realname,
+            nickname=register_request.nickname,
             email=register_request.email,
-            password=hashed_password,
-            role=UserRole(register_request.role or "student"),
+            password_hash=hashed_password,
+            role=UserRole(register_request.role or "user"),
         )
     except IntegrityError as e:
         logger.error(f"注册用户 {register_request.username} 失败: {e}")

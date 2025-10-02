@@ -10,7 +10,6 @@ from app.deps.sql import get_db as get_sql_db
 from app.main import app
 from app.models.user import User, UserRole
 from app.repositories.profile import UserProfileRepository
-from app.repositories.test_record import UserTestRecordRepository
 from app.repositories.user import UserRepository
 from app.services.auth_service import get_password_hash
 
@@ -51,20 +50,15 @@ async def profile_repo(database: AsyncSession) -> UserProfileRepository:
 
 
 @pytest_asyncio.fixture
-async def test_record_repo(database: AsyncSession) -> UserTestRecordRepository:
-    return UserTestRecordRepository(database)
-
-
-@pytest_asyncio.fixture
 async def test_user(user_repo: UserRepository) -> User:
     uuid = str(uuid4())
     hashed_password = get_password_hash("123456")
     user = await user_repo.create_user(
         username=f"test_{uuid}",
-        password=hashed_password,
-        realname="Test User",
-        email=f"test_{uuid}@m.gduf.edu.cn",
-        role=UserRole.student,
+        password_hash=hashed_password,
+        nickname="Test User",
+        email=f"test_{uuid}@example.com",
+        role=UserRole.user,
     )
     assert user
     return user
@@ -75,9 +69,9 @@ async def test_admin(user_repo: UserRepository) -> User:
     hashed_password = get_password_hash("123456")
     admin = await user_repo.create_user(
         username="test_admin",
-        password=hashed_password,
-        realname="Test User",
-        email="test_admin@m.gduf.edu.cn",
+        password_hash=hashed_password,
+        nickname="Test Admin",
+        email="test_admin@example.com",
         role=UserRole.admin,
     )
     assert admin

@@ -38,16 +38,16 @@ class RegisterRequest(BaseModel):
 
     username: str = Field(..., description="用户名", examples=["Muika", "Moemu"])
     """用户名"""
-    realname: str = Field(..., description="真实姓名", examples=["沐妮卡", "萌沐"])
-    """真实姓名"""
+    nickname: str = Field(..., description="昵称", examples=["沐妮卡", "萌沐"])
+    """昵称"""
     email: str = Field(
         ...,
-        description="广金邮箱",
-        pattern=r"^[a-zA-Z0-9._%+-]+@m\.gduf\.edu\.cn$",
-        examples=["240000000@m.gduf.edu.cn"],
+        description="邮箱",
+        pattern=r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+        examples=["user@example.com"],
     )
-    """广金邮箱"""
+    """邮箱"""
     password: str = Field(..., min_length=6, description="密码，至少六位(明文)")
     """密码"""
-    role: str = Field(default="student", description="用户角色，默认为 student", examples=["student", "admin"])
+    role: str = Field(default="user", description="用户角色，默认为 user", examples=["user", "admin"])
     """用户角色"""

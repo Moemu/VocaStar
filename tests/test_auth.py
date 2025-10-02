@@ -27,9 +27,9 @@ async def test_register(async_client: AsyncClient, user_repo: UserRepository):
         json={
             "username": "test_register",
             "password": "test_register",
-            "realname": "test_register",
-            "email": "test_register@m.gduf.edu.cn",
-            "role": "student",
+            "nickname": "test_register",
+            "email": "test_register@example.com",
+            "role": "user",
         },
     )
     assert response.status_code == 200

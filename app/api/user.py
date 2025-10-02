@@ -12,10 +12,8 @@ from app.core.redis import get_redis_client
 from app.deps.auth import get_current_user, get_db, oauth2_scheme
 from app.models.user import User
 from app.repositories.profile import UserProfileRepository
-from app.repositories.test_record import UserTestRecordRepository
 from app.repositories.user import UserRepository
 from app.schemas.user import (
-    UserAddTestRecordRequest,
     UserResetPasswordRequest,
     UserSetProfileRequest,
 )
@@ -87,7 +85,7 @@ async def get_profile(
     profile = await profile_repo.get_by_username(user.username)
     profile_data = {
         "username": user.username,
-        "realname": user.realname,
+        "nickname": user.nickname,
         "email": user.email,
         "college": profile.college if profile else None,
         "major": profile.major if profile else None,
@@ -112,10 +110,10 @@ async def set_profile(
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    if profile_data.email or profile_data.realname:
+    if profile_data.email or profile_data.nickname:
         await user_repo.edit_info(
             user,
-            realname=profile_data.realname,
+            nickname=profile_data.nickname,
             email=profile_data.email,
         )
 
@@ -146,63 +144,3 @@ async def set_profile(
 
     logger.info(f"用户 {current_user.username} 个人资料设置成功")
     return {"msg": "Profile updated successfully"}
-
-
-@router.get("/testrecords", tags=["user"])
-async def get_test_records(
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
-    test_name: str | None = None,
-):
-    logger.info(f"用户 {current_user.username} 请求获取测试记录")
-
-    user_repo = UserRepository(db)
-    user = await user_repo.get_by_username(current_user.username)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
-    test_record_repo = UserTestRecordRepository(db)
-    test_records = await test_record_repo.get_by_username(user.username, test_name=test_name)
-
-    if not test_records:
-        return {"test_records": []}
-
-    records_data = [
-        {
-            "test_name": record.test_name,
-            "result": record.result,
-            "details": record.details,
-            "created_at": record.create_time,
-        }
-        for record in test_records
-    ]
-
-    logger.info(f"用户 {current_user.username} 测试记录获取成功")
-    return {"test_records": records_data}
-
-
-@router.post("/addtestrecord", tags=["user"])
-async def add_test_record(
-    test_record_data: UserAddTestRecordRequest,
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
-):
-    logger.info(f"用户 {current_user.username} 请求添加测试记录")
-
-    user_repo = UserRepository(db)
-    user = await user_repo.get_by_username(current_user.username)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
-    test_record_repo = UserTestRecordRepository(db)
-    test_record = await test_record_repo.create_test_record(
-        user_id=user.id,
-        test_name=test_record_data.test_name,
-        result=test_record_data.result,
-        details=test_record_data.details,
-    )
-    if not test_record:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to add test record")
-
-    logger.info(f"用户 {current_user.username} 测试记录添加成功")
-    return {"msg": "Test record added successfully"}

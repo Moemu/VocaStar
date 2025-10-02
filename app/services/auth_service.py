@@ -47,7 +47,7 @@ async def authenticate_user(userdb: UserRepository, username: str, password: str
     登录用户鉴权
     """
     user = await userdb.get_by_username(username)
-    if user and verify_password(password, user.password):
+    if user and verify_password(password, user.password_hash):
         return user
     return None
 

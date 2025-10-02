@@ -38,21 +38,21 @@ class UserRepository:
     async def create_user(
         self,
         username: str,
-        password: str,
-        realname: str,
+        password_hash: str,
         email: str,
-        role: UserRole = UserRole.student,
-        status: bool = True,
+        nickname: Optional[str] = None,
+        role: UserRole = UserRole.user,
+        is_active: bool = True,
     ) -> Optional[User]:
         """
         创建一个用户
 
         :param username: 用户名
-        :param password: 用户哈希密钥
-        :param realname: 姓名
-        :param email: 学校邮箱
-        :param role: 用户角色(student/admin)
-        :param status: 用户状态(正常/禁用)
+        :param password_hash: 用户密码哈希
+        :param email: 邮箱
+        :param nickname: 昵称
+        :param role: 用户角色(user/admin)
+        :param is_active: 用户状态(激活/禁用)
 
         :raise IntegrityError: 用户名或邮箱已存在
 
@@ -61,11 +61,11 @@ class UserRepository:
 
         user = User(
             username=username,
-            password=password,
-            realname=realname,
+            password_hash=password_hash,
             email=email,
+            nickname=nickname,
             role=role,
-            status=status,
+            is_active=is_active,
         )
 
         self.session.add(user)
@@ -76,8 +76,8 @@ class UserRepository:
     async def edit_info(
         self,
         user: User,
-        realname: Optional[str] = None,
-        status: Optional[bool] = None,
+        nickname: Optional[str] = None,
+        is_active: Optional[bool] = None,
         role: Optional[UserRole] = None,
         email: Optional[str] = None,
     ) -> bool:
@@ -85,18 +85,19 @@ class UserRepository:
         编辑用户信息
 
         :param user: 用户对象
-        :param name: 姓名
-        :param role: 用户角色(student/teacher/admin)
-        :param status: 用户状态(正常/禁用)
-        :param session: 届号
-        :param dept_no: 院系ID
-        :param major_no: 专业ID
-        :param class_number: 班级ID
+        :param nickname: 昵称
+        :param role: 用户角色(user/admin)
+        :param is_active: 用户状态(激活/禁用)
+        :param email: 邮箱
         """
-        user.realname = realname or user.realname
-        user.role = role or user.role
-        user.status = status or user.status
-        user.email = email or user.email
+        if nickname is not None:
+            user.nickname = nickname
+        if role is not None:
+            user.role = role
+        if is_active is not None:
+            user.is_active = is_active
+        if email is not None:
+            user.email = email
 
         try:
             await self.session.commit()
@@ -105,14 +106,14 @@ class UserRepository:
 
         return True
 
-    async def change_password(self, user: User, new_password: str):
+    async def change_password(self, user: User, new_password_hash: str):
         """
         修改用户密码
 
         :param user: 用户对象
-        :param new_password: 新密码（已哈希）
+        :param new_password_hash: 新密码哈希
         """
-        user.password = new_password
+        user.password_hash = new_password_hash
         await self.session.commit()
 
     def _term_filter(self, course_date_column, term: str):
