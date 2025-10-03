@@ -1,16 +1,13 @@
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+import bcrypt
 import jwt
-from passlib import pwd
-from passlib.context import CryptContext
 
 from app.core.config import config
 from app.models.user import User
 from app.repositories.user import UserRepository
 from app.schemas.auth import Payload
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -20,14 +17,17 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     :param plain_password: 目标检测的明文密码
     :param hashed_password: 数据库中的哈希密码
     """
-    return pwd_context.verify(plain_password, hashed_password)
+    return bcrypt.checkpw(
+        plain_password.encode("utf-8"),
+        hashed_password.encode("utf-8"),
+    )
 
 
 def get_password_hash(password: str) -> str:
     """
     获得密码哈希
     """
-    return pwd_context.hash(password)
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
 def create_access_token(payload: Payload, expires_delta: Optional[timedelta] = None) -> str:
@@ -56,4 +56,4 @@ def generate_random_password(length: int = 8) -> str:
     """
     随机生成一个密码
     """
-    return pwd.genword(length=length, charset="ascii_62")
+    return bcrypt.gensalt().decode("utf-8")[7 : 7 + length]
