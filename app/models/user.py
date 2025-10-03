@@ -11,7 +11,6 @@ from app.core.sql import Base
 if TYPE_CHECKING:
     from app.models.cosplay import CosplaySession
     from app.models.extensions import Feedback, Notification, ReportBookmark, UserPoints
-    from app.models.profile import UserProfile
     from app.models.quiz import QuizSubmission
 
 
@@ -29,7 +28,6 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False, comment="密码哈希")
     nickname: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, comment="昵称")
     avatar_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True, comment="头像URL")
-    phone: Mapped[Optional[str]] = mapped_column(String(20), nullable=True, index=True, comment="手机号")
 
     role: Mapped[UserRole] = mapped_column(Enum(UserRole), nullable=False, comment="角色", default=UserRole.user)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, comment="账户状态")
@@ -50,7 +48,6 @@ class User(Base):
     )
 
     # 关系
-    profile: Mapped[Optional["UserProfile"]] = relationship("UserProfile", back_populates="user", uselist=False)
     quiz_submissions: Mapped[list["QuizSubmission"]] = relationship("QuizSubmission", back_populates="user")
     cosplay_sessions: Mapped[list["CosplaySession"]] = relationship("CosplaySession", back_populates="user")
     report_bookmarks: Mapped[list["ReportBookmark"]] = relationship("ReportBookmark", back_populates="user")

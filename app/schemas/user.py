@@ -25,12 +25,13 @@ class UserSetProfileRequest(BaseModel):
         None,
         description="邮箱",
         pattern=r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
-        examples=["user@example.com", "test@gduf.edu.cn"],
+        examples=["user@example.com"],
     )
     """邮箱"""
-    college: Optional[str] = Field(None, description="学院", examples=["计算机与信息工程学院", "经济与贸易学院"])
-    """学院"""
-    major: Optional[str] = Field(None, description="专业", examples=["计算机科学与技术", "国际经济与贸易"])
-    """专业"""
-    grade: Optional[int] = Field(None, description="年级", examples=[2023, 2024])
-    """年级"""
+    avatar_url: Optional[str] = Field(
+        None,
+        description="头像URL",
+        pattern=r"^(https?://).+",
+        examples=["https://example.com/avatar.png"],
+    )
+    """头像URL"""

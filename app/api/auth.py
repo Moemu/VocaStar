@@ -46,6 +46,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSessi
     access_token = create_access_token(payload=Payload(sub=user.username), expires_delta=access_token_expires)
 
     logger.info(f"用户 {form_data.username} 登录成功, 密钥后五位 {access_token[-5:]}")
+    await repo.update_last_login(user)
     return {"access_token": access_token, "token_type": "bearer"}
 
 

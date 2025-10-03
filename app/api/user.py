@@ -11,7 +11,6 @@ from app.core.logger import logger
 from app.core.redis import get_redis_client
 from app.deps.auth import get_current_user, get_db, oauth2_scheme
 from app.models.user import User
-from app.repositories.profile import UserProfileRepository
 from app.repositories.user import UserRepository
 from app.schemas.user import (
     UserResetPasswordRequest,
@@ -24,10 +23,6 @@ from app.services.auth_service import (
 from app.services.token_blacklist import add_token_to_blacklist
 
 router = APIRouter()
-
-
-def get_user_profile_repo(db: Annotated[AsyncSession, Depends(get_db)]) -> UserProfileRepository:
-    return UserProfileRepository(db)
 
 
 @router.post("/resetpw", tags=["user"])
@@ -69,78 +64,27 @@ async def reset_password(
     return {"msg": "密码重置成功，请使用新密码登录"}
 
 
-@router.get("/profile", tags=["user"])
-async def get_profile(
-    current_user: Annotated[User, Depends(get_current_user)],
-    db: Annotated[AsyncSession, Depends(get_db)],
-    profile_repo: Annotated[UserProfileRepository, Depends(get_user_profile_repo)],
-):
-    logger.info(f"用户 {current_user.username} 请求获取个人资料")
-
-    user_repo = UserRepository(db)
-    user = await user_repo.get_by_username(current_user.username)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
-    profile = await profile_repo.get_by_username(user.username)
-    profile_data = {
-        "username": user.username,
-        "nickname": user.nickname,
-        "email": user.email,
-        "college": profile.college if profile else None,
-        "major": profile.major if profile else None,
-        "grade": profile.grade if profile else None,
-    }
-
-    logger.info(f"用户 {current_user.username} 个人资料获取成功")
-    return profile_data
-
-
-@router.post("/setprofile", tags=["user"])
+@router.post("/set_profile", tags=["user"])
 async def set_profile(
-    profile_data: UserSetProfileRequest,
+    form_data: UserSetProfileRequest,
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
-    profile_repo: Annotated[UserProfileRepository, Depends(get_user_profile_repo)],
 ):
-    logger.info(f"用户 {current_user.username} 请求设置个人资料")
+    logger.info(f"用户 {current_user.username} 请求更新个人资料")
 
+    # 获取用户
     user_repo = UserRepository(db)
     user = await user_repo.get_by_username(current_user.username)
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    if profile_data.email or profile_data.nickname:
-        await user_repo.edit_info(
-            user,
-            nickname=profile_data.nickname,
-            email=profile_data.email,
-        )
+    # 更新资料
+    await user_repo.edit_info(
+        user,
+        nickname=form_data.nickname,
+        email=form_data.email,
+        avatar_url=form_data.avatar_url,
+    )
 
-    if not (profile_data.college or profile_data.major or profile_data.grade):
-        return {"msg": "Profile updated successfully"}
-
-    profile = await profile_repo.get_by_username(user.username)
-
-    # 如果已有资料则更新，否则创建新资料
-    if profile:
-        updated_profile = await profile_repo.update_profile(
-            profile,
-            college=profile_data.college,
-            major=profile_data.major,
-            grade=profile_data.grade,
-        )
-        if not updated_profile:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to update profile")
-    else:
-        new_profile = await profile_repo.create_profile(
-            user_id=user.id,
-            college=profile_data.college,
-            major=profile_data.major,
-            grade=profile_data.grade,
-        )
-        if not new_profile:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create profile")
-
-    logger.info(f"用户 {current_user.username} 个人资料设置成功")
-    return {"msg": "Profile updated successfully"}
+    logger.info(f"用户 {current_user.username} 个人资料更新成功")
+    return {"msg": "个人资料更新成功"}

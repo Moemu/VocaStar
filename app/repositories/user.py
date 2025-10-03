@@ -80,6 +80,7 @@ class UserRepository:
         is_active: Optional[bool] = None,
         role: Optional[UserRole] = None,
         email: Optional[str] = None,
+        avatar_url: Optional[str] = None,
     ) -> bool:
         """
         编辑用户信息
@@ -98,6 +99,8 @@ class UserRepository:
             user.is_active = is_active
         if email is not None:
             user.email = email
+        if avatar_url is not None:
+            user.avatar_url = avatar_url
 
         try:
             await self.session.commit()
@@ -135,4 +138,13 @@ class UserRepository:
         :param user: 用户对象
         """
         await self.session.delete(user)
+        await self.session.commit()
+
+    async def update_last_login(self, user: User):
+        """
+        更新用户最后登录时间
+
+        :param user: 用户对象
+        """
+        user.last_login_at = func.now()
         await self.session.commit()
