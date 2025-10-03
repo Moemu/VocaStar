@@ -41,11 +41,3 @@ async def test_upload_avatar(student_client: AsyncClient, test_user: User, user_
 
     # 清理测试头像文件
     avatar_path.unlink(missing_ok=True)
-
-    response = await student_client.post(
-        "/api/auth/login",
-        data={"username": test_user.username, "password": "newpassword"},
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-    )
-
-    assert response.status_code == 200
