@@ -55,7 +55,7 @@ async def test_set_profile(student_client: AsyncClient, test_user: User, user_re
     new_email = f"{test_user.username}_{uuid4().hex[:6]}@example.com"
 
     response = await student_client.post(
-        "/api/user/set_profile",
+        "/api/user/profile",
         json={
             "nickname": new_nickname,
             "email": new_email,

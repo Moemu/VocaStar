@@ -16,6 +16,7 @@ from app.deps.auth import get_current_user, get_db, oauth2_scheme
 from app.models.user import User
 from app.repositories.user import UserRepository
 from app.schemas.user import (
+    UserInfoResponse,
     UserResetPasswordRequest,
     UserSetProfileRequest,
 )
@@ -84,7 +85,7 @@ async def reset_password(
     return {"msg": "密码重置成功，请使用新密码登录"}
 
 
-@router.post("/set_profile", tags=["user"])
+@router.post("/profile", tags=["user"])
 async def set_profile(
     form_data: UserSetProfileRequest,
     current_user: Annotated[User, Depends(get_current_user)],
@@ -182,3 +183,9 @@ async def upload_avatar(
         "msg": "头像上传成功",
         "avatar_url": avatar_url,
     }
+
+
+@router.get("/profile", response_model=UserInfoResponse, tags=["user"])
+async def get_current_user_info(current_user: Annotated[User, Depends(get_current_user)]):
+    """获取当前登录用户信息"""
+    return current_user

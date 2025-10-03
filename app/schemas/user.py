@@ -35,3 +35,18 @@ class UserSetProfileRequest(BaseModel):
         examples=["https://example.com/avatar.png"],
     )
     """头像URL"""
+
+
+class UserInfoResponse(BaseModel):
+    """用户信息返回"""
+
+    id: int
+    username: str
+    email: str | None = None
+    nickname: str | None = None
+    avatar_url: str | None = None
+    role: str
+    is_active: bool
+
+    class Config:
+        from_attributes = True
