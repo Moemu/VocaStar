@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from app.api import auth, user
 from app.core.config import config
@@ -22,6 +23,7 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title=config.title, version=config.version, lifespan=lifespan)
+app.mount("/static", StaticFiles(directory=str(config.static_dir)), name="static")
 
 # 配置 CORS
 app.add_middleware(

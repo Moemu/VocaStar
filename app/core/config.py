@@ -1,9 +1,13 @@
+from pathlib import Path
 from typing import Literal
 
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
 
 load_dotenv()
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 class Config(BaseSettings):
@@ -48,5 +52,22 @@ class Config(BaseSettings):
     redis_port: int = 6379
     """Redis 端口号"""
 
+    # 静态资源与上传配置
+    static_dir: Path = BASE_DIR / "static"
+    """静态资源根目录"""
+    avatar_subdir: str = "avatars"
+    """头像文件子目录"""
+    avatar_url_prefix: str = "/static/avatars"
+    """头像访问 URL 前缀"""
+    max_avatar_size: int = 2 * 1024 * 1024
+    """头像文件大小限制，默认 2MB"""
+
+    @property
+    def avatar_dir(self) -> Path:
+        """头像实际存储路径"""
+        return self.static_dir / self.avatar_subdir
+
 
 config = Config()
+config.static_dir.mkdir(parents=True, exist_ok=True)
+config.avatar_dir.mkdir(parents=True, exist_ok=True)

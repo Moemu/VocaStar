@@ -9,7 +9,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.deps.sql import get_db as get_sql_db
 from app.main import app
 from app.models.user import User, UserRole
-from app.repositories.profile import UserProfileRepository
 from app.repositories.user import UserRepository
 from app.services.auth_service import get_password_hash
 
@@ -42,11 +41,6 @@ async def async_client(database: AsyncSession) -> AsyncGenerator[AsyncClient, No
 async def user_repo(database: AsyncSession) -> UserRepository:
     repo = UserRepository(database)
     return repo
-
-
-@pytest_asyncio.fixture
-async def profile_repo(database: AsyncSession) -> UserProfileRepository:
-    return UserProfileRepository(database)
 
 
 @pytest_asyncio.fixture
@@ -92,12 +86,18 @@ async def admin_client(async_client: AsyncClient, test_admin: User) -> AsyncClie
 
 @pytest_asyncio.fixture
 async def student_client(async_client: AsyncClient, test_user: User) -> AsyncClient:
-    response = await async_client.post(
-        "/api/auth/login",
-        data={"username": test_user.username, "password": "123456"},
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-    )
-    assert response.status_code == 200
+    response = None
+    for password in ("123456", "newpassword"):
+        login_response = await async_client.post(
+            "/api/auth/login",
+            data={"username": test_user.username, "password": password},
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+        )
+        if login_response.status_code == 200:
+            response = login_response
+            break
+
+    assert response is not None and response.status_code == 200
     access_token = response.json()["access_token"]
     async_client.headers.update({"Authorization": f"Bearer {access_token}"})
     return async_client

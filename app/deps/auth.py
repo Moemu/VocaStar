@@ -56,7 +56,7 @@ async def get_current_user(
     repo = UserRepository(db)
     user = await repo.get_by_username(payload.sub)
 
-    if not user or not user.status:
+    if not user or not user.is_active:
         logger.warning("用户鉴权失败，尝试登录的用户不存在或已被禁用")
         raise credentials_exception
 

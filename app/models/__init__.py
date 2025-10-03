@@ -30,7 +30,6 @@ from app.models.extensions import (
     UserAchievement,
     UserPoints,
 )
-from app.models.profile import UserProfile
 
 # 测评系统
 from app.models.quiz import (
@@ -48,7 +47,6 @@ __all__ = [
     # 用户相关
     "User",
     "UserRole",
-    "UserProfile",
     # 测评系统
     "Quiz",
     "Question",
