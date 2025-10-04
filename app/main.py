@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.api import auth, user
+from app.api import auth, quiz, user
 from app.core.config import config
 from app.core.logger import logger
 from app.core.sql import close_db, load_db
@@ -37,6 +37,7 @@ app.add_middleware(
 # 注册 API 路由
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(user.router, prefix="/api/user", tags=["user"])
+app.include_router(quiz.router, prefix="/api/quiz", tags=["quiz"])
 
 if __name__ == "__main__":
     import uvicorn

@@ -2,7 +2,7 @@
 
 import enum
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, List, Optional
 
 import sqlalchemy
 from sqlalchemy import (
@@ -30,9 +30,19 @@ if TYPE_CHECKING:
 class QuestionType(str, enum.Enum):
     """题目类型"""
 
-    single_choice = "single_choice"  # 单选
-    multiple_choice = "multiple_choice"  # 多选
-    rating = "rating"  # 打分
+    scenario = "scenario"
+    image_preference = "image_preference"
+    word_choice = "word_choice"
+    value_balance = "value_balance"
+    time_allocation = "time_allocation"
+
+
+class QuizSubmissionStatus(str, enum.Enum):
+    """测评会话状态"""
+
+    in_progress = "in_progress"
+    completed = "completed"
+    expired = "expired"
 
 
 class Quiz(Base):
@@ -79,6 +89,7 @@ class Question(Base):
     quiz_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("quizzes.id", ondelete="CASCADE"), nullable=False, index=True, comment="测评ID"
     )
+    title: Mapped[Optional[str]] = mapped_column(String(200), nullable=True, comment="题目标题")
     content: Mapped[str] = mapped_column(Text, nullable=False, comment="题目内容")
     question_type: Mapped[QuestionType] = mapped_column(Enum(QuestionType), nullable=False, comment="题目类型")
     order: Mapped[int] = mapped_column(Integer, nullable=False, default=0, comment="题目顺序")
@@ -105,7 +116,8 @@ class Option(Base):
         Integer, ForeignKey("questions.id", ondelete="CASCADE"), nullable=False, index=True, comment="题目ID"
     )
     content: Mapped[str] = mapped_column(String(500), nullable=False, comment="选项内容")
-    weight: Mapped[float] = mapped_column(Float, nullable=False, default=0.0, comment="权重(用于计算结果)")
+    dimension: Mapped[Optional[str]] = mapped_column(String(1), nullable=True, comment="霍兰德维度")
+    score: Mapped[int] = mapped_column(Integer, nullable=False, default=0, comment="得分")
     order: Mapped[int] = mapped_column(Integer, nullable=False, default=0, comment="选项顺序")
 
     # 关系
@@ -119,7 +131,7 @@ class Option(Base):
 
 
 class QuizSubmission(Base):
-    """用户答题记录"""
+    """用户测评会话/提交"""
 
     __tablename__ = "quiz_submissions"
 
@@ -130,14 +142,20 @@ class QuizSubmission(Base):
     quiz_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("quizzes.id", ondelete="CASCADE"), nullable=False, index=True, comment="测评ID"
     )
-
-    submitted_at: Mapped[datetime] = mapped_column(
+    session_token: Mapped[str] = mapped_column(String(64), nullable=False, unique=True, comment="会话ID")
+    status: Mapped[QuizSubmissionStatus] = mapped_column(
+        Enum(QuizSubmissionStatus), nullable=False, default=QuizSubmissionStatus.in_progress, comment="状态"
+    )
+    started_at: Mapped[datetime] = mapped_column(
+        "submitted_at",
         DateTime,
         nullable=False,
         server_default=sqlalchemy.func.now(),
         index=True,
-        comment="提交时间",
+        comment="开始时间",
     )
+    expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, comment="过期时间")
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True, comment="完成时间")
 
     # 关系
     user: Mapped["User"] = relationship("User", back_populates="quiz_submissions")
@@ -169,8 +187,9 @@ class QuizAnswer(Base):
     option_id: Mapped[Optional[int]] = mapped_column(
         Integer, ForeignKey("options.id", ondelete="SET NULL"), nullable=True, index=True, comment="选项ID(单选)"
     )
-    option_ids: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True, comment="选项IDs(多选,JSON数组)")
+    option_ids: Mapped[Optional[List[int]]] = mapped_column(JSON, nullable=True, comment="选项IDs(多选,JSON数组)")
     rating_value: Mapped[Optional[float]] = mapped_column(Float, nullable=True, comment="打分值")
+    response_time: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, comment="答题耗时(秒)")
 
     # 关系
     submission: Mapped["QuizSubmission"] = relationship("QuizSubmission", back_populates="answers")

@@ -8,6 +8,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.deps.sql import get_db as get_sql_db
 from app.main import app
+from app.models.career import Career
+from app.models.quiz import Option, Question, QuestionType, Quiz
 from app.models.user import User, UserRole
 from app.repositories.user import UserRepository
 from app.services.auth_service import get_password_hash
@@ -113,3 +115,90 @@ async def teacher_client(async_client: AsyncClient, test_teacher: User) -> Async
     access_token = response.json()["access_token"]
     async_client.headers.update({"Authorization": f"Bearer {access_token}"})
     return async_client
+
+
+@pytest_asyncio.fixture
+async def sample_careers(database: AsyncSession) -> list[Career]:
+    careers = [
+        Career(
+            name="工程实践工程师",
+            code="R001",
+            description="擅长动手实践，负责工程设备的安装与维护。",
+            holland_dimensions=["R", "I"],
+            work_content=["负责生产设备的调试", "制定日常维护计划"],
+        ),
+        Career(
+            name="数据分析师",
+            code="I001",
+            description="通过数据挖掘支持业务决策。",
+            holland_dimensions=["I", "C"],
+            work_content=["构建数据报表", "进行探索性分析"],
+        ),
+        Career(
+            name="创意设计师",
+            code="A001",
+            description="专注视觉创意，为品牌打造设计方案。",
+            holland_dimensions=["A", "E"],
+            work_content=["进行视觉概念设计", "与团队合作产出整合创意"],
+        ),
+        Career(
+            name="教育顾问",
+            code="S001",
+            description="提供学习规划与成长辅导。",
+            holland_dimensions=["S", "E"],
+            work_content=["制定学习计划", "组织交流活动"],
+        ),
+    ]
+    database.add_all(careers)
+    await database.commit()
+    for career in careers:
+        await database.refresh(career)
+    return careers
+
+
+@pytest_asyncio.fixture
+async def sample_quiz(database: AsyncSession, sample_careers: list[Career]) -> Quiz:
+    quiz = Quiz(title="职业兴趣测评", description="基础霍兰德测评", is_published=True)
+    database.add(quiz)
+    await database.flush()
+
+    questions = [
+        Question(
+            quiz_id=quiz.id,
+            title="场景判断",
+            content="面对需要动手实践的任务，你的选择是？",
+            question_type=QuestionType.scenario,
+            order=1,
+        ),
+        Question(
+            quiz_id=quiz.id,
+            title="兴趣偏好",
+            content="以下哪类活动更吸引你？",
+            question_type=QuestionType.word_choice,
+            order=2,
+        ),
+        Question(
+            quiz_id=quiz.id,
+            title="价值排序",
+            content="你更看重哪种工作价值？",
+            question_type=QuestionType.value_balance,
+            order=3,
+        ),
+    ]
+
+    database.add_all(questions)
+    await database.flush()
+
+    options = [
+        Option(question_id=questions[0].id, content="立即动手尝试解决", dimension="R", score=5, order=1),
+        Option(question_id=questions[0].id, content="查阅资料后再动手", dimension="I", score=3, order=2),
+        Option(question_id=questions[1].id, content="参加创意工作坊", dimension="A", score=5, order=1),
+        Option(question_id=questions[1].id, content="组织同学一起做项目", dimension="E", score=4, order=2),
+        Option(question_id=questions[2].id, content="帮助他人成长", dimension="S", score=5, order=1),
+        Option(question_id=questions[2].id, content="处理数据确保准确", dimension="C", score=4, order=2),
+    ]
+
+    database.add_all(options)
+    await database.commit()
+    await database.refresh(quiz)
+    return quiz
