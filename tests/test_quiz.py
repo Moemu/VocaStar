@@ -14,7 +14,7 @@ async def test_quiz_flow(
     test_user: User,
     database: AsyncSession,
 ):
-    start_response = await student_client.post("/api/quiz/start")
+    start_response = await student_client.post("/api/quiz/start", params={"slug": "test-classic"})
     assert start_response.status_code == 200
     start_payload = start_response.json()
     session_id = start_payload["session_id"]
@@ -86,3 +86,10 @@ async def test_quiz_flow(
     user_points = result.scalars().first()
     assert user_points is not None
     assert user_points.points >= report["reward_points"]
+
+
+async def test_start_quiz_with_invalid_slug(
+    student_client: AsyncClient,
+):
+    response = await student_client.post("/api/quiz/start", params={"slug": "non-existent"})
+    assert response.status_code == 404

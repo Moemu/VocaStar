@@ -20,6 +20,12 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.sql import Base
+from app.schemas.quiz import (
+    AnswerExtraPayload,
+    QuestionSettings,
+    QuizConfig,
+    QuizReportPayload,
+)
 
 if TYPE_CHECKING:
     from app.models.career import CareerRecommendation
@@ -30,7 +36,7 @@ if TYPE_CHECKING:
 class QuestionType(str, enum.Enum):
     """题目类型"""
 
-    scenario = "scenario"
+    classic_scenario = "classic_scenario"
     image_preference = "image_preference"
     word_choice = "word_choice"
     value_balance = "value_balance"
@@ -54,6 +60,7 @@ class Quiz(Base):
     title: Mapped[str] = mapped_column(String(200), nullable=False, comment="测评标题")
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True, comment="测评描述")
     is_published: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, comment="是否发布")
+    config: Mapped[Optional[QuizConfig]] = mapped_column(JSON, nullable=True, default=dict, comment="测评配置(JSON)")
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
@@ -94,6 +101,7 @@ class Question(Base):
     question_type: Mapped[QuestionType] = mapped_column(Enum(QuestionType), nullable=False, comment="题目类型")
     order: Mapped[int] = mapped_column(Integer, nullable=False, default=0, comment="题目顺序")
     is_required: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, comment="是否必答")
+    settings: Mapped[QuestionSettings] = mapped_column(JSON, nullable=False, default=dict, comment="题目额外配置(JSON)")
 
     # 关系
     quiz: Mapped["Quiz"] = relationship("Quiz", back_populates="questions")
@@ -116,6 +124,7 @@ class Option(Base):
         Integer, ForeignKey("questions.id", ondelete="CASCADE"), nullable=False, index=True, comment="题目ID"
     )
     content: Mapped[str] = mapped_column(String(500), nullable=False, comment="选项内容")
+    image_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True, comment="选项图片URL")
     dimension: Mapped[Optional[str]] = mapped_column(String(1), nullable=True, comment="霍兰德维度")
     score: Mapped[int] = mapped_column(Integer, nullable=False, default=0, comment="得分")
     order: Mapped[int] = mapped_column(Integer, nullable=False, default=0, comment="选项顺序")
@@ -190,6 +199,9 @@ class QuizAnswer(Base):
     option_ids: Mapped[Optional[List[int]]] = mapped_column(JSON, nullable=True, comment="选项IDs(多选,JSON数组)")
     rating_value: Mapped[Optional[float]] = mapped_column(Float, nullable=True, comment="打分值")
     response_time: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, comment="答题耗时(秒)")
+    extra_payload: Mapped[Optional[AnswerExtraPayload]] = mapped_column(
+        JSON, nullable=True, comment="答案附加信息(JSON)"
+    )
 
     # 关系
     submission: Mapped["QuizSubmission"] = relationship("QuizSubmission", back_populates="answers")
@@ -216,7 +228,7 @@ class QuizReport(Base):
         index=True,
         comment="提交记录ID",
     )
-    result_json: Mapped[dict] = mapped_column(JSON, nullable=False, comment="报告内容(JSON格式)")
+    result_json: Mapped[QuizReportPayload] = mapped_column(JSON, nullable=False, comment="报告内容(JSON格式)")
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime,

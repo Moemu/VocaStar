@@ -28,6 +28,19 @@ class QuizRepository:
         result = await self.session.execute(stmt)
         return result.scalars().first()
 
+    async def get_published_quiz_by_slug(self, slug: str) -> Optional[Quiz]:
+        if not slug:
+            return None
+
+        stmt = select(Quiz).where(Quiz.is_published.is_(True))
+        result = await self.session.execute(stmt)
+        quizzes = result.scalars().unique().all()
+        for quiz in quizzes:
+            config = quiz.config or {}
+            if isinstance(config, dict) and config.get("slug") == slug:
+                return quiz
+        return None
+
     async def get_submission_by_token(self, token: str) -> Optional[QuizSubmission]:
         stmt = (
             select(QuizSubmission)
@@ -43,7 +56,9 @@ class QuizRepository:
         result = await self.session.execute(stmt)
         return result.scalars().unique().first()
 
-    async def get_active_submission_by_user(self, user_id: int) -> Optional[QuizSubmission]:
+    async def get_active_submission_by_user(
+        self, user_id: int, *, quiz_id: Optional[int] = None
+    ) -> Optional[QuizSubmission]:
         stmt = (
             select(QuizSubmission)
             .where(
@@ -53,6 +68,8 @@ class QuizRepository:
             .order_by(QuizSubmission.started_at.desc())
             .limit(1)
         )
+        if quiz_id is not None:
+            stmt = stmt.where(QuizSubmission.quiz_id == quiz_id)
         result = await self.session.execute(stmt)
         return result.scalars().first()
 
@@ -104,6 +121,7 @@ class QuizRepository:
         option_ids: Optional[Sequence[int]],
         rating_value: Optional[float],
         response_time: Optional[int],
+        extra_payload: Optional[dict],
     ) -> QuizAnswer:
         answer = QuizAnswer(
             submission_id=submission_id,
@@ -112,6 +130,7 @@ class QuizRepository:
             option_ids=list(option_ids) if option_ids is not None else None,
             rating_value=rating_value,
             response_time=response_time,
+            extra_payload=extra_payload,
         )
         self.session.add(answer)
         return answer

@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
-from typing import Iterable
+from typing import Any, Dict, Iterable, List, Optional, Tuple, cast
 from uuid import uuid4
 
 from fastapi import HTTPException, status
@@ -11,12 +12,23 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.career import Career
 from app.models.extensions import PointTransaction, UserPoints
-from app.models.quiz import Option, QuizAnswer, QuizSubmission, QuizSubmissionStatus
+from app.models.quiz import (
+    Option,
+    Question,
+    QuestionType,
+    QuizAnswer,
+    QuizSubmission,
+    QuizSubmissionStatus,
+)
 from app.models.user import User
 from app.repositories.quiz import QuizRepository
 from app.schemas.quiz import (
+    QuestionSettings,
+    QuestionSettingsModel,
+    QuizAllocationAnswer,
     QuizAnswerRequest,
     QuizAnswerResponse,
+    QuizMetricsAnswer,
     QuizMultipleChoiceAnswer,
     QuizOption,
     QuizQuestion,
@@ -25,6 +37,9 @@ from app.schemas.quiz import (
     QuizRecommendation,
     QuizReportData,
     QuizReportResponse,
+    QuizScoringConfig,
+    QuizScoringConfigModel,
+    QuizSingleChoiceAnswer,
     QuizStartResponse,
     QuizSubmitRequest,
 )
@@ -64,11 +79,12 @@ class QuizService:
         self.session = session
         self.repo = QuizRepository(session)
 
-    async def start_quiz(self, user: User) -> QuizStartResponse:
+    async def start_quiz(self, user: User, *, slug: Optional[str] = None) -> QuizStartResponse:
         """创建或返回用户的进行中测评会话。
 
         Args:
             user: 当前登录用户。
+            slug: 指定的测评题库标识，若为空则默认选择最新发布的测评。
 
         Returns:
             QuizStartResponse: 包含会话标识、过期时间与服务器时间。
@@ -76,21 +92,27 @@ class QuizService:
         Raises:
             HTTPException: 当没有可用测评时返回 404。
         """
-        quiz = await self.repo.get_latest_published_quiz()
-        if not quiz:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="当前没有可用的测评")
+        if slug:
+            quiz = await self.repo.get_published_quiz_by_slug(slug)
+            if not quiz:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="指定的测评暂未发布")
+        else:
+            quiz = await self.repo.get_latest_published_quiz()
+            if not quiz:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="当前没有可用的测评")
 
-        submission = await self.repo.get_active_submission_by_user(user.id)
+        submission = await self.repo.get_active_submission_by_user(user.id, quiz_id=quiz.id)
         now = datetime.now(timezone.utc)
 
         if submission:
-            if submission.expires_at <= now:
+            expires_at = self._ensure_utc(submission.expires_at)
+            if expires_at <= now:
                 submission.status = QuizSubmissionStatus.expired
                 await self.session.commit()
             else:
                 return QuizStartResponse(
                     session_id=submission.session_token,
-                    expires_at=self._ensure_utc(submission.expires_at),
+                    expires_at=expires_at,
                     server_time=now,
                 )
 
@@ -129,7 +151,12 @@ class QuizService:
         for question in questions:
             existing_answer = answers_map.get(question.id)
             options = [
-                QuizOption(id=option.id, text=option.content, dimension=option.dimension)
+                QuizOption(
+                    id=option.id,
+                    text=option.content,
+                    dimension=option.dimension,
+                    image_url=option.image_url,
+                )
                 for option in sorted(question.options, key=lambda opt: (opt.order, opt.id))
             ]
             selected_option_id = existing_answer.option_id if existing_answer else None
@@ -137,6 +164,21 @@ class QuizService:
                 list(existing_answer.option_ids) if existing_answer and existing_answer.option_ids is not None else None
             )
             rating_value = existing_answer.rating_value if existing_answer else None
+            metric_values = None
+            allocations = None
+            if existing_answer and existing_answer.extra_payload:
+                raw_values = existing_answer.extra_payload.get("values")
+                if isinstance(raw_values, dict):
+                    metric_values = {str(key): float(value) for key, value in raw_values.items()}
+                raw_allocations = existing_answer.extra_payload.get("allocations")
+                if isinstance(raw_allocations, dict):
+                    allocations = {str(key): float(value) for key, value in raw_allocations.items()}
+            raw_settings: Any = question.settings or {}
+            try:
+                validated_settings = QuestionSettingsModel.model_validate(raw_settings)
+                settings_payload = cast(QuestionSettings, validated_settings.model_dump(exclude_none=True))
+            except Exception:
+                settings_payload = cast(QuestionSettings, {})
             payload.append(
                 QuizQuestion(
                     question_id=question.id,
@@ -147,6 +189,9 @@ class QuizService:
                     selected_option_id=selected_option_id,
                     selected_option_ids=selected_option_ids,
                     rating_value=rating_value,
+                    metric_values=metric_values,
+                    allocations=allocations,
+                    settings=settings_payload,
                 )
             )
         return QuizQuestionsResponse(
@@ -180,22 +225,52 @@ class QuizService:
 
         option_map = await self.repo.list_options_map(question_ids)
         for answer in request.answers:
+            question = question_map.get(answer.question_id)
+            if question is None:
+                raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="题目不存在或已失效")
+            question_type = question.question_type
+
             if isinstance(answer, QuizMultipleChoiceAnswer):
                 option_ids = self._deduplicate_option_ids(answer.option_ids)
                 if not option_ids:
                     raise HTTPException(
                         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="多选题需至少选择一个选项"
                     )
+                # 使用 Pydantic 验证配置
+                try:
+                    settings = QuestionSettingsModel.model_validate(question.settings or {})
+                    max_select = settings.max_select
+                except Exception as e:
+                    # Provide specific error message for validation failures
+                    raise HTTPException(
+                        status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=f"题目配置验证失败: {str(e)}"
+                    )
+
+                if max_select is not None and len(option_ids) > max_select:
+                    raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="超过可选择的最大数量")
                 for option_id in option_ids:
                     option = option_map.get(option_id)
                     if not option or option.question_id != answer.question_id:
                         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="存在非法选项")
-            elif answer.type == "single_choice":
+            elif isinstance(answer, QuizSingleChoiceAnswer):
                 option = option_map.get(answer.option_id)
                 if not option or option.question_id != answer.question_id:
                     raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="存在非法选项")
             elif isinstance(answer, QuizRatingAnswer):
-                pass
+                if answer.rating_value is None:
+                    raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="评分题答案无效")
+            elif isinstance(answer, QuizMetricsAnswer):
+                if question_type != QuestionType.value_balance:
+                    raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="答案类型与题目不匹配")
+                if not answer.values:
+                    raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="请完成滑块题的填写")
+            elif isinstance(answer, QuizAllocationAnswer):
+                if question_type != QuestionType.time_allocation:
+                    raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="答案类型与题目不匹配")
+                if not answer.allocations:
+                    raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="请完成分配题的填写")
+            else:
+                raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="暂不支持的答案类型")
 
         await self.repo.clear_answers_for_questions(submission.id, question_ids)
 
@@ -209,6 +284,7 @@ class QuizService:
                     option_ids=option_ids,
                     rating_value=None,
                     response_time=answer.response_time,
+                    extra_payload=None,
                 )
             elif isinstance(answer, QuizRatingAnswer):
                 await self.repo.add_answer(
@@ -218,8 +294,31 @@ class QuizService:
                     option_ids=None,
                     rating_value=answer.rating_value,
                     response_time=answer.response_time,
+                    extra_payload=None,
                 )
-            else:
+            elif isinstance(answer, QuizMetricsAnswer):
+                normalized_values = {str(key): float(value) for key, value in answer.values.items()}
+                await self.repo.add_answer(
+                    submission_id=submission.id,
+                    question_id=answer.question_id,
+                    option_id=None,
+                    option_ids=None,
+                    rating_value=None,
+                    response_time=answer.response_time,
+                    extra_payload={"values": normalized_values},
+                )
+            elif isinstance(answer, QuizAllocationAnswer):
+                normalized_allocations = {str(key): float(value) for key, value in answer.allocations.items()}
+                await self.repo.add_answer(
+                    submission_id=submission.id,
+                    question_id=answer.question_id,
+                    option_id=None,
+                    option_ids=None,
+                    rating_value=None,
+                    response_time=answer.response_time,
+                    extra_payload={"allocations": normalized_allocations},
+                )
+            elif isinstance(answer, QuizSingleChoiceAnswer):
                 await self.repo.add_answer(
                     submission_id=submission.id,
                     question_id=answer.question_id,
@@ -227,7 +326,10 @@ class QuizService:
                     option_ids=None,
                     rating_value=None,
                     response_time=answer.response_time,
+                    extra_payload=None,
                 )
+            else:
+                raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="暂不支持的答案类型")
 
         await self.session.commit()
         return QuizAnswerResponse(msg="答题已保存")
@@ -258,7 +360,7 @@ class QuizService:
         if not answers:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="请先完成答题")
 
-        dimension_scores = self._calculate_dimension_scores(answers, submission)
+        dimension_scores, component_scores = self._calculate_dimension_scores(answers, submission)
         holland_code = self._calculate_holland_code(dimension_scores)
         recommendation_results = await self._generate_recommendations(dimension_scores)
         recommendation_payload = [
@@ -276,6 +378,7 @@ class QuizService:
             dimension_scores=dimension_scores,
             recommendations=recommendation_payload,
             reward_points=REWARD_POINTS,
+            component_scores=component_scores or None,
         )
 
         report = await self.repo.create_report(submission.id, report_data.model_dump())
@@ -363,28 +466,485 @@ class QuizService:
         self,
         answers: Iterable[QuizAnswer],
         submission: QuizSubmission,
-    ) -> dict[str, int]:
-        """根据答案累计各维度分值。"""
-        score_map: dict[str, int] = {dimension: 0 for dimension in DIMENSION_PRIORITY}
-        option_lookup: dict[int, Option] = {}
-        for question in submission.quiz.questions:
-            for option in question.options:
-                option_lookup[option.id] = option
+    ) -> Tuple[dict[str, int], dict[str, dict[str, float]]]:
+        """根据测评配置计算维度分数及组件得分。"""
 
+        answers_list = list(answers)
+        quiz_config = submission.quiz.config
+        scoring_config = quiz_config.get("scoring", QuizScoringConfig()) if quiz_config else QuizScoringConfig()
+        strategy = scoring_config.get("strategy") if isinstance(scoring_config, dict) else None
+
+        if strategy == "count_based":
+            return self._calculate_count_based_scores(answers_list, submission, scoring_config)
+        if strategy == "weighted_components":
+            return self._calculate_weighted_component_scores(answers_list, submission, scoring_config)
+
+        legacy_scores = self._calculate_legacy_scores(answers_list, submission)
+        return legacy_scores, {}
+
+    def _calculate_legacy_scores(
+        self,
+        answers: Iterable[QuizAnswer],
+        submission: QuizSubmission,
+    ) -> dict[str, int]:
+        """默认的计分方式，按选项维度计数。"""
+
+        option_lookup = self._build_option_lookup(submission)
+        score_map: dict[str, int] = {dimension: 0 for dimension in DIMENSION_PRIORITY}
         for answer in answers:
             if answer.option_id is not None:
                 option = option_lookup.get(answer.option_id)
                 if option and option.dimension:
-                    score_map.setdefault(option.dimension, 0)
-                    score_map[option.dimension] += option.score
+                    score_map[option.dimension] = score_map.get(option.dimension, 0) + 1
             if answer.option_ids:
                 for option_id in answer.option_ids:
                     option = option_lookup.get(option_id)
                     if option and option.dimension:
-                        score_map.setdefault(option.dimension, 0)
-                        score_map[option.dimension] += option.score
-
+                        score_map[option.dimension] = score_map.get(option.dimension, 0) + 1
         return score_map
+
+    def _calculate_count_based_scores(
+        self,
+        answers: Iterable[QuizAnswer],
+        submission: QuizSubmission,
+        scoring_config: QuizScoringConfig,
+    ) -> Tuple[dict[str, int], dict[str, dict[str, float]]]:
+        """基于出现次数的计分策略。
+
+        使用 Pydantic 验证配置，简化了类型检查逻辑。
+        """
+        option_lookup = self._build_option_lookup(submission)
+        counts: Dict[str, int] = defaultdict(int)
+        dimension_max_occurrences: Dict[str, int] = defaultdict(int)
+
+        # 统计各维度出现次数
+        for answer in answers:
+            if answer.option_id is not None:
+                option = option_lookup.get(answer.option_id)
+                if option and option.dimension:
+                    counts[option.dimension] += 1
+            if answer.option_ids:
+                for option_id in answer.option_ids:
+                    option = option_lookup.get(option_id)
+                    if option and option.dimension:
+                        counts[option.dimension] += 1
+
+        # 动态计算各维度的理论最大出现次数（按题目中是否包含该维度统计）
+        quiz_questions = submission.quiz.questions or []
+        for question in quiz_questions:
+            if not question.options:
+                continue
+            dims_in_question = {opt.dimension for opt in question.options if opt.dimension}
+            for dim in dims_in_question:
+                dimension_max_occurrences[dim] += 1
+
+        # 使用 Pydantic 验证配置
+        try:
+            validated_config = QuizScoringConfigModel.model_validate(scoring_config or {})
+            dimension_formulas = validated_config.dimension_formulas or {}
+        except Exception:
+            dimension_formulas = {}
+
+        component_scores: dict[str, dict[str, float]] = {"classic_scenario": {}}
+        final_scores: dict[str, int] = {}
+
+        # 根据配置计算各维度得分
+        for dimension, formula_cfg in dimension_formulas.items():
+            raw_count = counts.get(dimension, 0)
+            computed_max = dimension_max_occurrences.get(dimension, raw_count)
+            max_occurrences_val = formula_cfg.max_occurrences or computed_max
+            max_occurrences_val = max(max_occurrences_val, 1)
+            clamped_count = min(raw_count, max_occurrences_val)
+
+            # 计算得分（避免执行外部表达式，固定为百分制算法）
+            score_value = (clamped_count / max_occurrences_val) * 100
+
+            score_value = max(0.0, min(100.0, score_value))
+            component_scores["classic_scenario"][dimension] = round(score_value, 2)
+            final_scores[dimension] = int(round(score_value))
+
+        # 处理未配置公式的维度
+        for dimension, count in counts.items():
+            if dimension not in final_scores:
+                max_occurs = dimension_max_occurrences.get(dimension, count)
+                max_occurs = max(max_occurs, 1)
+                clamped_count = min(count, max_occurs)
+                score_value = (clamped_count / max_occurs) * 100
+                component_scores["classic_scenario"][dimension] = round(score_value, 2)
+                final_scores[dimension] = int(round(score_value))
+
+        # 确保所有标准维度都有值
+        for dimension in DIMENSION_PRIORITY:
+            final_scores.setdefault(dimension, 0)
+            component_scores["classic_scenario"].setdefault(dimension, 0.0)
+
+        return final_scores, component_scores
+
+    def _calculate_weighted_component_scores(
+        self,
+        answers: Iterable[QuizAnswer],
+        submission: QuizSubmission,
+        scoring_config: QuizScoringConfig,
+    ) -> Tuple[dict[str, int], dict[str, dict[str, float]]]:
+        """按题型权重聚合的计分策略。
+
+        该方法协调各个子步骤完成加权计分：
+        1. 计算各题型的理论最高分
+        2. 累计用户实际得分
+        3. 归一化为百分制
+        4. 应用权重聚合
+        """
+        question_map = {question.id: question for question in submission.quiz.questions}
+        option_lookup = self._build_option_lookup(submission)
+
+        # 步骤 1: 计算理论最高分
+        component_possible = self._calculate_possible_scores(submission.quiz.questions)
+
+        # 步骤 2: 累计实际得分
+        component_raw = self._accumulate_actual_scores(answers, question_map, option_lookup)
+
+        # 步骤 3: 归一化为百分制
+        component_scores = self._normalize_to_percentage(component_raw, component_possible)
+
+        # 步骤 4: 应用权重聚合
+        dimension_scores = self._apply_weights(component_scores, scoring_config)
+
+        return dimension_scores, component_scores
+
+    def _calculate_possible_scores(
+        self,
+        questions: Iterable[Question],
+    ) -> Dict[str, Dict[str, float]]:
+        """计算各题型各维度的理论最高分。
+
+        Args:
+            questions: 测评的所有题目列表
+
+        Returns:
+            嵌套字典 {题型: {维度: 最高分}}
+        """
+        component_possible: Dict[str, Dict[str, float]] = defaultdict(lambda: defaultdict(float))
+
+        for question in questions:
+            component = question.question_type.value
+
+            # 使用 Pydantic 验证和解析配置
+            try:
+                settings = QuestionSettingsModel.model_validate(question.settings or {})
+            except Exception:
+                settings = QuestionSettingsModel()
+
+            if question.question_type in {
+                QuestionType.classic_scenario,
+                QuestionType.image_preference,
+                QuestionType.word_choice,
+            }:
+                # 选择题型：计算每个维度的最高可得分
+                max_select = self._get_max_select(question, settings)
+                per_dimension_scores: Dict[str, list[float]] = defaultdict(list)
+
+                for option in question.options:
+                    if option.dimension:
+                        per_dimension_scores[option.dimension].append(float(option.score or 0) or 1.0)
+
+                for dimension, scores in per_dimension_scores.items():
+                    scores.sort(reverse=True)
+                    limit = min(max_select, len(scores))
+                    component_possible[component][dimension] += sum(scores[:limit])
+
+            elif question.question_type == QuestionType.value_balance:
+                # 价值观天平：最高分为滑块最大值
+                max_value = settings.scale.max_value if settings.scale else 100.0
+                if settings.dimensions:
+                    for entry in settings.dimensions:
+                        component_possible[component][entry.dimension] += max_value
+
+            elif question.question_type == QuestionType.time_allocation:
+                # 时间分配：最高分为总可分配时间
+                max_hours = settings.max_hours or 0.0
+                if settings.activities:
+                    for activity in settings.activities:
+                        if activity.dimension and max_hours > 0:
+                            component_possible[component][activity.dimension] += max_hours
+
+        return component_possible
+
+    def _get_max_select(self, question: Question, settings: QuestionSettingsModel) -> int:
+        """获取题目的最大可选数量。"""
+        if question.question_type == QuestionType.word_choice:
+            return settings.max_select or len(question.options)
+        return 1
+
+    def _accumulate_actual_scores(
+        self,
+        answers: Iterable[QuizAnswer],
+        question_map: Dict[int, Question],
+        option_lookup: Dict[int, Option],
+    ) -> Dict[str, Dict[str, float]]:
+        """累计用户实际得分。
+
+        Args:
+            answers: 用户提交的答案列表
+            question_map: 题目ID到题目对象的映射
+            option_lookup: 选项ID到选项对象的映射
+
+        Returns:
+            嵌套字典 {题型: {维度: 实际得分}}
+        """
+        component_raw: Dict[str, Dict[str, float]] = defaultdict(lambda: defaultdict(float))
+
+        for answer in answers:
+            question = question_map.get(answer.question_id)
+            if not question:
+                continue
+            component = question.question_type.value
+
+            # 处理单选答案
+            if answer.option_id is not None:
+                option = option_lookup.get(answer.option_id)
+                if option and option.dimension:
+                    component_raw[component][option.dimension] += float(option.score or 0) or 1.0
+
+            # 处理多选答案
+            if answer.option_ids:
+                for option_id in answer.option_ids:
+                    option = option_lookup.get(option_id)
+                    if option and option.dimension:
+                        component_raw[component][option.dimension] += float(option.score or 0) or 1.0
+
+            # 处理扩展答案（价值观天平、时间分配）
+            if answer.extra_payload and isinstance(answer.extra_payload, dict):
+                try:
+                    settings = QuestionSettingsModel.model_validate(question.settings or {})
+                except Exception:
+                    settings = QuestionSettingsModel()
+
+                if question.question_type == QuestionType.value_balance:
+                    self._accumulate_value_balance_score(answer, component, component_raw, settings)
+                elif question.question_type == QuestionType.time_allocation:
+                    self._accumulate_time_allocation_score(answer, component, component_raw, settings)
+
+        return component_raw
+
+    def _accumulate_value_balance_score(
+        self,
+        answer: QuizAnswer,
+        component: str,
+        component_raw: Dict[str, Dict[str, float]],
+        settings: QuestionSettingsModel,
+    ) -> None:
+        """累计价值观天平题的得分。"""
+        if not answer.extra_payload:
+            return
+        values = answer.extra_payload.get("values")
+        if not isinstance(values, dict) or not settings.dimensions:
+            return
+
+        for key, value in values.items():
+            dimension = self._resolve_dimension_from_validated_settings(key, settings.dimensions)
+            if dimension:
+                try:
+                    component_raw[component][dimension] += float(value)
+                except (TypeError, ValueError):
+                    continue
+
+    def _accumulate_time_allocation_score(
+        self,
+        answer: QuizAnswer,
+        component: str,
+        component_raw: Dict[str, Dict[str, float]],
+        settings: QuestionSettingsModel,
+    ) -> None:
+        """累计时间分配题的得分。"""
+        if not answer.extra_payload:
+            return
+        allocations = answer.extra_payload.get("allocations")
+        if not isinstance(allocations, dict) or not settings.activities:
+            return
+
+        for key, value in allocations.items():
+            dimension = self._resolve_dimension_from_validated_settings(key, settings.activities)
+            if dimension:
+                try:
+                    component_raw[component][dimension] += float(value)
+                except (TypeError, ValueError):
+                    continue
+
+    def _resolve_dimension_from_validated_settings(
+        self,
+        key: str,
+        entries: Optional[List],
+    ) -> Optional[str]:
+        """从已验证的设置中解析维度代码。
+
+        Args:
+            key: 用户提交的键值
+            entries: 维度或活动条目列表
+
+        Returns:
+            对应的维度代码，如果找不到返回 None
+        """
+        if not entries:
+            return None
+
+        key_str = str(key)
+        for entry in entries:
+            if not hasattr(entry, "dimension"):
+                continue
+            dimension = entry.dimension
+            if not dimension:
+                continue
+            # 尝试匹配维度、标签等字段
+            candidates = {
+                str(dimension),
+                str(getattr(entry, "label", "")),
+            }
+            if key_str in candidates:
+                return dimension
+
+        # 如果没有匹配，检查是否是有效的维度代码
+        if key_str in DIMENSION_PRIORITY:
+            return key_str
+        return None
+
+    def _normalize_to_percentage(
+        self,
+        component_raw: Dict[str, Dict[str, float]],
+        component_possible: Dict[str, Dict[str, float]],
+    ) -> dict[str, dict[str, float]]:
+        """将原始得分归一化为百分制。
+
+        Args:
+            component_raw: 实际得分
+            component_possible: 理论最高分
+
+        Returns:
+            归一化后的百分制得分
+        """
+        component_scores: dict[str, dict[str, float]] = {}
+
+        for component, dim_scores in component_raw.items():
+            comp_result: dict[str, float] = {}
+            possible_map = component_possible.get(component, {})
+
+            for dimension, raw_value in dim_scores.items():
+                possible = possible_map.get(dimension, 0.0)
+                if possible > 0:
+                    percentage = (raw_value / possible) * 100
+                else:
+                    percentage = raw_value
+                comp_result[dimension] = round(max(0.0, min(100.0, percentage)), 2)
+
+            # 确保所有可能的维度都有值（未答题的维度为0）
+            for dimension, possible in possible_map.items():
+                comp_result.setdefault(dimension, 0.0)
+
+            component_scores[component] = comp_result
+
+        # 确保所有题型都有完整的维度映射
+        for component_name, possible_map in component_possible.items():
+            if component_name not in component_scores:
+                component_scores[component_name] = {}
+            existing_scores = component_scores[component_name]
+            for dimension in possible_map.keys():
+                existing_scores.setdefault(dimension, 0.0)
+
+        return component_scores
+
+    def _apply_weights(
+        self,
+        component_scores: dict[str, dict[str, float]],
+        scoring_config: QuizScoringConfig,
+    ) -> dict[str, int]:
+        """应用权重聚合各题型得分。
+
+        Args:
+            component_scores: 各题型的百分制得分
+            scoring_config: 计分配置（包含权重信息）
+
+        Returns:
+            最终的维度得分（整数）
+        """
+        # 使用 Pydantic 验证配置
+        try:
+            validated_config = QuizScoringConfigModel.model_validate(scoring_config or {})
+            weights_cfg = validated_config.weights or {}
+        except Exception:
+            weights_cfg = {}
+
+        # 提取权重
+        weights: dict[str, float] = {}
+        for component in component_scores.keys():
+            weight_value = weights_cfg.get(component, 0.0)
+            weights[component] = float(weight_value) if isinstance(weight_value, (int, float)) else 0.0
+
+        total_weight = sum(weight for weight in weights.values() if weight > 0)
+
+        # 如果没有配置权重，使用均匀权重
+        if total_weight <= 0:
+            uniform_weight = 1.0 if component_scores else 0.0
+            weights = {component: uniform_weight for component in component_scores.keys()}
+            total_weight = uniform_weight * len(component_scores)
+
+        # 计算加权平均
+        dimension_scores: dict[str, int] = {}
+        for dimension in DIMENSION_PRIORITY:
+            weighted_sum = 0.0
+            for component, comp_scores in component_scores.items():
+                weight = weights.get(component, 0.0)
+                if weight <= 0:
+                    continue
+                weighted_sum += comp_scores.get(dimension, 0.0) * weight
+
+            if total_weight > 0:
+                value = weighted_sum / total_weight
+            else:
+                value = 0.0
+            dimension_scores[dimension] = int(round(max(0.0, min(100.0, value))))
+
+        # 确保所有维度都有值
+        for scores in component_scores.values():
+            for dimension, score in scores.items():
+                dimension_scores.setdefault(dimension, int(round(score)))
+
+        return dimension_scores
+
+    @staticmethod
+    def _build_option_lookup(submission: QuizSubmission) -> dict[int, Option]:
+        """生成选项快速索引。"""
+
+        lookup: dict[int, Option] = {}
+        for question in submission.quiz.questions:
+            for option in question.options:
+                lookup[option.id] = option
+        return lookup
+
+    @staticmethod
+    def _resolve_dimension_from_settings(settings: Any, raw_key: Any, entries_key: str) -> Optional[str]:
+        """根据题目设置映射提交键到维度代码。"""
+
+        key = str(raw_key)
+        if isinstance(settings, dict):
+            entries = settings.get(entries_key)
+            if isinstance(entries, list):
+                for entry in entries:
+                    if not isinstance(entry, dict):
+                        continue
+                    dimension = entry.get("dimension")
+                    if not dimension:
+                        continue
+                    candidates = {
+                        str(entry.get("dimension")),
+                        str(entry.get("label")),
+                        str(entry.get("key")),
+                        str(entry.get("value")),
+                        str(entry.get("id")),
+                    }
+                    if key in candidates:
+                        return dimension
+        if key in DIMENSION_PRIORITY:
+            return key
+        return None
 
     def _calculate_holland_code(self, scores: dict[str, int]) -> str:
         """依据维度分值生成霍兰德代码。"""

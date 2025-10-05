@@ -19,11 +19,12 @@ router = APIRouter()
 
 @router.post("/start", response_model=QuizStartResponse)
 async def start_quiz(
+    slug: str | None = None,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> QuizStartResponse:
     service = QuizService(db)
-    return await service.start_quiz(current_user)
+    return await service.start_quiz(current_user, slug=slug)
 
 
 @router.get("/questions", response_model=QuizQuestionsResponse)

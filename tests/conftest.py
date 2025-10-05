@@ -117,7 +117,7 @@ async def teacher_client(async_client: AsyncClient, test_teacher: User) -> Async
     return async_client
 
 
-@pytest_asyncio.fixture
+@pytest_asyncio.fixture(scope="session")
 async def sample_careers(database: AsyncSession) -> list[Career]:
     careers = [
         Career(
@@ -158,7 +158,12 @@ async def sample_careers(database: AsyncSession) -> list[Career]:
 
 @pytest_asyncio.fixture
 async def sample_quiz(database: AsyncSession, sample_careers: list[Career]) -> Quiz:
-    quiz = Quiz(title="职业兴趣测评", description="基础霍兰德测评", is_published=True)
+    quiz = Quiz(
+        title="职业兴趣测评",
+        description="基础霍兰德测评",
+        is_published=True,
+        config={"slug": "test-classic"},
+    )
     database.add(quiz)
     await database.flush()
 
@@ -167,7 +172,7 @@ async def sample_quiz(database: AsyncSession, sample_careers: list[Career]) -> Q
             quiz_id=quiz.id,
             title="场景判断",
             content="面对需要动手实践的任务，你的选择是？",
-            question_type=QuestionType.scenario,
+            question_type=QuestionType.classic_scenario,
             order=1,
         ),
         Question(
