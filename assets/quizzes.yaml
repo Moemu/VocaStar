@@ -1,0 +1,529 @@
+classic_scenario_mode:
+  title: 经典情景模式
+  description: "八道情景题，聚焦霍兰德六维兴趣偏好"
+  is_published: true
+
+  scoring:
+    strategy: count_based
+
+  questions:
+    - title: 荒岛求生
+      content: 情景：你和朋友们意外漂流到一座荒岛，岛上资源丰富但充满未知。
+      question_type: classic_scenario
+      order: 1
+      is_required: true
+      options:
+        - content: 动手搭建坚固的住所和生存工具
+          dimension: R
+          score: 1
+          order: 1
+        - content: 研究探索岛上的动植物生态系统
+          dimension: I
+          score: 1
+          order: 2
+        - content: 设计创作独特的求救信号和地图
+          dimension: A
+          score: 1
+          order: 3
+        - content: 照顾安抚大家的情绪，组织集体活动
+          dimension: S
+          score: 1
+          order: 4
+
+    - title: 神秘发明
+      content: 情景：你发现了一个神奇的发明工具箱，可以创造任何实用的装置。
+      question_type: classic_scenario
+      order: 2
+      is_required: true
+      options:
+        - content: 规划商业用途并组织团队生产
+          dimension: E
+          score: 1
+          order: 1
+        - content: 分类整理所有工具建立管理系统
+          dimension: C
+          score: 1
+          order: 2
+        - content: 拆解研究每个工具的原理和功能
+          dimension: R
+          score: 1
+          order: 3
+        - content: 实验测试不同组合的科学效果
+          dimension: I
+          score: 1
+          order: 4
+
+    - title: 社区庆典
+      content: 情景：社区要举办大型庆典活动，邀请居民共同参与策划。
+      question_type: classic_scenario
+      order: 3
+      is_required: true
+      options:
+        - content: 策划表演节目和艺术装饰设计
+          dimension: A
+          score: 1
+          order: 1
+        - content: 组织志愿者服务参与活动的居民
+          dimension: S
+          score: 1
+          order: 2
+        - content: 统筹规划整个活动的流程和宣传
+          dimension: E
+          score: 1
+          order: 3
+        - content: 管理预算和物资确保顺利举办
+          dimension: C
+          score: 1
+          order: 4
+
+    - title: 未来科技展
+      content: 情景：参观未来科技展览，你对哪个领域最感兴趣？
+      question_type: classic_scenario
+      order: 4
+      is_required: true
+      options:
+        - content: 体验操作最新的机器人和技术设备
+          dimension: R
+          score: 1
+          order: 1
+        - content: 深入了解人工智能的算法原理
+          dimension: I
+          score: 1
+          order: 2
+        - content: 探讨商业应用和发展前景
+          dimension: E
+          score: 1
+          order: 3
+        - content: 研究技术标准和安全性问题
+          dimension: C
+          score: 1
+          order: 4
+
+    - title: 创意工作坊
+      content: 情景：参加一个创意工作坊，你可以自由选择创作方向。
+      question_type: classic_scenario
+      order: 5
+      is_required: true
+      options:
+        - content: 设计制作独特的艺术品和装饰
+          dimension: A
+          score: 1
+          order: 1
+        - content: 教导帮助其他参与者完成作品
+          dimension: S
+          score: 1
+          order: 2
+        - content: 学习掌握各种工具的使用技巧
+          dimension: R
+          score: 1
+          order: 3
+        - content: 分析研究不同材料的特性差异
+          dimension: I
+          score: 1
+          order: 4
+
+    - title: 团队挑战赛
+      content: 情景：参加团队挑战比赛，需要分工合作完成复杂任务。
+      question_type: classic_scenario
+      order: 6
+      is_required: true
+      options:
+        - content: 制定策略领导团队向目标前进
+          dimension: E
+          score: 1
+          order: 1
+        - content: 系统记录任务进度和成果数据
+          dimension: C
+          score: 1
+          order: 2
+        - content: 创意解决遇到的困难和障碍
+          dimension: A
+          score: 1
+          order: 3
+        - content: 协调沟通确保团队合作顺畅
+          dimension: S
+          score: 1
+          order: 4
+
+    - title: 科学探索营
+      content: 情景：参加科学探索营，有机会深入研究感兴趣的项目。
+      question_type: classic_scenario
+      order: 7
+      is_required: true
+      options:
+        - content: 亲手建造实验装置和观测设备
+          dimension: R
+          score: 1
+          order: 1
+        - content: 设计研究方案并分析数据
+          dimension: I
+          score: 1
+          order: 2
+        - content: 创作科学可视化图表和展示
+          dimension: A
+          score: 1
+          order: 3
+        - content: 规划探索路线和研究计划
+          dimension: E
+          score: 1
+          order: 4
+
+    - title: 校园文化节
+      content: 情景：校园文化节需要策划各种活动，你会负责哪方面？
+      question_type: classic_scenario
+      order: 8
+      is_required: true
+      options:
+        - content: 关怀帮助参与活动的同学
+          dimension: S
+          score: 1
+          order: 1
+        - content: 细致安排活动流程和时间表
+          dimension: C
+          score: 1
+          order: 2
+        - content: 动手布置场地和设备
+          dimension: R
+          score: 1
+          order: 3
+        - content: 深入研究活动主题和背景
+          dimension: I
+          score: 1
+          order: 4
+
+
+intelligent_fusion_mode:
+  title: 智能融合模式
+  description: "6 道情景题 + 4 道游戏化题型，综合测量兴趣、价值观与行为偏好"
+  is_published: true
+
+  scoring:
+    strategy: weighted_components
+    weights:
+      classic_scenario: 0.4
+      image_preference: 0.2
+      word_choice: 0.1
+      value_balance: 0.15
+      time_allocation: 0.15
+    notes: "经典情景题计分按照维度出现次数；图片题含两组，最终得分取平均后按 20% 计入；词汇题每维度最高 2 分；价值观与时间分配题直接取百分制得分。"
+
+  questions:
+    - title: 荒岛求生
+      content: 情景：你和朋友们意外漂流到一座荒岛，岛上资源丰富但充满未知。
+      question_type: classic_scenario
+      order: 1
+      is_required: true
+      options:
+        - content: 动手搭建坚固的住所和生存工具
+          dimension: R
+          score: 1
+          order: 1
+        - content: 研究探索岛上的动植物生态系统
+          dimension: I
+          score: 1
+          order: 2
+        - content: 设计创作独特的求救信号和地图
+          dimension: A
+          score: 1
+          order: 3
+        - content: 照顾安抚大家的情绪，组织集体活动
+          dimension: S
+          score: 1
+          order: 4
+
+    - title: 神秘发明
+      content: 情景：你发现了一个神奇的发明工具箱，可以创造任何实用的装置。
+      question_type: classic_scenario
+      order: 2
+      is_required: true
+      options:
+        - content: 规划商业用途并组织团队生产
+          dimension: E
+          score: 1
+          order: 1
+        - content: 分类整理所有工具建立管理系统
+          dimension: C
+          score: 1
+          order: 2
+        - content: 拆解研究每个工具的原理和功能
+          dimension: R
+          score: 1
+          order: 3
+        - content: 实验测试不同组合的科学效果
+          dimension: I
+          score: 1
+          order: 4
+
+    - title: 社区庆典
+      content: 情景：社区要举办大型庆典活动，邀请居民共同参与策划。
+      question_type: classic_scenario
+      order: 3
+      is_required: true
+      options:
+        - content: 策划表演节目和艺术装饰设计
+          dimension: A
+          score: 1
+          order: 1
+        - content: 组织志愿者服务参与活动的居民
+          dimension: S
+          score: 1
+          order: 2
+        - content: 统筹规划整个活动的流程和宣传
+          dimension: E
+          score: 1
+          order: 3
+        - content: 管理预算和物资确保顺利举办
+          dimension: C
+          score: 1
+          order: 4
+
+    - title: 未来科技展
+      content: 情景：参观未来科技展览，你对哪个领域最感兴趣？
+      question_type: classic_scenario
+      order: 4
+      is_required: true
+      options:
+        - content: 体验操作最新的机器人和技术设备
+          dimension: R
+          score: 1
+          order: 1
+        - content: 深入了解人工智能的算法原理
+          dimension: I
+          score: 1
+          order: 2
+        - content: 探讨商业应用和发展前景
+          dimension: E
+          score: 1
+          order: 3
+        - content: 研究技术标准和安全性问题
+          dimension: C
+          score: 1
+          order: 4
+
+    - title: 创意工作坊
+      content: 情景：参加一个创意工作坊，你可以自由选择创作方向。
+      question_type: classic_scenario
+      order: 5
+      is_required: true
+      options:
+        - content: 设计制作独特的艺术品和装饰
+          dimension: A
+          score: 1
+          order: 1
+        - content: 教导帮助其他参与者完成作品
+          dimension: S
+          score: 1
+          order: 2
+        - content: 学习掌握各种工具的使用技巧
+          dimension: R
+          score: 1
+          order: 3
+        - content: 分析研究不同材料的特性差异
+          dimension: I
+          score: 1
+          order: 4
+
+    - title: 团队挑战赛
+      content: 情景：参加团队挑战比赛，需要分工合作完成复杂任务。
+      question_type: classic_scenario
+      order: 6
+      is_required: true
+      options:
+        - content: 制定策略领导团队向目标前进
+          dimension: E
+          score: 1
+          order: 1
+        - content: 系统记录任务进度和成果数据
+          dimension: C
+          score: 1
+          order: 2
+        - content: 创意解决遇到的困难和障碍
+          dimension: A
+          score: 1
+          order: 3
+        - content: 协调沟通确保团队合作顺畅
+          dimension: S
+          score: 1
+          order: 4
+
+    - title: 快速选择词汇
+      content: "请在 10 秒内从词汇云中选择 3 个最吸引你的词语"
+      question_type: word_choice
+      order: 7
+      is_required: true
+      response_time_limit: 10
+      max_select: 3
+      options:
+        - content: 创新
+          dimension: A
+          score: 1
+          order: 1
+        - content: 稳定
+          dimension: C
+          score: 1
+          order: 2
+        - content: 分析
+          dimension: I
+          score: 1
+          order: 3
+        - content: 协作
+          dimension: S
+          score: 1
+          order: 4
+        - content: 冒险
+          dimension: R
+          score: 1
+          order: 5
+        - content: 细致
+          dimension: C
+          score: 1
+          order: 6
+        - content: 领导
+          dimension: E
+          score: 1
+          order: 7
+        - content: 技术
+          dimension: R
+          score: 1
+          order: 8
+        - content: 艺术
+          dimension: A
+          score: 1
+          order: 9
+        - content: 服务
+          dimension: S
+          score: 1
+          order: 10
+        - content: 规划
+          dimension: E
+          score: 1
+          order: 11
+        - content: 探索
+          dimension: I
+          score: 1
+          order: 12
+
+    - title: 图片偏好题（场景一）
+      content: 从以下图片中选择最吸引你的 2 张。每张图片代表一个兴趣维度。
+      question_type: image_preference
+      order: 8
+      is_required: true
+      max_select: 2
+      options:
+        - content: 图片 A
+          dimension: C
+          score: 2
+          image_url: /static/quiz-options/P8A.webp
+          order: 1
+        - content: 图片 B
+          dimension: E
+          score: 2
+          image_url: /static/quiz-options/P8B.webp
+          order: 2
+        - content: 图片 C
+          dimension: S
+          score: 2
+          image_url: /static/quiz-options/P8C.webp
+          order: 3
+        - content: 图片 D
+          dimension: A
+          score: 2
+          image_url: /static/quiz-options/P8D.webp
+          order: 4
+        - content: 图片 E
+          dimension: I
+          score: 2
+          image_url: /static/quiz-options/P8E.webp
+          order: 5
+        - content: 图片 F
+          dimension: R
+          score: 2
+          image_url: /static/quiz-options/P8F.webp
+          order: 6
+
+    - title: 图片偏好题（场景二）
+      content: 再次从以下图片中选择最吸引你的 2 张，感受不同情境的偏好变化。
+      question_type: image_preference
+      order: 9
+      is_required: true
+      max_select: 2
+      options:
+        - content: 图片 A2
+          dimension: E
+          score: 2
+          image_url: /static/quiz-options/P9A.webp
+          order: 1
+        - content: 图片 B2
+          dimension: S
+          score: 2
+          image_url: /static/quiz-options/P9B.webp
+          order: 2
+        - content: 图片 C2
+          dimension: A
+          score: 2
+          image_url: /static/quiz-options/P9C.webp
+          order: 3
+        - content: 图片 D2
+          dimension: I
+          score: 2
+          image_url: /static/quiz-options/P9D.webp
+          order: 4
+        - content: 图片 E2
+          dimension: R
+          score: 2
+          image_url: /static/quiz-options/P9E.webp
+          order: 5
+        - content: 图片 F2
+          dimension: C
+          score: 2
+          image_url: /static/quiz-options/P9F.webp
+          order: 6
+
+    - title: 价值观天平
+      content: 通过拖动滑块，标记你对下列价值观的认同度（0-100%）。
+      question_type: value_balance
+      order: 10
+      is_required: true
+      scale:
+        min_value: 0
+        max_value: 100
+        step: 1
+      dimensions:
+        - label: 实干与成果
+          dimension: R
+        - label: 理性与探索
+          dimension: I
+        - label: 创意与表达
+          dimension: A
+        - label: 关怀与合作
+          dimension: S
+        - label: 领导与影响
+          dimension: E
+        - label: 秩序与效率
+          dimension: C
+
+    - title: 时间分配游戏
+      content: "想象你有一个完全自由的周末，有 10 小时可以自由支配，请把时间分配给最想做的活动。"
+      question_type: time_allocation
+      order: 11
+      is_required: true
+      max_hours: 10
+      activities:
+        - label: 动手制作
+          description: 制作手工艺品、修理物品、DIY 项目
+          dimension: R
+        - label: 学习研究
+          description: 阅读书籍、在线课程、探索新知识
+          dimension: I
+        - label: 创意设计
+          description: 绘画、写作、音乐创作、设计作品
+          dimension: A
+        - label: 朋友聚会
+          description: 与朋友交流、组织活动、团队协作
+          dimension: S
+        - label: 规划项目
+          description: 制定计划、策划方案、设定目标
+          dimension: E
+        - label: 整理优化
+          description: 整理空间、优化系统、完善细节
+          dimension: C
