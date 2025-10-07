@@ -30,7 +30,7 @@ pip install .
 **运行**
 
 ```shell
-uv run app.main:app --reload
+uv run python -m app.main
 ```
 
 或者
@@ -74,41 +74,20 @@ APIFox 文档: <https://2v5c0iiid5.apifox.cn/>
 | `/api/quiz/submit`   | POST | 提交测评并生成报告           |
 | `/api/quiz/report`   | GET  | 查看已生成的测评报告与推荐   |
 
-## 职业推荐数据准备
-
-测评报告会依据数据库中的职业数据实时生成推荐，请在运行前确保以下表已填充：
-
-### `careers`
-
-- **必填字段**：
-	- `name`：职业名称，例如“数据分析师”。
-	- `code`：唯一编码，方便运营/导入，例如 `I001`。
-	- `holland_dimensions`：JSON 数组，声明职业适配的霍兰德维度，如 `["I", "C"]`。
-- **建议补充**：`description`、`work_content`、`career_outlook`、`development_path` 等，可提升推荐理由质量。
-- 可通过手工录入或编写脚本导入，示例 SQL：
-
-	```sql
-	INSERT INTO careers (name, code, holland_dimensions, description)
-	VALUES (
-		'数据分析师',
-		'I001',
-		'["I", "C"]',
-		'通过数据洞察支持业务决策。'
-	);
-	```
-
-### `career_tags` 与 `career_tag_relations`
-
-- 若需要在前端展示职业标签，可预先创建标签（如“热门”“科技行业”），并在关联表中关联到对应职业。
-- 当前推荐逻辑未直接使用标签，但完善后能支持更多筛选维度。
-
-### 自动生成的数据
-
-- `quiz_reports`：在用户完成测评并提交后自动写入，无需手动准备。
-- `career_recommendations`：测评提交时会基于上述职业数据生成并落库，用于后续查询报告。
-
-填充完职业数据后，可运行一次完整测评流程，确认返回的推荐列表与 `career_recommendations` 表中的记录一致。
-
 **🚧 计划中/开发中**
 
 ...
+
+## 导入数据
+
+测评题库数据存放于 `assets\quizzes.yaml`，可根据需要修改。
+
+运行以下脚本以导入测评题库数据
+
+```shell
+uv run scripts\import_quiz_from_yaml.py
+```
+
+## 数据库重置
+
+删除项目根目录下的 `database.db` 即可。
