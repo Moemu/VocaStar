@@ -8,8 +8,14 @@ from typing_extensions import TypedDict
 class QuizScoringFormulaConfigModel(BaseModel):
     """计分公式配置的验证模型"""
 
-    max_occurrences: Optional[int] = None
-    expression: Optional[str] = None
+    max_occurrences: Optional[int] = Field(
+        None,
+        description="维度出现次数的上限，用于限定计数型题目的最大计分次数",
+    )
+    expression: Optional[str] = Field(
+        None,
+        description="自定义计分表达式（若启用），使用安全公式语法描述各维度的计算方式",
+    )
 
     model_config = ConfigDict(extra="allow")
 
@@ -17,10 +23,22 @@ class QuizScoringFormulaConfigModel(BaseModel):
 class QuizScoringConfigModel(BaseModel):
     """计分策略配置的验证模型"""
 
-    strategy: Optional[str] = None
-    dimension_formulas: Optional[Dict[str, QuizScoringFormulaConfigModel]] = None
-    weights: Optional[Dict[str, float]] = None
-    notes: Optional[str] = None
+    strategy: Optional[str] = Field(
+        None,
+        description="计分策略标识，例如 count_based、weighted_components 等",
+    )
+    dimension_formulas: Optional[Dict[str, QuizScoringFormulaConfigModel]] = Field(
+        None,
+        description="按维度划分的公式配置，键为维度代码，值为对应的计分公式",
+    )
+    weights: Optional[Dict[str, float]] = Field(
+        None,
+        description="题型或组件的权重配置，取值范围通常在 0-1 之间",
+    )
+    notes: Optional[str] = Field(
+        None,
+        description="计分策略的补充说明，例如算法备注或业务提示",
+    )
 
     model_config = ConfigDict(extra="allow")
 
@@ -28,8 +46,14 @@ class QuizScoringConfigModel(BaseModel):
 class QuizConfigModel(BaseModel):
     """测评配置的验证模型"""
 
-    slug: Optional[str] = None
-    scoring: Optional[QuizScoringConfigModel] = None
+    slug: Optional[str] = Field(
+        None,
+        description="题库的唯一标识，便于前后端按别名检索测评",
+    )
+    scoring: Optional[QuizScoringConfigModel] = Field(
+        None,
+        description="测评整体的计分配置，包含策略、权重与公式说明",
+    )
 
     model_config = ConfigDict(extra="allow")
 
@@ -37,9 +61,9 @@ class QuizConfigModel(BaseModel):
 class QuestionScaleConfigModel(BaseModel):
     """题目量表配置的验证模型"""
 
-    min_value: float = 0.0
-    max_value: float = 100.0
-    step: float = 1.0
+    min_value: float = Field(0.0, description="量表允许的最小取值，例如 0")
+    max_value: float = Field(100.0, description="量表允许的最大取值，例如 100")
+    step: float = Field(1.0, description="滑块或量表的步进值，用于控制精度")
 
     model_config = ConfigDict(extra="allow")
 
@@ -47,8 +71,8 @@ class QuestionScaleConfigModel(BaseModel):
 class QuestionDimensionEntryModel(BaseModel):
     """维度条目的验证模型"""
 
-    label: str
-    dimension: str
+    label: str = Field(..., description="显示给用户的维度名称或标签")
+    dimension: str = Field(..., description="对应的霍兰德维度代码，例如 R/I/A/S/E/C")
 
     model_config = ConfigDict(extra="allow")
 
@@ -56,9 +80,9 @@ class QuestionDimensionEntryModel(BaseModel):
 class QuestionActivityEntryModel(BaseModel):
     """活动条目的验证模型"""
 
-    label: str
-    description: str = ""
-    dimension: str
+    label: str = Field(..., description="活动名称或标题，用于呈现给用户")
+    description: str = Field("", description="活动的补充说明或示例描述")
+    dimension: str = Field(..., description="活动关联的霍兰德维度代码")
 
     model_config = ConfigDict(extra="allow")
 
@@ -66,13 +90,34 @@ class QuestionActivityEntryModel(BaseModel):
 class QuestionSettingsModel(BaseModel):
     """题目设置的验证模型"""
 
-    response_time_limit: Optional[int] = None
-    max_select: Optional[int] = None
-    scale: Optional[QuestionScaleConfigModel] = None
-    dimensions: Optional[List[QuestionDimensionEntryModel]] = None
-    max_hours: Optional[float] = None
-    activities: Optional[List[QuestionActivityEntryModel]] = None
-    notes: Optional[str] = None
+    response_time_limit: Optional[int] = Field(
+        None,
+        description="题目的作答时间限制（秒），为空表示不限制",
+    )
+    max_select: Optional[int] = Field(
+        None,
+        description="多选题允许选择的最大选项数量",
+    )
+    scale: Optional[QuestionScaleConfigModel] = Field(
+        None,
+        description="量表题的取值范围与步进设置",
+    )
+    dimensions: Optional[List[QuestionDimensionEntryModel]] = Field(
+        None,
+        description="量表题或词汇题涉及的维度列表，用于映射用户输入",
+    )
+    max_hours: Optional[float] = Field(
+        None,
+        description="时间分配题可分配的总时长（小时），为空表示未设限制",
+    )
+    activities: Optional[List[QuestionActivityEntryModel]] = Field(
+        None,
+        description="时间分配题的活动列表，与维度一一对应",
+    )
+    notes: Optional[str] = Field(
+        None,
+        description="题目配置的补充说明或出题备注",
+    )
 
     model_config = ConfigDict(extra="allow")
 
