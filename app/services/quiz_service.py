@@ -396,22 +396,42 @@ class QuizService:
             report=report_data,
         )
 
-    async def get_report(self, session_id: str, user: User) -> QuizReportResponse:
-        """获取指定会话的测评报告。
+    async def get_report(
+        self,
+        user: User,
+        *,
+        session_id: Optional[str] = None,
+        slug: Optional[str] = None,
+    ) -> QuizReportResponse:
+        """获取用户最新的测评报告。
 
         Args:
-            session_id: 测评会话 ID。
             user: 当前登录用户。
+            session_id: 可选的测评会话 ID。
+            slug: 可选的测评题库标识，用于筛选特定测评。
 
         Returns:
             QuizReportResponse: 已生成的测评报告。
 
         Raises:
-            HTTPException: 会话未完成或不存在时抛出。
+            HTTPException: 测评未完成、会话不存在或未找到可用报告时抛出。
         """
-        submission = await self._get_valid_submission(session_id, user)
-        if submission.status != QuizSubmissionStatus.completed or not submission.report:
-            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="测评尚未完成")
+        submission: Optional[QuizSubmission]
+        if session_id:
+            submission = await self._get_valid_submission(session_id, user)
+            if submission.status != QuizSubmissionStatus.completed or not submission.report:
+                raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="测评尚未完成")
+            if slug:
+                quiz_config = submission.quiz.config or {}
+                if isinstance(quiz_config, dict) and quiz_config.get("slug") != slug:
+                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="会话不属于指定测评")
+        else:
+            submission = await self.repo.get_latest_completed_submission(user.id, slug=slug)
+            if not submission:
+                detail = "未找到对应测评报告" if slug else "暂无可用的测评报告"
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=detail)
+            if not submission.report:
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="测评报告数据缺失")
 
         report = submission.report
         payload = report.result_json
@@ -438,7 +458,7 @@ class QuizService:
                     )
                 )
             report_data = report_data.model_copy(update={"recommendations": recommendations})
-        return QuizReportResponse(session_id=session_id, report=report_data)
+        return QuizReportResponse(session_id=submission.session_token, report=report_data)
 
     async def _get_valid_submission(self, session_id: str, user: User) -> QuizSubmission:
         """校验并返回有效的测评会话。"""
@@ -632,7 +652,7 @@ class QuizService:
             try:
                 settings = QuestionSettingsModel.model_validate(question.settings or {})
             except Exception:
-                settings = QuestionSettingsModel()
+                settings = QuestionSettingsModel.model_validate({})
 
             if question.question_type in {
                 QuestionType.classic_scenario,
@@ -717,7 +737,7 @@ class QuizService:
                 try:
                     settings = QuestionSettingsModel.model_validate(question.settings or {})
                 except Exception:
-                    settings = QuestionSettingsModel()
+                    settings = QuestionSettingsModel.model_validate({})
 
                 if question.question_type == QuestionType.value_balance:
                     self._accumulate_value_balance_score(answer, component, component_raw, settings)

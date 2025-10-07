@@ -59,9 +59,10 @@ async def submit_quiz(
 
 @router.get("/report", response_model=QuizReportResponse)
 async def get_report(
-    session_id: str,
+    session_id: str | None = None,
+    slug: str | None = None,
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> QuizReportResponse:
     service = QuizService(db)
-    return await service.get_report(session_id, current_user)
+    return await service.get_report(current_user, session_id=session_id, slug=slug)

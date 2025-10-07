@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Iterable, Optional, Sequence
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -53,6 +53,37 @@ class QuizRepository:
                 .selectinload(CareerRecommendation.career),
             )
         )
+        result = await self.session.execute(stmt)
+        return result.scalars().unique().first()
+
+    async def get_latest_completed_submission(
+        self,
+        user_id: int,
+        *,
+        slug: Optional[str] = None,
+    ) -> Optional[QuizSubmission]:
+        order_key = func.coalesce(QuizSubmission.completed_at, QuizSubmission.started_at)
+        stmt = (
+            select(QuizSubmission)
+            .join(Quiz, Quiz.id == QuizSubmission.quiz_id)
+            .where(
+                QuizSubmission.user_id == user_id,
+                QuizSubmission.status == QuizSubmissionStatus.completed,
+            )
+            .options(
+                selectinload(QuizSubmission.quiz).selectinload(Quiz.questions).selectinload(Question.options),
+                selectinload(QuizSubmission.answers),
+                selectinload(QuizSubmission.report)
+                .selectinload(QuizReport.career_recommendations)
+                .selectinload(CareerRecommendation.career),
+            )
+            .order_by(order_key.desc(), QuizSubmission.id.desc())
+            .limit(1)
+        )
+
+        if slug:
+            stmt = stmt.where(Quiz.config["slug"].as_string() == slug)
+
         result = await self.session.execute(stmt)
         return result.scalars().unique().first()
 

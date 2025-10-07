@@ -77,10 +77,14 @@ async def test_quiz_flow(
     assert submit_second.status_code == 200
     assert submit_second.json()["report"] == report
 
-    report_response = await student_client.get("/api/quiz/report", params={"session_id": session_id})
-    assert report_response.status_code == 200
-    fetched_report = report_response.json()["report"]
+    report_by_slug = await student_client.get("/api/quiz/report", params={"slug": "test-classic"})
+    assert report_by_slug.status_code == 200
+    fetched_report = report_by_slug.json()["report"]
     assert fetched_report == report
+
+    latest_report_response = await student_client.get("/api/quiz/report")
+    assert latest_report_response.status_code == 200
+    assert latest_report_response.json()["report"] == report
 
     result = await database.execute(select(UserPoints).where(UserPoints.user_id == test_user.id))
     user_points = result.scalars().first()
