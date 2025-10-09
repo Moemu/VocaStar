@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.deps.sql import get_db
@@ -16,26 +16,62 @@ def get_service(db: AsyncSession) -> CareerService:
     return CareerService(db)
 
 
+def _parse_int_param(
+    name: str,
+    raw_value: Optional[str],
+    *,
+    default: int,
+    min_value: int,
+    max_value: Optional[int] = None,
+) -> int:
+    if raw_value is None or raw_value == "":
+        return default
+    try:
+        value = int(raw_value)
+    except (TypeError, ValueError):
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"参数 {name} 必须是整数",
+        ) from None
+
+    if value < min_value:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"参数 {name} 不能小于 {min_value}",
+        )
+    if max_value is not None and value > max_value:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"参数 {name} 不能大于 {max_value}",
+        )
+    return value
+
+
 @router.get("/", response_model=CareerListResponse, summary="分页获取职业列表")
 async def list_careers(
     dimension: Optional[str] = Query(None, description="按霍兰德维度过滤，例如 R/I/A/S/E/C"),
     keyword: Optional[str] = Query(None, description="按名称或简介模糊搜索"),
-    limit: int = Query(20, ge=1, le=50, description="返回条数，默认 20"),
-    offset: int = Query(0, ge=0, description="偏移量，用于分页"),
+    limit: Optional[str] = Query(None, description="返回条数，默认 20，范围 1-50"),
+    offset: Optional[str] = Query(None, description="偏移量，用于分页，默认 0"),
     db: AsyncSession = Depends(get_db),
 ) -> CareerListResponse:
+    limit_value = _parse_int_param("limit", limit, default=20, min_value=1, max_value=50)
+    offset_value = _parse_int_param("offset", offset, default=0, min_value=0)
+
     service = get_service(db)
-    return await service.list_careers(dimension=dimension, keyword=keyword, limit=limit, offset=offset)
+    return await service.list_careers(dimension=dimension, keyword=keyword, limit=limit_value, offset=offset_value)
 
 
 @router.get("/featured", response_model=list[CareerSummary], summary="获取推荐职业列表")
 async def featured_careers(
-    limit: int = Query(6, ge=1, le=20, description="返回推荐数量"),
+    limit: Optional[str] = Query(None, description="返回推荐数量"),
     dimension: Optional[str] = Query(None, description="可选维度过滤"),
     db: AsyncSession = Depends(get_db),
 ) -> list[CareerSummary]:
+    limit_value = _parse_int_param("limit", limit, default=6, min_value=1, max_value=20)
+
     service = get_service(db)
-    return await service.list_featured_careers(limit=limit, dimension=dimension)
+    return await service.list_featured_careers(limit=limit_value, dimension=dimension)
 
 
 @router.get("/{career_id}", response_model=CareerDetail, summary="根据 ID 获取职业详情")
