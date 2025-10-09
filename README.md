@@ -49,6 +49,8 @@ APIFox 文档: <https://2v5c0iiid5.apifox.cn/>
 
 **✅ 已完成**
 
+**鉴权相关**
+
 | API                  | 方法 | 说明     |
 | -------------------- | ---- | -------- |
 | `/api/auth/login`    | POST | 登录接口 |
@@ -74,18 +76,29 @@ APIFox 文档: <https://2v5c0iiid5.apifox.cn/>
 | `/api/quiz/submit`   | POST | 提交测评并生成报告           |
 | `/api/quiz/report`   | GET  | 查看已生成的测评报告与推荐   |
 
+**职业（Career）相关**
+
+| API                     | 方法 | 说明                                 |
+| ----------------------- | ---- | ------------------------------------ |
+| `/api/career`           | GET  | 分页获取职业列表，支持维度与关键词筛选 |
+| `/api/career/featured`  | GET  | 获取推荐职业列表，可按维度过滤         |
+| `/api/career/{careerId}`| GET  | 获取指定职业的详细信息                 |
+
+
+
 **🚧 计划中/开发中**
 
 ...
 
 ## 导入数据
 
-测评题库数据存放于 `assets\quizzes.yaml`，可根据需要修改。
+测评题库数据与职业信息分别存放于 `assets\quizzes.yaml`、`assets\careers.yaml`，可根据需要修改。
 
-运行以下脚本以导入测评题库数据
+运行以下脚本以导入对应数据：
 
 ```shell
 uv run scripts\import_quiz_from_yaml.py
+uv run scripts\import_careers_from_yaml.py
 ```
 
 ## 数据库重置
