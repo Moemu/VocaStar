@@ -25,8 +25,11 @@ class CareerRepository:
         filters = []
         if dimension:
             dimension_token = dimension.upper()
-            filters.append(Career.holland_dimensions.isnot(None))
-            filters.append(Career.holland_dimensions.contains([dimension_token]))
+            dimension_filter = or_(
+                Career.holland_dimensions.contains([dimension_token]),
+                func.instr(Career.holland_dimensions, f'"{dimension_token}"') > 0,
+            )
+            filters.append(dimension_filter)
         if keyword:
             like_pattern = f"%{keyword.strip()}%"
             filters.append(
@@ -68,9 +71,15 @@ class CareerRepository:
         return list(result.scalars().unique().all())
 
     async def list_careers_with_dimension(self, dimension: str, *, limit: int = 20) -> list[Career]:
+        dimension_token = dimension.upper()
         stmt = (
             select(Career)
-            .where(Career.holland_dimensions.contains([dimension.upper()]))
+            .where(
+                or_(
+                    Career.holland_dimensions.contains([dimension_token]),
+                    func.instr(Career.holland_dimensions, f'"{dimension_token}"') > 0,
+                )
+            )
             .order_by(Career.created_at.desc(), Career.id.desc())
             .limit(max(limit, 1))
         )
