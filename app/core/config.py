@@ -62,6 +62,16 @@ class Config(BaseSettings):
     max_avatar_size: int = 2 * 1024 * 1024
     """头像文件大小限制，默认 2MB"""
 
+    # LLM 配置
+    llm_api_base_url: str = ""
+    """OpenAI 兼容接口的基础地址，例如 http://localhost:11434/v1"""
+    llm_api_key: str = ""
+    """调用 LLM 服务所需的 API Key，若为空则视为未启用"""
+    llm_default_model: str = "gpt-4o-mini"
+    """默认使用的模型名称，可根据部署环境调整"""
+    llm_request_timeout: float = 30.0
+    """调用 LLM 服务的超时时间（秒）"""
+
     @property
     def avatar_dir(self) -> Path:
         """头像实际存储路径"""
