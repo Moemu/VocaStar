@@ -5,8 +5,6 @@
 from app.models.career import (
     Career,
     CareerRecommendation,
-    CareerTag,
-    CareerTagRelation,
 )
 
 # Cosplay剧本
@@ -57,8 +55,6 @@ __all__ = [
     "QuizReport",
     # 职业星球
     "Career",
-    "CareerTag",
-    "CareerTagRelation",
     "CareerRecommendation",
     # Cosplay剧本
     "CosplayScript",

@@ -122,31 +122,27 @@ async def sample_careers(database: AsyncSession) -> list[Career]:
     careers = [
         Career(
             name="工程实践工程师",
-            code="R001",
             description="擅长动手实践，负责工程设备的安装与维护。",
             holland_dimensions=["R", "I"],
-            work_content=["负责生产设备的调试", "制定日常维护计划"],
+            work_contents=["负责生产设备的调试", "制定日常维护计划"],
         ),
         Career(
             name="数据分析师",
-            code="I001",
             description="通过数据挖掘支持业务决策。",
             holland_dimensions=["I", "C"],
-            work_content=["构建数据报表", "进行探索性分析"],
+            work_contents=["构建数据报表", "进行探索性分析"],
         ),
         Career(
             name="创意设计师",
-            code="A001",
             description="专注视觉创意，为品牌打造设计方案。",
             holland_dimensions=["A", "E"],
-            work_content=["进行视觉概念设计", "与团队合作产出整合创意"],
+            work_contents=["进行视觉概念设计", "与团队合作产出整合创意"],
         ),
         Career(
             name="教育顾问",
-            code="S001",
             description="提供学习规划与成长辅导。",
             holland_dimensions=["S", "E"],
-            work_content=["制定学习计划", "组织交流活动"],
+            work_contents=["制定学习计划", "组织交流活动"],
         ),
     ]
     database.add_all(careers)

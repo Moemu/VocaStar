@@ -1,0 +1,73 @@
+careers:
+  software_engineer:
+    name: 软件工程师
+    description: 软件工程师负责设计、开发和维护软件系统，解决复杂技术问题。他们需要掌握多种编程语言和开发工具，持续学习新技术，并与团队协作完成项目。 软件工程师需要具备扎实的编程基础，能够理解和实现复杂的业务逻辑，同时需要具备良好的沟通能力和团队协作精神。随着技术的不断发展，软件工程师需要保持持续学习的热情，关注行业动态和新技术趋势，不断提升自己的专业技能和解决问题的能力。
+    planet_image_url: /static/career_planets/software_engineer.webp
+    holland_dimensions: ["I", "C", "R"]
+    work_contents:
+      - 参与软件系统的设计与开发，编写高质量代码
+      - 进行代码审查，确保代码质量和性能
+      - 诊断和修复软件缺陷，优化系统性能
+      - 与产品经理和设计师协作，理解需求并转化为技术方案
+      - 参与技术文档的编写和维护
+    career_outlook: 随着数字化转型的加速，软件工程师的需求持续增长。职业发展路径清晰，可向资深工程师、技术专家、架构师或技术管理方向发展。
+    development_path:
+      - 初级工程师
+      - 中级工程师
+      - 高级工程师
+      - 技术专家/架构师
+    required_skills:
+      - 熟悉常用编程语言，诸如 C/C++, Java, Python 等，并对某一门或多门语言的特性有着较深入的理解
+      - 基本的数据结构和算法设计能力，熟练掌握数据结构的应用和复杂度分析并灵活运用
+      - 操作系统和网络方面：能够熟练运用系统 API 接口，设计良好的程序，熟悉 Linux 操作系统，熟悉 TCP/IP、HTTP 等通信协议，有 socket 网络编程和大规模并发服务器开发经验或有搜索相关领域(如信息检索、索引、排序)经验
+      - 具备沟通能力、表达能力以及团队合作能力，能够与团队中的成员协同开发，共同完成任务
+    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 3}
+
+  data_analyst:
+    name: 数据分析师
+    description: 进行组织研究和评估，设计系统和流程，开展工作简化和测量研究，并编制运营和程序手册，以帮助管理层更高效、更有效地运作。包括项目分析师和管理顾问。
+    planet_image_url: /static/career_planets/data_analyst.webp
+    holland_dimensions: ["I", "C", "E"]
+    work_contents:
+      - 收集和整理有关问题或程序的信息
+      - 与相关人员协商，确保新实施的系统或程序能够成功运行
+      - 分析信息并评估结果以选择最佳解决方案和解决问题
+      - 就技术、系统或流程相关主题向管理层或其他团体提供指导和专家建议
+    career_outlook: 数据分析师在各行各业的需求不断增长，职业发展路径包括高级数据分析师、数据科学家和数据工程师等方向。
+    development_path:
+      - 初级数据分析师
+      - 中级数据分析师
+      - 高级数据分析师
+      - 数据科学家/数据工程师
+    required_skills:
+      - 数据库用户界面和查询软件
+      - 开发环境软件
+      - 企业资源规划 ERP 软件
+      - 面向对象或组件式开发软件
+      - Web 平台开发软件
+    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 4, "team_collaboration": 4, "innovative_ability": 4, "task_execution": 3}
+
+  accountant:
+    name: 会计师
+    description: 审查、分析并解释会计记录，以编制财务报表、提供建议，或审计和评估他人编制的报表。安装或建议成本记录或其他财务和预算数据的系统。
+    planet_image_url: /static/career_planets/accountant.webp
+    holland_dimensions: ["C", "I", "E"]
+    work_contents:
+      - 准备关于审计发现的详细报告
+      - 向管理层汇报资产利用情况和审计结果，并建议运营和财务活动的变更
+      - 收集和分析数据，以发现控制缺陷、重复工作、浪费、欺诈或违反法律法规和管理政策的情况
+      - 检查账簿和会计系统，确保其效率、效果，并使用公认的会计程序记录交易
+      - 监督机构的审计工作，并确定所需调查的范围
+    career_outlook: 会计人员各行各业都有需求，但是目前电算化的推行，基础会计有饱和的趋势，但是高级会计人员管理会计方向的需求是非常大的，所以需要在工作中不断的提升自己，既懂得会计知识，又懂得管理的高级会计人员将会有好的职业发展前景。
+    development_path:
+      - 基础会计
+      - 主管会计
+      - 财务经理
+      - 单位财务负责人
+      - 财务总监
+    required_skills:
+      - 了解经济和会计原则与实践、金融市场、银行以及财务数据的分析与报告
+      - 对算术、代数、几何、微积分、统计学及其应用的知识
+      - 熟悉战略规划、资源分配、人力资源建模、领导技巧、生产方法和协调人员与资源所涉及的商业与管理原则
+      - 提供客户和个人服务的原则和流程知识。这包括客户需求评估、服务质量标准的满足以及客户满意度的评价
+    core_competency_model: {"basic_ability": 3, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 3}
