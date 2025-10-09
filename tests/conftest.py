@@ -131,6 +131,11 @@ async def sample_careers(database: AsyncSession) -> list[Career]:
                 "self_management": 3,
                 "task_execution": 3,
             },
+            related_courses=["机械设计", "工程力学"],
+            knowledge_background={
+                "industry_knowledge": "了解制造业生产流程",
+                "professional_knowledge": "掌握机械结构与维护原理",
+            },
         ),
         Career(
             name="数据分析师",
@@ -142,6 +147,11 @@ async def sample_careers(database: AsyncSession) -> list[Career]:
                 "basic_ability": 4,
                 "innovative_ability": 3,
                 "task_execution": 3,
+            },
+            related_courses=["统计学", "概率论"],
+            knowledge_background={
+                "industry_knowledge": "了解数据驱动的业务模式",
+                "professional_knowledge": "熟悉统计建模与数据库管理",
             },
         ),
         Career(
@@ -155,6 +165,11 @@ async def sample_careers(database: AsyncSession) -> list[Career]:
                 "social_ability": 3,
                 "team_collaboration": 3,
             },
+            related_courses=["视觉传达", "品牌策划"],
+            knowledge_background={
+                "industry_knowledge": "熟悉品牌推广流程",
+                "professional_knowledge": "掌握平面与多媒体设计技能",
+            },
         ),
         Career(
             name="教育顾问",
@@ -166,6 +181,11 @@ async def sample_careers(database: AsyncSession) -> list[Career]:
                 "social_ability": 4,
                 "team_collaboration": 3,
                 "self_management": 3,
+            },
+            related_courses=["教育心理学", "教学设计"],
+            knowledge_background={
+                "industry_knowledge": "了解教育培训行业趋势",
+                "professional_knowledge": "熟悉教学方法与评估工具",
             },
         ),
     ]

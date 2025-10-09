@@ -11,6 +11,7 @@ async def test_list_careers(student_client, sample_careers):
     first = payload["items"][0]
     assert "core_competency_model" in first
     assert first["name"]
+    assert isinstance(first.get("related_courses"), list)
 
 
 @pytest.mark.asyncio
@@ -32,6 +33,8 @@ async def test_get_career_detail(student_client, sample_careers):
     assert detail["name"] == target.name
     assert detail["required_skills"] and isinstance(detail["required_skills"], list)
     assert detail["core_competency_model"]["basic_ability"] == pytest.approx(4)
+    assert detail["related_courses"] and isinstance(detail["related_courses"], list)
+    assert detail["knowledge_background"]["industry_knowledge"]
 
 
 @pytest.mark.asyncio
@@ -41,3 +44,4 @@ async def test_featured_careers(student_client):
     items = response.json()
     assert len(items) == 3
     assert all("name" in item for item in items)
+    assert all(isinstance(item.get("related_courses"), list) for item in items)

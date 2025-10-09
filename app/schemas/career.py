@@ -15,9 +15,14 @@ class CareerSummary(BaseModel):
         description="匹配的霍兰德维度列表，例如 ['R','I','A']",
     )
     planet_image_url: Optional[str] = Field(None, description="职业星球展示图地址")
+    related_courses: Optional[list[str]] = Field(None, description="推荐学习的课程列表")
     core_competency_model: Optional[dict[str, float]] = Field(
         None,
         description="核心胜任力模型分布，键为能力项，值为评分",
+    )
+    knowledge_background: Optional[dict[str, str]] = Field(
+        None,
+        description="知识背景补充说明，例如行业及专业知识要求",
     )
 
 

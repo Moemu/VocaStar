@@ -25,7 +25,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import yaml
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 ROOT_PATH = Path(__file__).resolve().parents[1]
@@ -89,6 +89,35 @@ def normalize_core_competency(value: Any) -> dict[str, float] | None:
     return normalized or None
 
 
+def normalize_mapping_of_strings(value: Any, *, field_name: str) -> dict[str, str] | None:
+    if value is None:
+        return None
+    if not isinstance(value, Mapping):
+        raise ValueError(f"{field_name} 字段必须是对象")
+    normalized: dict[str, str] = {}
+    for key, raw in value.items():
+        if raw is None:
+            continue
+        normalized[str(key)] = str(raw).strip()
+    return normalized or None
+
+
+async def ensure_career_columns(session: AsyncSession) -> None:
+    result = await session.execute(text("PRAGMA table_info(careers)"))
+    columns = {row[1] for row in result.fetchall()}  # type: ignore[index]
+    statements: list[str] = []
+    if "core_competency_model" not in columns:
+        statements.append("ALTER TABLE careers ADD COLUMN core_competency_model JSON")
+    if "related_courses" not in columns:
+        statements.append("ALTER TABLE careers ADD COLUMN related_courses JSON")
+    if "knowledge_background" not in columns:
+        statements.append("ALTER TABLE careers ADD COLUMN knowledge_background JSON")
+
+    for ddl in statements:
+        logger.warning("检测到 careers 表缺少字段，正在执行: %s", ddl)
+        await session.execute(text(ddl))
+
+
 async def upsert_career(
     session: AsyncSession,
     *,
@@ -125,6 +154,10 @@ async def upsert_career(
 
     career.required_skills = normalize_skills(payload.get("required_skills"))
     career.core_competency_model = normalize_core_competency(payload.get("core_competency_model"))
+    career.related_courses = normalize_list(payload.get("related_courses"))
+    career.knowledge_background = normalize_mapping_of_strings(
+        payload.get("knowledge_background"), field_name="knowledge_background"
+    )
 
     return created
 
@@ -150,6 +183,7 @@ async def async_main(args: argparse.Namespace) -> None:
         raise ValueError("careers 节点必须是对象")
 
     async with async_session_maker() as session:
+        await ensure_career_columns(session)
         created_count = 0
         updated_count = 0
         imported_names: list[str] = []

@@ -33,7 +33,9 @@ class CareerService:
             description=career.description,
             holland_dimensions=career.holland_dimensions,
             planet_image_url=career.planet_image_url,
+            related_courses=career.related_courses,
             core_competency_model=career.core_competency_model,
+            knowledge_background=career.knowledge_background,
         )
 
     def _build_detail(self, career: Career) -> CareerDetail:
@@ -48,6 +50,8 @@ class CareerService:
             development_path=career.development_path,
             required_skills=self._split_lines(career.required_skills),
             core_competency_model=career.core_competency_model,
+            related_courses=career.related_courses,
+            knowledge_background=career.knowledge_background,
             created_at=career.created_at,
             updated_at=career.updated_at,
         )

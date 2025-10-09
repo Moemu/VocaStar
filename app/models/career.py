@@ -28,10 +28,16 @@ class Career(Base):
     development_path: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True, comment="发展路径列表")
     required_skills: Mapped[Optional[str]] = mapped_column(Text, nullable=True, comment="核心技能要求")
     planet_image_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True, comment="星球图片URL")
+    related_courses: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True, comment="相关课程列表")
     core_competency_model: Mapped[Optional[dict[str, float]]] = mapped_column(
         JSON,
         nullable=True,
         comment="核心胜任力模型分布(JSON)",
+    )
+    knowledge_background: Mapped[Optional[dict[str, str]]] = mapped_column(
+        JSON,
+        nullable=True,
+        comment="知识背景要求(JSON)",
     )
 
     created_at: Mapped[datetime] = mapped_column(
