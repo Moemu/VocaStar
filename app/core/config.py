@@ -26,6 +26,16 @@ class Config(BaseSettings):
     port: int = 8080
     """API 服务端口"""
 
+    # CORS 配置
+    cors_allow_origins: list[str] = ["*"] if env == "dev" else []
+    """允许跨域的源列表，开发环境下允许所有来源"""
+    cors_allow_methods: list[str] = ["*"]
+    """允许的 HTTP 方法"""
+    cors_allow_headers: list[str] = ["*"]
+    """允许的 HTTP 头"""
+    cors_allow_credentials: bool = True
+    """是否允许携带凭证（如 Cookies）"""
+
     # jwt 配置
     secret_key: str = "82ec285b5f0670c852c2e16d9776c5d17bd89a5f1dc09cdab5374a8a9ec7aa11"
     """32 位 hex 密钥，可以通过类似于 openssl rand -hex 32 的命令获得"""
