@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.career import CareerRecommendation
 from app.models.extensions import UserPoints
-from app.models.quiz import Quiz
+from app.models.quiz import Quiz, UserProfile
 from app.models.user import User
 
 
@@ -14,6 +14,32 @@ async def test_quiz_flow(
     test_user: User,
     database: AsyncSession,
 ):
+    # Test profile submission (before starting quiz)
+    profile_response = await student_client.post(
+        "/api/quiz/profile",
+        json={
+            "career_stage": "大学生",
+            "major": "计算机科学",
+            "career_confusion": "不确定未来从事什么方向",
+            "short_term_goals": ["找到合适的专业方向", "获得实习机会"],
+        },
+    )
+    assert profile_response.status_code == 200
+    profile_data = profile_response.json()
+    assert profile_data["career_stage"] == "大学生"
+    assert profile_data["major"] == "计算机科学"
+    assert len(profile_data["short_term_goals"]) == 2
+
+    # Verify profile was saved to user (not session)
+    result = await database.execute(select(UserProfile).where(UserProfile.user_id == test_user.id))
+    profile = result.scalars().first()
+    assert profile is not None
+    assert profile.career_stage == "大学生"
+    assert profile.major == "计算机科学"
+    assert profile.career_confusion == "不确定未来从事什么方向"
+    assert len(profile.short_term_goals) == 2
+
+    # Start quiz after profile
     start_response = await student_client.post("/api/quiz/start", params={"slug": "test-classic"})
     assert start_response.status_code == 200
     start_payload = start_response.json()
@@ -90,6 +116,76 @@ async def test_quiz_flow(
     user_points = result.scalars().first()
     assert user_points is not None
     assert user_points.points >= report["reward_points"]
+
+
+async def test_profile_validation(
+    student_client: AsyncClient,
+    sample_quiz: Quiz,
+):
+    """
+    Test the validation logic for the quiz profile submission,
+    including invalid career stage, empty goals, normal submission, update, and GET profile.
+    """
+
+    # Test invalid career stage
+    invalid_stage_response = await student_client.post(
+        "/api/quiz/profile",
+        json={
+            "career_stage": "无效阶段",
+            "major": "计算机科学",
+            "career_confusion": "测试困惑",
+            "short_term_goals": ["目标1"],
+        },
+    )
+    assert invalid_stage_response.status_code == 422
+
+    # Test empty short term goals
+    empty_goals_response = await student_client.post(
+        "/api/quiz/profile",
+        json={
+            "career_stage": "大学生",
+            "major": "计算机科学",
+            "career_confusion": "测试困惑",
+            "short_term_goals": [],
+        },
+    )
+    assert empty_goals_response.status_code == 422
+
+    # Test normal submission
+    valid_response = await student_client.post(
+        "/api/quiz/profile",
+        json={
+            "career_stage": "大学生",
+            "major": "计算机科学",
+            "career_confusion": "测试困惑",
+            "short_term_goals": ["目标1"],
+        },
+    )
+    assert valid_response.status_code == 200
+    profile_data = valid_response.json()
+    assert profile_data["career_stage"] == "大学生"
+
+    # Test update (not duplicate - should update existing)
+    update_response = await student_client.post(
+        "/api/quiz/profile",
+        json={
+            "career_stage": "职场新人",
+            "major": "金融",
+            "career_confusion": "另一个困惑",
+            "short_term_goals": ["目标2"],
+        },
+    )
+    assert update_response.status_code == 200
+    updated_data = update_response.json()
+    assert updated_data["career_stage"] == "职场新人"
+    assert updated_data["major"] == "金融"
+
+    # Test GET profile
+    get_response = await student_client.get("/api/quiz/profile")
+    assert get_response.status_code == 200
+    fetched_data = get_response.json()
+    assert fetched_data["career_stage"] == "职场新人"
+    assert fetched_data["major"] == "金融"
 
 
 async def test_start_quiz_with_invalid_slug(

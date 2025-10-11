@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.deps.auth import get_current_user
@@ -7,6 +7,8 @@ from app.models.user import User
 from app.schemas.quiz import (
     QuizAnswerRequest,
     QuizAnswerResponse,
+    QuizProfileRequest,
+    QuizProfileResponse,
     QuizQuestionsResponse,
     QuizReportResponse,
     QuizStartResponse,
@@ -45,6 +47,30 @@ async def answer_questions(
 ) -> QuizAnswerResponse:
     service = QuizService(db)
     return await service.answer_questions(request, current_user)
+
+
+@router.post("/profile", response_model=QuizProfileResponse)
+async def save_profile(
+    request: QuizProfileRequest,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> QuizProfileResponse:
+    """保存或更新用户个性化档案。"""
+    service = QuizService(db)
+    return await service.save_profile(request, current_user)
+
+
+@router.get("/profile", response_model=QuizProfileResponse)
+async def get_profile(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> QuizProfileResponse:
+    """获取用户个性化档案。"""
+    service = QuizService(db)
+    profile = await service.get_profile(current_user)
+    if not profile:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="尚未填写个性化档案")
+    return profile
 
 
 @router.post("/submit", response_model=QuizReportResponse)

@@ -11,7 +11,7 @@ from app.core.sql import Base
 if TYPE_CHECKING:
     from app.models.cosplay import CosplaySession
     from app.models.extensions import Feedback, Notification, ReportBookmark, UserPoints
-    from app.models.quiz import QuizSubmission
+    from app.models.quiz import QuizSubmission, UserProfile
 
 
 class UserRole(str, enum.Enum):
@@ -48,6 +48,7 @@ class User(Base):
     )
 
     # 关系
+    profile: Mapped[Optional["UserProfile"]] = relationship("UserProfile", back_populates="user", uselist=False)
     quiz_submissions: Mapped[list["QuizSubmission"]] = relationship("QuizSubmission", back_populates="user")
     cosplay_sessions: Mapped[list["CosplaySession"]] = relationship("CosplaySession", back_populates="user")
     report_bookmarks: Mapped[list["ReportBookmark"]] = relationship("ReportBookmark", back_populates="user")

@@ -139,6 +139,45 @@ class Option(Base):
     )
 
 
+class UserProfile(Base):
+    """用户个性化档案"""
+
+    __tablename__ = "user_profiles"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True, comment="主键ID")
+    user_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+        index=True,
+        comment="用户ID",
+    )
+    career_stage: Mapped[str] = mapped_column(String(50), nullable=False, comment="职业阶段")
+    major: Mapped[str] = mapped_column(String(200), nullable=False, comment="专业方向")
+    career_confusion: Mapped[str] = mapped_column(Text, nullable=False, comment="职业困惑")
+    short_term_goals: Mapped[List[str]] = mapped_column(JSON, nullable=False, comment="短期目标(JSON数组)")
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        server_default=sqlalchemy.func.now(),
+        comment="创建时间",
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        server_default=sqlalchemy.func.now(),
+        onupdate=sqlalchemy.func.now(),
+        comment="更新时间",
+    )
+
+    # 关系
+    user: Mapped["User"] = relationship("User", back_populates="profile")
+
+    __table_args__ = (Index("idx_profile_user_id", "user_id"),)
+
+
 class QuizSubmission(Base):
     """用户测评会话/提交"""
 

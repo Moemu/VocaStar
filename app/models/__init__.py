@@ -38,6 +38,7 @@ from app.models.quiz import (
     QuizAnswer,
     QuizReport,
     QuizSubmission,
+    UserProfile,
 )
 from app.models.user import User, UserRole
 
@@ -51,6 +52,7 @@ __all__ = [
     "QuestionType",
     "Option",
     "QuizSubmission",
+    "UserProfile",
     "QuizAnswer",
     "QuizReport",
     # 职业星球

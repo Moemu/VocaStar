@@ -71,6 +71,8 @@ APIFox 文档: <https://2v5c0iiid5.apifox.cn/>
 | API                  | 方法 | 说明                         |
 | -------------------- | ---- | ---------------------------- |
 | `/api/quiz/start`    | POST | 创建/获取测评会话            |
+| `/api/quiz/profile`  | POST | 保存/更新用户个性化档案       |
+| `/api/quiz/profile`  | GET  | 获取用户个性化档案           |
 | `/api/quiz/questions`| GET  | 获取题目与当前作答状态       |
 | `/api/quiz/answer`   | POST | 保存作答                     |
 | `/api/quiz/submit`   | POST | 提交测评并生成报告           |

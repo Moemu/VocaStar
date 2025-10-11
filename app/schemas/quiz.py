@@ -301,6 +301,33 @@ class QuizAnswerResponse(BaseModel):
     msg: str = Field(..., description="提示信息")
 
 
+class QuizProfileRequest(BaseModel):
+    """提交/更新用户个性化档案的请求体。"""
+
+    career_stage: str = Field(
+        ...,
+        description="职业阶段：高中生/大学生/职场新人/资深宇航员/星际指挥官",
+    )
+    major: str = Field(..., description="专业方向", min_length=1, max_length=200)
+    career_confusion: str = Field(..., description="职业困惑", min_length=1)
+    short_term_goals: List[str] = Field(
+        ...,
+        description="短期目标列表",
+        min_length=1,
+    )
+
+
+class QuizProfileResponse(BaseModel):
+    """用户个性化档案响应体。"""
+
+    career_stage: str = Field(..., description="职业阶段")
+    major: str = Field(..., description="专业方向")
+    career_confusion: str = Field(..., description="职业困惑")
+    short_term_goals: List[str] = Field(..., description="短期目标列表")
+    created_at: datetime = Field(..., description="创建时间")
+    updated_at: datetime = Field(..., description="更新时间")
+
+
 class QuizSubmitRequest(BaseModel):
     """提交测评的请求体。"""
 

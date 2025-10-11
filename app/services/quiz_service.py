@@ -19,6 +19,7 @@ from app.models.quiz import (
     QuizAnswer,
     QuizSubmission,
     QuizSubmissionStatus,
+    UserProfile,
 )
 from app.models.user import User
 from app.repositories.quiz import QuizRepository
@@ -31,6 +32,8 @@ from app.schemas.quiz import (
     QuizMetricsAnswer,
     QuizMultipleChoiceAnswer,
     QuizOption,
+    QuizProfileRequest,
+    QuizProfileResponse,
     QuizQuestion,
     QuizQuestionsResponse,
     QuizRatingAnswer,
@@ -90,7 +93,7 @@ class QuizService:
             QuizStartResponse: 包含会话标识、过期时间与服务器时间。
 
         Raises:
-            HTTPException: 当没有可用测评时返回 404。
+            HTTPException: 当没有可用测评时返回 404; 当未填写个性化档案时返回 400。
         """
         if slug:
             quiz = await self.repo.get_published_quiz_by_slug(slug)
@@ -101,6 +104,7 @@ class QuizService:
             if not quiz:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="当前没有可用的测评")
 
+        # 检查用户是否已有进行中的测评
         submission = await self.repo.get_active_submission_by_user(user.id, quiz_id=quiz.id)
         now = datetime.now(timezone.utc)
 
@@ -116,6 +120,12 @@ class QuizService:
                     server_time=now,
                 )
 
+        # 检查用户是否已完成个性化档案的填写
+        profile = await self.get_profile(user)
+        if not profile:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="请先完成个性化档案的填写")
+
+        # 创建新的测评会话
         session_token = uuid4().hex
         expires_at = now + timedelta(minutes=SESSION_DURATION_MINUTES)
         submission = await self.repo.create_submission(
@@ -1052,6 +1062,91 @@ class QuizService:
     def _format_dimension_label(self, dimension: str) -> str:
         """将维度代码转成更易理解的标签。"""
         return DIMENSION_LABELS.get(dimension, dimension)
+
+    async def save_profile(self, request: QuizProfileRequest, user: User) -> QuizProfileResponse:
+        """保存或更新用户个性化档案。
+
+        Args:
+            request: 档案数据。
+            user: 当前登录用户。
+
+        Returns:
+            QuizProfileResponse: 完整的档案信息。
+
+        Raises:
+            HTTPException: 验证失败时抛出。
+        """
+        # 验证职业阶段选项
+        valid_stages = {"高中生", "大学生", "职场新人", "资深宇航员", "星际指挥官"}
+        if request.career_stage not in valid_stages:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail=f"职业阶段无效，仅支持：{', '.join(valid_stages)}",
+            )
+
+        # 验证短期目标非空
+        if not request.short_term_goals or all(not goal.strip() for goal in request.short_term_goals):
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail="短期目标不能为空",
+            )
+
+        # 查找或创建档案
+        result = await self.session.execute(select(UserProfile).where(UserProfile.user_id == user.id))
+        profile = result.scalars().first()
+
+        if profile:
+            # 更新现有档案
+            profile.career_stage = request.career_stage
+            profile.major = request.major.strip()
+            profile.career_confusion = request.career_confusion.strip()
+            profile.short_term_goals = [goal.strip() for goal in request.short_term_goals if goal.strip()]
+        else:
+            # 创建新档案
+            profile = UserProfile(
+                user_id=user.id,
+                career_stage=request.career_stage,
+                major=request.major.strip(),
+                career_confusion=request.career_confusion.strip(),
+                short_term_goals=[goal.strip() for goal in request.short_term_goals if goal.strip()],
+            )
+            self.session.add(profile)
+
+        await self.session.commit()
+        await self.session.refresh(profile)
+
+        return QuizProfileResponse(
+            career_stage=profile.career_stage,
+            major=profile.major,
+            career_confusion=profile.career_confusion,
+            short_term_goals=profile.short_term_goals,
+            created_at=profile.created_at,
+            updated_at=profile.updated_at,
+        )
+
+    async def get_profile(self, user: User) -> Optional[QuizProfileResponse]:
+        """获取用户个性化档案。
+
+        Args:
+            user: 当前登录用户。
+
+        Returns:
+            QuizProfileResponse: 档案信息，不存在时返回 None。
+        """
+        result = await self.session.execute(select(UserProfile).where(UserProfile.user_id == user.id))
+        profile = result.scalars().first()
+
+        if not profile:
+            return None
+
+        return QuizProfileResponse(
+            career_stage=profile.career_stage,
+            major=profile.major,
+            career_confusion=profile.career_confusion,
+            short_term_goals=profile.short_term_goals,
+            created_at=profile.created_at,
+            updated_at=profile.updated_at,
+        )
 
     async def _award_points(self, user_id: int, points: int, *, reason: str) -> None:
         """为用户增加积分并记录积分流水。"""
