@@ -1,0 +1,46 @@
+# Python aiohttp
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+pip-selfcheck.json
+
+# VS Code
+.vscode/
+.history/
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Docker
+.dockerignore
+Dockerfile
+
+# Logs
+logs/
+*.log
+
+# Other
+.idea/
+*.iml
+.project
+.pydevproject
+.settings/
+*.DS_Store*
+*.suo
+*.user
+*.sln
+*.userprefs

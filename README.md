@@ -106,3 +106,34 @@ uv run scripts\import_careers_from_yaml.py
 ## 数据库重置
 
 删除项目根目录下的 `database.db` 即可。
+
+## 在容器中构建
+
+在项目根目录中创建 `app/data` 目录，用于容器存储数据库数据
+
+在项目根目录中创建 `.env` 文件
+
+`.env` 的写法可参考: [config.py](https://github.com/Moemu/FinancialCareerCommunity/blob/main/app/core/config.py)
+
+添加一个可持久化的 SQLite 数据库配置:
+
+```env
+DATABASE_URL="sqlite+aiosqlite:///app/data/database.db"
+```
+
+构建容器:
+
+```shell
+docker volume create financial-career-data
+docker build -t fcc .
+```
+
+启动容器:
+
+```shell
+docker run -d --name fcc-app \
+  -p 8080:8080 \
+  --env-file ./.env \
+  -v financial-career-data:/app/data \
+  fcc
+```
