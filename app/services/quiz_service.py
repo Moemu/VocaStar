@@ -121,9 +121,9 @@ class QuizService:
                 )
 
         # 检查用户是否已完成个性化档案的填写
-        profile = await self.get_profile(user)
-        if not profile:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="请先完成个性化档案的填写")
+        # profile = await self.get_profile(user)
+        # if not profile:
+        #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="请先完成个性化档案的填写")
 
         # 创建新的测评会话
         session_token = uuid4().hex
