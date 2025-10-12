@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.deps.sql import get_db as get_sql_db
 from app.main import app
-from app.models.career import Career
+from app.models.career import Career, CareerGalaxy
 from app.models.quiz import Option, Question, QuestionType, Quiz
 from app.models.user import User, UserRole
 from app.repositories.user import UserRepository
@@ -118,7 +118,33 @@ async def teacher_client(async_client: AsyncClient, test_teacher: User) -> Async
 
 
 @pytest_asyncio.fixture(scope="session")
-async def sample_careers(database: AsyncSession) -> list[Career]:
+async def sample_galaxies(database: AsyncSession) -> list[CareerGalaxy]:
+    galaxies = [
+        CareerGalaxy(
+            name="硅基星系",
+            category="互联网·通信",
+            description="聚焦互联网与通信职业的高科技星系",
+        ),
+        CareerGalaxy(
+            name="极光星系",
+            category="创意·教育",
+            description="灵感与成长并存的创意教育星系",
+        ),
+        CareerGalaxy(
+            name="开普勒星系",
+            category="金融·建筑·工程",
+            description="兼具理性与秩序的金融工程星系",
+        ),
+    ]
+    database.add_all(galaxies)
+    await database.commit()
+    for galaxy in galaxies:
+        await database.refresh(galaxy)
+    return galaxies
+
+
+@pytest_asyncio.fixture(scope="session")
+async def sample_careers(database: AsyncSession, sample_galaxies: list[CareerGalaxy]) -> list[Career]:
     careers = [
         Career(
             name="工程实践工程师",
@@ -136,6 +162,11 @@ async def sample_careers(database: AsyncSession) -> list[Career]:
                 "industry_knowledge": "了解制造业生产流程",
                 "professional_knowledge": "掌握机械结构与维护原理",
             },
+            galaxy_id=sample_galaxies[2].id,
+            salary_min=9000,
+            salary_max=15000,
+            skills_snapshot=["机械维护", "安全规范", "方案执行"],
+            planet_image_url="/static/career_planets/engineer.webp",
         ),
         Career(
             name="数据分析师",
@@ -153,6 +184,11 @@ async def sample_careers(database: AsyncSession) -> list[Career]:
                 "industry_knowledge": "了解数据驱动的业务模式",
                 "professional_knowledge": "熟悉统计建模与数据库管理",
             },
+            galaxy_id=sample_galaxies[0].id,
+            salary_min=12000,
+            salary_max=20000,
+            skills_snapshot=["SQL", "数据建模", "可视化"],
+            planet_image_url="/static/career_planets/data_analyst.webp",
         ),
         Career(
             name="创意设计师",
@@ -170,6 +206,11 @@ async def sample_careers(database: AsyncSession) -> list[Career]:
                 "industry_knowledge": "熟悉品牌推广流程",
                 "professional_knowledge": "掌握平面与多媒体设计技能",
             },
+            galaxy_id=sample_galaxies[1].id,
+            salary_min=8000,
+            salary_max=16000,
+            skills_snapshot=["视觉创意", "沟通协作"],
+            planet_image_url="/static/career_planets/designer.webp",
         ),
         Career(
             name="教育顾问",
@@ -187,6 +228,11 @@ async def sample_careers(database: AsyncSession) -> list[Career]:
                 "industry_knowledge": "了解教育培训行业趋势",
                 "professional_knowledge": "熟悉教学方法与评估工具",
             },
+            galaxy_id=sample_galaxies[1].id,
+            salary_min=7000,
+            salary_max=14000,
+            skills_snapshot=["成长辅导", "沟通协调"],
+            planet_image_url="/static/career_planets/mentor.webp",
         ),
     ]
     database.add_all(careers)

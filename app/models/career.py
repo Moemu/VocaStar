@@ -14,6 +14,35 @@ if TYPE_CHECKING:
     from app.models.quiz import QuizReport
 
 
+class CareerGalaxy(Base):
+    """职业探索星系，用于将职业星球按主题和类目进行分组"""
+
+    __tablename__ = "career_galaxies"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True, comment="主键ID")
+    name: Mapped[str] = mapped_column(String(100), nullable=False, comment="星系名称")
+    category: Mapped[str] = mapped_column(String(100), nullable=False, comment="对应的职业分类显示名称")
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True, comment="星系简介")
+    cover_image_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True, comment="星系封面图 URL")
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        server_default=sqlalchemy.func.now(),
+        comment="创建时间",
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime,
+        nullable=False,
+        server_default=sqlalchemy.func.now(),
+        onupdate=sqlalchemy.func.now(),
+        comment="更新时间",
+    )
+
+    # 关系
+    careers: Mapped[list["Career"]] = relationship("Career", back_populates="galaxy")
+
+
 class Career(Base):
     """职业"""
 
@@ -39,6 +68,16 @@ class Career(Base):
         nullable=True,
         comment="知识背景要求(JSON)",
     )
+    galaxy_id: Mapped[Optional[int]] = mapped_column(
+        Integer,
+        ForeignKey("career_galaxies.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+        comment="所属探索星系ID",
+    )
+    salary_min: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, comment="建议薪资范围最小值")
+    salary_max: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, comment="建议薪资范围最大值")
+    skills_snapshot: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True, comment="技能亮点简表(JSON 列表)")
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
@@ -59,8 +98,12 @@ class Career(Base):
         "CareerRecommendation", back_populates="career"
     )
     scripts: Mapped[list["CosplayScript"]] = relationship("CosplayScript", back_populates="career")
+    galaxy: Mapped[Optional[CareerGalaxy]] = relationship("CareerGalaxy", back_populates="careers")
 
-    __table_args__ = (Index("idx_career_name", "name"),)
+    __table_args__ = (
+        Index("idx_career_name", "name"),
+        Index("idx_career_salary_range", "salary_min", "salary_max"),
+    )
 
 
 class CareerRecommendation(Base):

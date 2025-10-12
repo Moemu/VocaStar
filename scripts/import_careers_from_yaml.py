@@ -1,7 +1,6 @@
 """Utility script to import career definitions from a YAML file into the database.
 
 Usage examples
---------------
 Default import using ``assets/careers.yaml``::
 
     uv run python scripts/import_careers_from_yaml.py

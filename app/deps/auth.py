@@ -1,8 +1,8 @@
 from datetime import datetime
-from typing import Annotated, Callable, Coroutine
+from typing import Annotated, Callable, Coroutine, Optional
 
 import jwt
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from redis.asyncio import Redis
@@ -21,13 +21,13 @@ from .sql import get_db
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="./login")
 
 
-async def get_current_user(
-    db: Annotated[AsyncSession, Depends(get_db)],
-    token: Annotated[str, Depends(oauth2_scheme)],
-    redis: Annotated[Redis, Depends(get_redis_client)],
+async def _resolve_user_from_token(
+    *,
+    db: AsyncSession,
+    redis: Redis,
+    token: str,
 ) -> User:
     logger.debug("尝试鉴权已登录用户...")
-
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -44,7 +44,6 @@ async def get_current_user(
         ):
             logger.warning("用户鉴权失败，用户可能没有设置密钥体或密钥过期")
             raise credentials_exception
-
     except jwt.ExpiredSignatureError:
         logger.warning("用户鉴权失败，用户使用的 jwt 已过期")
         raise credentials_exception
@@ -64,6 +63,33 @@ async def get_current_user(
     return user
 
 
+async def get_current_user(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    token: Annotated[str, Depends(oauth2_scheme)],
+    redis: Annotated[Redis, Depends(get_redis_client)],
+) -> User:
+    return await _resolve_user_from_token(db=db, redis=redis, token=token)
+
+
+async def get_current_user_optional(
+    request: Request,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    redis: Annotated[Redis, Depends(get_redis_client)],
+) -> Optional[User]:
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header.lower().startswith("bearer "):
+        return None
+    token = auth_header.split(" ", 1)[1].strip()
+    if not token:
+        return None
+    try:
+        return await _resolve_user_from_token(db=db, redis=redis, token=token)
+    except HTTPException as exc:
+        if exc.status_code == status.HTTP_401_UNAUTHORIZED:
+            return None
+        raise
+
+
 def check_and_get_current_role(
     role: UserRole,
 ) -> Callable[..., Coroutine[None, None, User]]:
@@ -72,7 +98,7 @@ def check_and_get_current_role(
         token: Annotated[str, Depends(oauth2_scheme)],
         redis: Annotated[Redis, Depends(get_redis_client)],
     ) -> User:
-        user = await get_current_user(db, token, redis)
+        user = await _resolve_user_from_token(db=db, redis=redis, token=token)
         if user.role != role:
             logger.warning("用户鉴权失败，所登录的用户没有响应的权限")
             raise HTTPException(status_code=403, detail="Permission denied")
