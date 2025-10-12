@@ -34,8 +34,11 @@ COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/pytho
 # Copy the application source code
 COPY ./app ./app
 COPY ./assets ./assets
+COPY ./scripts ./scripts
 
-# Change ownership of the files to the app user
+# Data import scripts will be run at container startup to avoid conflicts with the volume
+
+# Change ownership of the app files to the app user
 RUN chown -R app:app /app
 
 # Switch to the non-root user
@@ -47,6 +50,9 @@ VOLUME /app/data
 # Expose the port the app runs on
 EXPOSE 8080
 
-# Command to run the application
+# Command to run the application and import data at startup
 # Use 0.0.0.0 to make it accessible from outside the container
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD bash -c 'export DB_URL="sqlite+aiosqlite:///app/data/database.db" \
+    && python scripts/import_careers_from_yaml.py \
+    && python scripts/import_quiz_from_yaml.py \
+    && uvicorn app.main:app --host 0.0.0.0 --port 8080'

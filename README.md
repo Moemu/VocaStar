@@ -14,6 +14,7 @@
 
 - [uv](https://docs.astral.sh/uv/)
 - `Python > 3.11`
+- `Redis`
 
 **安装依赖:**
 
@@ -121,19 +122,8 @@ uv run scripts\import_careers_from_yaml.py
 DATABASE_URL="sqlite+aiosqlite:///app/data/database.db"
 ```
 
-构建容器:
-
-```shell
-docker volume create financial-career-data
-docker build -t fcc .
-```
-
 启动容器:
 
 ```shell
-docker run -d --name fcc-app \
-  -p 8080:8080 \
-  --env-file ./.env \
-  -v financial-career-data:/app/data \
-  fcc
+docker-compose up --build -d
 ```

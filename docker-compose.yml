@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: financial_career_app
+    ports:
+      - "8000:8000"
+    volumes:
+      - financial_career_data:/app/data
+    env_file:
+      - ./.env
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  redis:
+    image: "redis:alpine"
+    container_name: financial_career_redis
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+
+volumes:
+  financial_career_data:
+  redis_data:
