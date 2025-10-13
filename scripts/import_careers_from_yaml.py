@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Any, Iterable
 
 import yaml
-from sqlalchemy import delete, select, text
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 ROOT_PATH = Path(__file__).resolve().parents[1]
@@ -33,9 +33,10 @@ if str(ROOT_PATH) not in sys.path:
 
 from app.core.logger import logger  # noqa: E402
 from app.core.sql import async_session_maker  # noqa: E402
-from app.models.career import Career  # noqa: E402
+from app.models.career import Career, CareerGalaxy  # noqa: E402
 
 CAREERS_SECTION_KEY = "careers"
+GALAXIES_SECTION_KEY = "galaxies"
 
 
 def load_yaml(path: Path) -> dict[str, Any]:
@@ -101,20 +102,46 @@ def normalize_mapping_of_strings(value: Any, *, field_name: str) -> dict[str, st
     return normalized or None
 
 
-async def ensure_career_columns(session: AsyncSession) -> None:
-    result = await session.execute(text("PRAGMA table_info(careers)"))
-    columns = {row[1] for row in result.fetchall()}  # type: ignore[index]
-    statements: list[str] = []
-    if "core_competency_model" not in columns:
-        statements.append("ALTER TABLE careers ADD COLUMN core_competency_model JSON")
-    if "related_courses" not in columns:
-        statements.append("ALTER TABLE careers ADD COLUMN related_courses JSON")
-    if "knowledge_background" not in columns:
-        statements.append("ALTER TABLE careers ADD COLUMN knowledge_background JSON")
+def normalize_optional_int(value: Any, *, field_name: str) -> int | None:
+    if value is None or value == "":
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{field_name} 字段必须是整数") from exc
 
-    for ddl in statements:
-        logger.warning("检测到 careers 表缺少字段，正在执行: %s", ddl)
-        await session.execute(text(ddl))
+
+async def upsert_galaxy(
+    session: AsyncSession,
+    *,
+    identifier: str,
+    payload: Mapping[str, Any],
+) -> tuple[CareerGalaxy, bool]:
+    name = payload.get("name") or identifier.replace("_", " ")
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError(f"星系节点 {identifier!r} 缺少有效的 name 字段")
+    name = name.strip()
+
+    stmt = select(CareerGalaxy).where(CareerGalaxy.name == name)
+    result = await session.execute(stmt)
+    galaxy = result.scalars().first()
+
+    created = False
+    category_value = payload.get("category") or name
+
+    if not galaxy:
+        galaxy = CareerGalaxy(
+            name=name,
+            category=category_value,
+        )
+        session.add(galaxy)
+        created = True
+
+    galaxy.category = category_value or galaxy.category
+    galaxy.description = payload.get("description") or None
+    galaxy.cover_image_url = payload.get("cover_image_url") or None
+
+    return galaxy, created
 
 
 async def upsert_career(
@@ -122,6 +149,7 @@ async def upsert_career(
     *,
     identifier: str,
     payload: Mapping[str, Any],
+    galaxy_index: Mapping[str, CareerGalaxy],
 ) -> bool:
     name = payload.get("name") or identifier.replace("_", " ")
     if not isinstance(name, str) or not name.strip():
@@ -157,6 +185,24 @@ async def upsert_career(
     career.knowledge_background = normalize_mapping_of_strings(
         payload.get("knowledge_background"), field_name="knowledge_background"
     )
+    career.salary_min = normalize_optional_int(payload.get("salary_min"), field_name="salary_min")
+    career.salary_max = normalize_optional_int(payload.get("salary_max"), field_name="salary_max")
+    career.skills_snapshot = normalize_list(payload.get("skills_snapshot"))
+
+    galaxy_ref = payload.get("galaxy")
+    galaxy_name: str | None = None
+    if isinstance(galaxy_ref, str):
+        galaxy_name = galaxy_ref.strip()
+    elif isinstance(galaxy_ref, Mapping):
+        raw_name = galaxy_ref.get("name")
+        galaxy_name = str(raw_name).strip() if raw_name else None
+
+    if galaxy_name:
+        galaxy_obj = galaxy_index.get(galaxy_name)
+        if galaxy_obj:
+            career.galaxy_id = galaxy_obj.id
+        else:
+            logger.warning("未找到名称为 %s 的星系，职业 %s 保持原有关联", galaxy_name, name)
 
     return created
 
@@ -182,7 +228,35 @@ async def async_main(args: argparse.Namespace) -> None:
         raise ValueError("careers 节点必须是对象")
 
     async with async_session_maker() as session:
-        await ensure_career_columns(session)
+        galaxy_records: dict[str, CareerGalaxy] = {}
+        galaxy_created = 0
+        galaxy_updated = 0
+
+        galaxies_section = payload.get(GALAXIES_SECTION_KEY)
+        if galaxies_section is None:
+            print("galaxies 条目为空，请检查职业配置文件")
+            return
+
+        for identifier, galaxy_payload in galaxies_section.items():
+            if not isinstance(galaxy_payload, Mapping):
+                raise ValueError(f"星系节点 {identifier!r} 必须是对象")
+            galaxy, created = await upsert_galaxy(
+                session,
+                identifier=str(identifier),
+                payload=galaxy_payload,
+            )
+            galaxy_records[galaxy.name] = galaxy
+            if created:
+                galaxy_created += 1
+            else:
+                galaxy_updated += 1
+        await session.flush()
+
+        # Ensure缓存包含所有现有星系，防止 YAML 未覆盖的旧记录丢失关联
+        existing_result = await session.execute(select(CareerGalaxy))
+        for galaxy in existing_result.scalars():
+            galaxy_records.setdefault(galaxy.name, galaxy)
+
         created_count = 0
         updated_count = 0
         imported_names: list[str] = []
@@ -190,7 +264,12 @@ async def async_main(args: argparse.Namespace) -> None:
         for identifier, career_payload in careers_section.items():
             if not isinstance(career_payload, Mapping):
                 raise ValueError(f"职业节点 {identifier!r} 必须是对象")
-            created = await upsert_career(session, identifier=str(identifier), payload=career_payload)
+            created = await upsert_career(
+                session,
+                identifier=str(identifier),
+                payload=career_payload,
+                galaxy_index=galaxy_records,
+            )
             name = career_payload.get("name") or str(identifier)
             imported_names.append(str(name).strip())
             if created:
@@ -205,10 +284,12 @@ async def async_main(args: argparse.Namespace) -> None:
         await session.commit()
 
     logger.info(
-        "职业导入已完成 ✅ 新增 %d 条，更新 %d 条，删除 %d 条 (YAML: %s)",
+        "职业导入已完成 ✅ 新增职业 %d 条，更新职业 %d 条，删除职业 %d 条；新增星系 %d 条，更新星系 %d 条 (YAML: %s)",
         created_count,
         updated_count,
         removed,
+        galaxy_created,
+        galaxy_updated,
         yaml_path,
     )
 

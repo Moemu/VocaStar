@@ -4,6 +4,13 @@ careers:
     description: 软件工程师负责设计、开发和维护软件系统，解决复杂技术问题。他们需要掌握多种编程语言和开发工具，持续学习新技术，并与团队协作完成项目。 软件工程师需要具备扎实的编程基础，能够理解和实现复杂的业务逻辑，同时需要具备良好的沟通能力和团队协作精神。随着技术的不断发展，软件工程师需要保持持续学习的热情，关注行业动态和新技术趋势，不断提升自己的专业技能和解决问题的能力。
     planet_image_url: /static/career_planets/software_engineer.webp
     holland_dimensions: ["I", "C", "R"]
+    galaxy: 硅基星系
+    salary_min: 15000
+    salary_max: 32000
+    skills_snapshot:
+      - 云原生开发
+      - 系统架构设计
+      - 敏捷协作
     core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 3}
     work_contents:
       - 参与软件系统的设计与开发，编写高质量代码
@@ -39,6 +46,13 @@ careers:
     description: 进行组织研究和评估，设计系统和流程，开展工作简化和测量研究，并编制运营和程序手册，以帮助管理层更高效、更有效地运作。包括项目分析师和管理顾问。
     planet_image_url: /static/career_planets/data_analyst.webp
     holland_dimensions: ["I", "C", "E"]
+    galaxy: 硅基星系
+    salary_min: 12000
+    salary_max: 22000
+    skills_snapshot:
+      - SQL 建模
+      - 数据可视化
+      - 业务洞察
     core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 4, "team_collaboration": 4, "innovative_ability": 4, "task_execution": 3}
     work_contents:
       - 收集和整理有关问题或程序的信息
@@ -74,6 +88,13 @@ careers:
     description: 审查、分析并解释会计记录，以编制财务报表、提供建议，或审计和评估他人编制的报表。安装或建议成本记录或其他财务和预算数据的系统。
     planet_image_url: /static/career_planets/accountant.webp
     holland_dimensions: ["C", "I", "E"]
+    galaxy: 基石星系
+    salary_min: 8000
+    salary_max: 18000
+    skills_snapshot:
+      - 财务报表分析
+      - 成本控制
+      - 法规合规
     core_competency_model: {"basic_ability": 3, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 3}
     work_contents:
       - 准备关于审计发现的详细报告
@@ -104,3 +125,25 @@ careers:
     knowledge_background:
       industry_knowledge: 要时刻关注会计准则和税法的公告更新，因为中国会计准则是向IFRS趋同，而IFRS最近几年的概念框架发生大幅变动，所以很多条例在根本上会发生改变；现在的新兴行业越来越多，国家对企业的支持力度也在加大，所以税收法规更新快。作为和数字打交道的职业，其与金融的影响密不可分，所以掌握一定的金融知识是很有必要。同时从业人员所在企业的行业有些基础知识需要了解，方便对资金流动性、税收筹划以及融资方式做出决策。
       professional_knowledge: 金融、会计、经济等相关知识。大学期间学习到的专业知识非常重要，是做好工作的基础，是理论与实践的结合。当然在工作中还需要保持边工作边学习的精神和态度，努力使自己成为能够为社会所欣赏吸纳的高级人才，在不同企业间游刃有余。
+
+galaxies:
+  silicon:
+    name: 硅基星系
+    category: 互联网·通信
+    description: 聚焦云计算、人工智能与互联网工程的前沿科技星系
+    cover_image_url: /static/career_galaxies/silicon.png
+  cornerstone:
+    name: 基石星系
+    category: 金融·建筑·工程
+    description: 关注金融、建筑与工程领域的创新与发展星系
+    cover_image_url: /static/career_galaxies/cornerstone.png
+  giant:
+    name: 巨构星系
+    category: 医疗·生物·化工
+    description: 专注医疗健康、生物技术与化工产业的巨构星系
+    cover_image_url: /static/career_galaxies/giant.png
+  life:
+    name: 生命星系
+    category: 农·林·牧·渔
+    description: 专注农业、林业、畜牧业与渔业的生态星系
+    cover_image_url: /static/career_galaxies/life.png
