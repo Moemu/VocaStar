@@ -1,4 +1,4 @@
-# FinancialCareerCommunity Backend
+# VocaStar
 
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
 ![Black CodeStyle](https://img.shields.io/badge/Code%20Style-Black-121110.svg)
@@ -6,7 +6,7 @@
 [![Test and Coverage](https://github.com/Moemu/FinancialCareerCommunity/actions/workflows/pytest.yaml/badge.svg)](https://github.com/Moemu/FinancialCareerCommunity/actions/workflows/pytest.yaml)
 ![coverage](./src/coverage.svg)
 
-别急，还没开始写.
+A simple Python backend implementation to provide services for VocaStar.
 
 ## 快速开始
 
@@ -44,7 +44,7 @@ python -m app.main
 
 默认本地 FastAPI 文档: <http://127.0.0.1:8080/docs>
 
-APIFox 文档: <https://2v5c0iiid5.apifox.cn/>
+APIFox 文档: <https://vocastar.snowy.moe/>
 
 ## API 适配情况
 
