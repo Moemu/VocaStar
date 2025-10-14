@@ -126,6 +126,349 @@ careers:
       industry_knowledge: 要时刻关注会计准则和税法的公告更新，因为中国会计准则是向IFRS趋同，而IFRS最近几年的概念框架发生大幅变动，所以很多条例在根本上会发生改变；现在的新兴行业越来越多，国家对企业的支持力度也在加大，所以税收法规更新快。作为和数字打交道的职业，其与金融的影响密不可分，所以掌握一定的金融知识是很有必要。同时从业人员所在企业的行业有些基础知识需要了解，方便对资金流动性、税收筹划以及融资方式做出决策。
       professional_knowledge: 金融、会计、经济等相关知识。大学期间学习到的专业知识非常重要，是做好工作的基础，是理论与实践的结合。当然在工作中还需要保持边工作边学习的精神和态度，努力使自己成为能够为社会所欣赏吸纳的高级人才，在不同企业间游刃有余。
 
+  frontend_development_engineer:
+    name: 前端开发工程师
+    description: 前端开发工程师负责实现网站和应用的用户界面，确保页面在不同设备和浏览器上的兼容性与交互体验。他们需要精通 HTML、CSS、JavaScript 及相关框架，能够与设计师和后端工程师协作，将设计稿转化为高效、可维护的代码。
+    planet_image_url: /static/career_planets/frontend_development_engineer.webp
+    holland_dimensions: ["A", "C", "R"]
+    galaxy: 硅基星系
+    salary_min: 12000
+    salary_max: 25000
+    skills_snapshot:
+      - 响应式设计
+      - 前端框架（React/Vue）
+      - 跨浏览器调试
+    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 4, "innovative_ability": 3, "task_execution": 4}
+    work_contents:
+      - 将设计稿转化为高质量的网页代码
+      - 优化页面性能和加载速度
+      - 处理跨浏览器兼容性问题
+      - 与后端工程师协作实现数据交互
+    career_outlook: 随着互联网应用的普及，前端开发工程师需求持续增长，未来可向全栈开发、前端架构师或技术管理方向发展。
+    development_path:
+      - 初级前端工程师
+      - 中级前端工程师
+      - 高级前端工程师
+      - 前端架构师/技术负责人
+    required_skills:
+      - 熟悉 HTML5、CSS3、JavaScript
+      - 掌握主流前端框架（React、Vue、Angular）
+      - 了解 Web 性能优化与安全
+    related_courses:
+      - Web 前端开发
+      - JavaScript 高级编程
+      - 计算机网络
+      - 用户体验设计
+    knowledge_background:
+      industry_knowledge: 参与过网站或应用的前端开发项目，熟悉常见的前端开发流程。
+      professional_knowledge: 掌握计算机网络、浏览器渲染机制、前端工程化工具（Webpack、Vite 等）。
+
+  communications_engineer:
+    name: 通信工程师
+    description: 通信工程师负责通信系统的设计、建设与维护，包括无线通信、光纤通信和网络传输。他们需要掌握通信原理、信号处理和网络协议，确保通信系统的稳定性和高效性。
+    planet_image_url: /static/career_planets/communications_engineer.webp
+    holland_dimensions: ["R", "I", "C"]
+    galaxy: 硅基星系
+    salary_min: 13000
+    salary_max: 28000
+    skills_snapshot:
+      - 无线通信技术
+      - 网络协议分析
+      - 信号处理
+    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 4}
+    work_contents:
+      - 设计和优化通信网络
+      - 进行信号测试与故障排查
+      - 研究新一代通信技术（如 5G/6G）
+    career_outlook: 随着 5G、物联网的发展，通信工程师需求旺盛，未来可发展为网络架构师或通信专家。
+    development_path:
+      - 初级通信工程师
+      - 中级通信工程师
+      - 高级通信工程师
+      - 通信架构师/专家
+    required_skills:
+      - 掌握通信原理与信号处理
+      - 熟悉 TCP/IP、5G 等通信协议
+      - 具备网络优化与排障能力
+    related_courses:
+      - 通信原理
+      - 数字信号处理
+      - 无线通信
+      - 网络工程
+    knowledge_background:
+      industry_knowledge: 参与过通信网络建设或优化项目。
+      professional_knowledge: 掌握通信系统设计、信号处理、网络协议。
+
+  architectural_designer:
+    name: 建筑设计师
+    description: 建筑设计师负责建筑物的外观与空间设计，兼顾美学、功能与安全。他们需要掌握建筑学原理、设计软件和施工规范，能够与工程师、客户沟通，完成建筑方案。
+    planet_image_url: /static/career_planets/architectural_designer.webp
+    holland_dimensions: ["A", "I", "C"]
+    galaxy: 基石星系
+    salary_min: 10000
+    salary_max: 22000
+    skills_snapshot:
+      - 建筑设计
+      - CAD/BIM 建模
+      - 空间规划
+    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 4, "team_collaboration": 3, "innovative_ability": 4, "task_execution": 3}
+    work_contents:
+      - 设计建筑方案并绘制图纸
+      - 使用 BIM/CAD 工具进行建模
+      - 与客户沟通需求并优化设计
+    career_outlook: 城市化进程推动建筑设计需求，未来可发展为建筑总设计师或城市规划师。
+    development_path:
+      - 助理建筑师
+      - 建筑设计师
+      - 高级建筑设计师
+      - 总建筑师
+    required_skills:
+      - 熟练使用 CAD、Revit、SketchUp
+      - 掌握建筑规范与施工工艺
+      - 良好的审美与空间想象力
+    related_courses:
+      - 建筑设计原理
+      - 建筑构造
+      - 城市规划
+      - 建筑美学
+    knowledge_background:
+      industry_knowledge: 参与过建筑设计或施工图绘制。
+      professional_knowledge: 掌握建筑学、结构学、材料学。
+
+  civil_engineer:
+    name: 土木工程师
+    description: 土木工程师负责基础设施的设计、施工与维护，包括道路、桥梁、隧道和建筑结构。他们需要掌握结构力学、施工技术和工程管理。
+    planet_image_url: /static/career_planets/civil_engineer.webp
+    holland_dimensions: ["R", "C", "I"]
+    galaxy: 基石星系
+    salary_min: 12000
+    salary_max: 26000
+    skills_snapshot:
+      - 结构设计
+      - 工程管理
+      - 施工监理
+    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 4, "innovative_ability": 3, "task_execution": 4}
+    work_contents:
+      - 进行结构设计与计算
+      - 监督施工质量与进度
+      - 进行工程安全评估
+    career_outlook: 基建投资持续，土木工程师需求稳定，未来可发展为项目经理或总工程师。
+    development_path:
+      - 助理工程师
+      - 工程师
+      - 高级工程师
+      - 项目经理/总工
+    required_skills:
+      - 掌握结构力学与施工技术
+      - 熟悉工程管理流程
+      - 具备项目协调能力
+    related_courses:
+      - 结构力学
+      - 工程测量
+      - 建筑材料
+      - 工程管理
+    knowledge_background:
+      industry_knowledge: 参与过土木工程项目施工或设计。
+      professional_knowledge: 掌握土木工程学科基础与施工规范。
+
+  medical_data_analyst:
+    name: 医学数据分析师
+    description: 医学数据分析师负责收集、清洗和分析医疗数据，支持临床研究和医疗决策。他们需要掌握统计学、数据挖掘和医学知识。
+    planet_image_url: /static/career_planets/medical_data_analyst.webp
+    holland_dimensions: ["I", "C", "R"]
+    galaxy: 巨构星系
+    salary_min: 14000
+    salary_max: 28000
+    skills_snapshot:
+      - 医学统计
+      - 数据建模
+      - Python/R 编程
+    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 4}
+    work_contents:
+      - 收集与清洗医疗数据
+      - 构建统计模型支持临床研究
+      - 撰写数据分析报告
+    career_outlook: 医疗大数据发展
+
+  bio_engineers:
+    name: 生物工程师
+    description: 生物工程师利用生物学、化学和工程学原理，开发新型生物产品和工艺，包括药物、食品、环保材料和能源。他们在实验室和产业界之间架起桥梁，将科研成果转化为实际应用。
+    planet_image_url: /static/career_planets/bio_engineers.webp
+    holland_dimensions: ["I", "R", "C"]
+    galaxy: 巨构星系
+    salary_min: 13000
+    salary_max: 27000
+    skills_snapshot:
+      - 分子生物学实验
+      - 生物工艺设计
+      - 数据分析与建模
+    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 4, "innovative_ability": 4, "task_execution": 3}
+    work_contents:
+      - 设计和优化生物工艺流程
+      - 进行细胞培养与基因工程实验
+      - 将科研成果转化为产业应用
+    career_outlook: 生物工程在医药、农业、环保等领域应用广泛，未来发展潜力巨大。
+    development_path:
+      - 助理研究员
+      - 生物工程师
+      - 高级工程师
+      - 技术专家/研发主管
+    required_skills:
+      - 掌握分子生物学与生物化学
+      - 熟悉生物反应器与工艺设计
+      - 具备跨学科协作能力
+    related_courses:
+      - 分子生物学
+      - 生物化学
+      - 生物工艺学
+      - 生物信息学
+    knowledge_background:
+      industry_knowledge: 参与过生物制药或生物材料研发项目。
+      professional_knowledge: 掌握生物学、化学与工程学交叉知识。
+
+  drug_development_specialist:
+    name: 药物研发专家
+    description: 药物研发专家负责新药的发现、设计、临床前研究与临床试验，确保药物的安全性与有效性。他们需要掌握药理学、化学合成、临床试验设计等知识。
+    planet_image_url: /static/career_planets/drug_development_specialist.webp
+    holland_dimensions: ["I", "C", "R"]
+    galaxy: 巨构星系
+    salary_min: 16000
+    salary_max: 35000
+    skills_snapshot:
+      - 药物筛选
+      - 临床试验设计
+      - 药理与毒理分析
+    core_competency_model: {"basic_ability": 5, "self_management": 3, "social_ability": 3, "team_collaboration": 4, "innovative_ability": 4, "task_execution": 4}
+    work_contents:
+      - 进行药物分子设计与筛选
+      - 开展临床前实验与动物实验
+      - 设计并监督临床试验
+    career_outlook: 随着医药产业升级，药物研发专家需求旺盛，未来可发展为首席科学家或研发总监。
+    development_path:
+      - 研究助理
+      - 药物研发工程师
+      - 高级研发专家
+      - 首席科学家/研发总监
+    required_skills:
+      - 掌握药理学与药物化学
+      - 熟悉临床试验流程与法规
+      - 具备科研创新能力
+    related_courses:
+      - 药理学
+      - 药物化学
+      - 临床试验设计
+      - 生物统计学
+    knowledge_background:
+      industry_knowledge: 参与过药物研发或临床试验项目。
+      professional_knowledge: 掌握药物研发流程与相关法规。
+
+  agrotechnician:
+    name: 农艺师
+    description: 农艺师负责农作物的种植、培育与改良，研究农业生产技术，提升作物产量与质量。他们需要掌握植物学、土壤学和农业工程知识。
+    planet_image_url: /static/career_planets/agrotechnician.webp
+    holland_dimensions: ["R", "I", "C"]
+    galaxy: 生命星系
+    salary_min: 9000
+    salary_max: 18000
+    skills_snapshot:
+      - 作物栽培技术
+      - 土壤与肥料管理
+      - 农业实验设计
+    core_competency_model: {"basic_ability": 3, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 4}
+    work_contents:
+      - 指导农作物种植与管理
+      - 研究作物改良与抗病性
+      - 推广农业新技术
+    career_outlook: 随着现代农业发展，农艺师在粮食安全和农业可持续发展中作用突出。
+    development_path:
+      - 助理农艺师
+      - 农艺师
+      - 高级农艺师
+      - 农业专家/研究员
+    required_skills:
+      - 掌握植物学与农学
+      - 熟悉农业机械与技术
+      - 具备田间试验与推广能力
+    related_courses:
+      - 植物学
+      - 土壤学
+      - 作物栽培学
+      - 农业工程
+    knowledge_background:
+      industry_knowledge: 参与过农业生产或科研项目。
+      professional_knowledge: 掌握农学与农业工程基础。
+
+  animal_husbandry_and_veterinary_medicine:
+    name: 畜牧兽医
+    description: 畜牧兽医负责家畜的饲养管理、疾病防治和繁殖改良，保障畜牧业健康发展。他们需要掌握动物医学、营养学和养殖技术。
+    planet_image_url: /static/career_planets/animal_husbandry_and_veterinary_medicine.webp
+    holland_dimensions: ["R", "S", "I"]
+    galaxy: 生命星系
+    salary_min: 10000
+    salary_max: 20000
+    skills_snapshot:
+      - 动物疾病诊疗
+      - 饲养与繁殖管理
+      - 动物营养学
+    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 4, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 4}
+    work_contents:
+      - 诊断与治疗动物疾病
+      - 指导养殖场饲养与防疫
+      - 研究动物繁殖与改良
+    career_outlook: 畜牧业规模化发展推动兽医需求，未来可发展为畜牧专家或动物医学研究员。
+    development_path:
+      - 助理兽医
+      - 兽医师
+      - 高级兽医师
+      - 畜牧专家/研究员
+    required_skills:
+      - 掌握动物解剖与病理学
+      - 熟悉动物营养与繁殖
+      - 具备临床诊疗与防疫能力
+    related_courses:
+      - 动物解剖学
+      - 动物营养学
+      - 兽医学
+      - 畜牧学
+    knowledge_background:
+      industry_knowledge: 参与过畜牧养殖或动物诊疗工作。
+      professional_knowledge: 掌握兽医学与畜牧学基础。
+
+  agricultural_economic_analyst:
+    name: 农业经济分析师
+    description: 农业经济分析师研究农业生产、市场和政策，分析农业经济运行规律，为政府、企业和农户提供决策支持。他们需要掌握经济学、统计学和农业政策知识。
+    planet_image_url: /static/career_planets/agricultural_economic_analyst.webp
+    holland_dimensions: ["I", "C", "E"]
+    galaxy: 生命星系
+    salary_min: 11000
+    salary_max: 23000
+    skills_snapshot:
+      - 数据建模与统计分析
+      - 农业政策研究
+      - 市场预测
+    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 4}
+    work_contents:
+      - 收集与分析农业经济数据
+      - 研究农业市场与价格波动
+      - 提供政策与投资建议
+    career_outlook: 农业现代化推动经济分析需求，未来可发展为高级经济师或政策顾问。
+    development_path:
+      - 助理经济分析师
+      - 经济分析师
+      - 高级经济分析师
+      - 高级经济师/政策顾问
+    required_skills:
+      - 掌握经济学与统计学原理
+      - 熟悉农业政策与市场
+      - 具备数据分析与建模能力
+    related_courses:
+      - 微观经济学
+      - 统计学
+      - 农业经济学
+    knowledge_background:
+      industry_knowledge: 了解农业生产与市场运作。
+      professional_knowledge: 掌握经济学与统计学基础。
+
 galaxies:
   silicon:
     name: 硅基星系
