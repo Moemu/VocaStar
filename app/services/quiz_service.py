@@ -949,33 +949,6 @@ class QuizService:
                 lookup[option.id] = option
         return lookup
 
-    @staticmethod
-    def _resolve_dimension_from_settings(settings: Any, raw_key: Any, entries_key: str) -> Optional[str]:
-        """根据题目设置映射提交键到维度代码。"""
-
-        key = str(raw_key)
-        if isinstance(settings, dict):
-            entries = settings.get(entries_key)
-            if isinstance(entries, list):
-                for entry in entries:
-                    if not isinstance(entry, dict):
-                        continue
-                    dimension = entry.get("dimension")
-                    if not dimension:
-                        continue
-                    candidates = {
-                        str(entry.get("dimension")),
-                        str(entry.get("label")),
-                        str(entry.get("key")),
-                        str(entry.get("value")),
-                        str(entry.get("id")),
-                    }
-                    if key in candidates:
-                        return dimension
-        if key in DIMENSION_PRIORITY:
-            return key
-        return None
-
     def _calculate_holland_code(self, scores: dict[str, int]) -> str:
         """依据维度分值生成霍兰德代码。"""
         sorted_items = sorted(

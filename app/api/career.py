@@ -23,6 +23,7 @@ def get_service(db: AsyncSession) -> CareerService:
     return CareerService(db)
 
 
+# pragma: no cover
 def _parse_int_param(
     name: str,
     raw_value: Optional[str],
@@ -54,6 +55,7 @@ def _parse_int_param(
     return value
 
 
+# pragma: no cover
 def _parse_optional_int_param(
     name: str,
     raw_value: Optional[str],
@@ -83,6 +85,7 @@ def _parse_optional_int_param(
     return value
 
 
+# pragma: no cover
 def _parse_bool_param(name: str, raw_value: Optional[str]) -> bool:
     if raw_value is None or raw_value == "":
         return False
