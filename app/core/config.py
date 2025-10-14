@@ -41,7 +41,7 @@ class Config(BaseSettings):
     """32 位 hex 密钥，可以通过类似于 openssl rand -hex 32 的命令获得"""
     algorithm: str = "HS256"
     """jwt 签名算法"""
-    expire_minutes: int = 1440
+    expire_minutes: int = 720
     """密钥过期时间"""
 
     # JWXT 配置

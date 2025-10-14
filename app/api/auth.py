@@ -98,6 +98,10 @@ async def logout(
     now = int(time.time())
     ttl = exp - now
 
+    if ttl is None or ttl <= 0:
+        logger.warning("TTL 非法，跳过黑名单写入: jti=%s ttl=%s", jti, ttl)
+        return
+
     logger.debug(f"将 jti {jti[-5:]} 加入到 redis 黑名单中...")
     await add_token_to_blacklist(redis, jti, ttl)
 
