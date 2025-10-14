@@ -1,10 +1,14 @@
 from pathlib import Path
+from uuid import uuid4
 
 from httpx import AsyncClient
+from sqlalchemy.dialects import sqlite
+from sqlalchemy.sql import column
 
 from app.core.config import config
 from app.models.user import User
 from app.repositories.user import UserRepository
+from app.services.auth_service import get_password_hash
 
 
 async def test_reset_password(student_client: AsyncClient, test_user: User):
@@ -49,9 +53,6 @@ async def test_set_profile(student_client: AsyncClient, test_user: User, user_re
     assert old_user
 
     new_nickname = "Updated Nick"
-    # 生成新的唯一邮箱避免冲突
-    from uuid import uuid4
-
     new_email = f"{test_user.username}_{uuid4().hex[:6]}@example.com"
 
     response = await student_client.post(
@@ -73,3 +74,45 @@ async def test_set_profile(student_client: AsyncClient, test_user: User, user_re
     assert updated.email == new_email
     # 未修改的字段保持 (如 avatar_url 仍与之前一致)
     assert updated.avatar_url == old_user.avatar_url
+
+
+async def test_get_current_user_info(student_client: AsyncClient, test_user: User):
+    response = await student_client.get("/api/user/profile")
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["username"] == test_user.username
+    assert payload["role"] == test_user.role.value
+
+
+async def test_user_repository_addition_and_delete(user_repo: UserRepository):
+    prefix = f"order_{uuid4().hex[:6]}"
+
+    first_order = await user_repo.get_addition_order(prefix)
+    assert first_order == 1
+
+    password_hash = get_password_hash("TempPass123")
+    user = await user_repo.create_user(
+        username=f"{prefix}_user",
+        password_hash=password_hash,
+        email=f"{prefix}@example.com",
+    )
+    assert user is not None
+
+    second_order = await user_repo.get_addition_order(prefix)
+    assert second_order == 2
+
+    await user_repo.delete_user(user)
+
+    final_order = await user_repo.get_addition_order(prefix)
+    assert final_order == 1
+    deleted = await user_repo.get_by_username(f"{prefix}_user")
+    assert deleted is None
+
+
+async def test_user_repository_term_filter_generates_sql(user_repo: UserRepository):
+    expr = user_repo._term_filter(column("payload"), "2024-S1")
+    compiled = expr.compile(dialect=sqlite.dialect(), compile_kwargs={"literal_binds": True})
+    sql_text = str(compiled)
+    assert "json_extract" in sql_text
+    assert "$.term" in sql_text
+    assert "2024-S1" in sql_text

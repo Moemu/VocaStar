@@ -61,7 +61,7 @@ async def test_user(user_repo: UserRepository) -> User:
 
 
 @pytest_asyncio.fixture
-async def test_admin(user_repo: UserRepository) -> User:
+async def test_admin(user_repo: UserRepository) -> User:  # pragma: no cover - seldom used admin fixture
     hashed_password = get_password_hash("123456")
     admin = await user_repo.create_user(
         username="test_admin",
@@ -75,7 +75,9 @@ async def test_admin(user_repo: UserRepository) -> User:
 
 
 @pytest_asyncio.fixture
-async def admin_client(async_client: AsyncClient, test_admin: User) -> AsyncClient:
+async def admin_client(
+    async_client: AsyncClient, test_admin: User
+) -> AsyncClient:  # pragma: no cover - admin API helper
     response = await async_client.post(
         "/api/auth/login",
         data={"username": test_admin.username, "password": "123456"},
@@ -106,7 +108,9 @@ async def student_client(async_client: AsyncClient, test_user: User) -> AsyncCli
 
 
 @pytest_asyncio.fixture
-async def teacher_client(async_client: AsyncClient, test_teacher: User) -> AsyncClient:
+async def teacher_client(
+    async_client: AsyncClient, test_teacher: User
+) -> AsyncClient:  # pragma: no cover - rarely exercised client helper
     response = await async_client.post(
         "/api/auth/login",
         data={"username": test_teacher.username, "password": "123456"},

@@ -50,10 +50,3 @@ async def authenticate_user(userdb: UserRepository, username: str, password: str
     if user and verify_password(password, user.password_hash):
         return user
     return None
-
-
-def generate_random_password(length: int = 8) -> str:
-    """
-    随机生成一个密码
-    """
-    return bcrypt.gensalt().decode("utf-8")[7 : 7 + length]
