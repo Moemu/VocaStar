@@ -2,7 +2,7 @@
 
 import enum
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 import sqlalchemy
 from sqlalchemy import JSON, DateTime, Enum, ForeignKey, Index, Integer, String
@@ -33,7 +33,7 @@ class CosplayScript(Base):
         Integer, ForeignKey("careers.id", ondelete="CASCADE"), nullable=False, index=True, comment="职业ID"
     )
     title: Mapped[str] = mapped_column(String(200), nullable=False, comment="剧本标题")
-    content: Mapped[dict] = mapped_column(JSON, nullable=False, comment="剧本内容(JSON格式,包含剧情步骤)")
+    content: Mapped[dict[str, Any]] = mapped_column(JSON, nullable=False, comment="剧本内容(JSON格式,包含剧情步骤)")
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
@@ -68,9 +68,12 @@ class CosplaySession(Base):
     script_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("cosplay_scripts.id", ondelete="CASCADE"), nullable=False, index=True, comment="剧本ID"
     )
-    progress: Mapped[float] = mapped_column(Integer, nullable=False, default=0, comment="当前进度(0-100)")
+    progress: Mapped[int] = mapped_column(Integer, nullable=False, default=0, comment="当前进度(0-100)")
     state: Mapped[SessionState] = mapped_column(
         Enum(SessionState), nullable=False, default=SessionState.in_progress, comment="会话状态"
+    )
+    state_payload: Mapped[dict[str, Any]] = mapped_column(
+        JSON, nullable=False, default=dict, comment="会话状态详情(JSON: 进度、分数、历史)"
     )
 
     started_at: Mapped[datetime] = mapped_column(
