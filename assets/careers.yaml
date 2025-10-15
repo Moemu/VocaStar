@@ -469,6 +469,44 @@ careers:
       industry_knowledge: 了解农业生产与市场运作。
       professional_knowledge: 掌握经济学与统计学基础。
 
+  product_manager:
+    name: 产品经理
+    description: 产品经理，是从用户角度出发，做产品策划，推动产品成型的职业。
+    planet_image_url: /static/career_planets/product_manager.webp
+    holland_dimensions: ["E", "C", "R"]
+    galaxy: 硅基星系
+    salary_min: 14000
+    salary_max: 30000
+    skills_snapshot:
+      - 产品规划
+      - 用户研究
+      - 项目管理
+    core_competency_model: {"basic_ability": 4, "self_management": 4, "social_ability": 4, "team_collaboration": 4, "innovative_ability": 4, "task_execution": 4}
+    work_contents:
+      - 主要进行移动端和 web 端两个平台的方案策划和产品设计
+      - 主要针对具体的产品找出需要改进的地方和可能存在的需求，并针对这些内容设计对应的方案
+      - 为确保产品的正常上线进行推动，与各方面人员进行沟通，确保产品能按既定思路完成
+      - 产品最后测试、走查、运营、推广等等需要进行持续的跟踪，直到下一个产品迭代
+    career_outlook: 互联网近几年比较火热，行业这几年发展也较好。行业入职的门槛相对较低，因此从业者近几年较多,导致了这一行业的竞争较为激烈。所以新人在入职之后可能会面临较大的压力，但职业的提升空间较大，每个公司著名的人物大部分是产品经理出身。目前成熟的产品经理的需求市场还比较大，竞争较为激烈，淘汰率较高。
+    development_path:
+      - 产品助理
+      - 初级产品经理
+      - 中级产品经理
+      - 高级产品经理
+      - 产品总监
+    required_skills:
+      - 掌握产品管理流程与工具
+      - 熟悉市场分析与用户研究方法
+      - 具备跨部门协调与沟通能力
+    related_courses:
+      - 产品管理
+      - 市场营销
+      - 用户体验设计
+      - 项目管理
+    knowledge_background:
+      industry_knowledge: 需要一些计算机方面的知识背景，另外还要掌握些市场的基本原理、互联网产品的基本运作原理
+      professional_knowledge: 产品经理需要了解项目管理的相关内容。计算机相关专业最好，因为可能涉及到与技术研发人员的沟通，但职业本身对学科没有太大的要求
+
 galaxies:
   silicon:
     name: 硅基星系
