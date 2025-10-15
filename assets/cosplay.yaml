@@ -1,0 +1,487 @@
+scripts:
+  junior_software_engineer:
+    title: 初级软件工程师
+    career_name: 软件工程师
+    summary: "你刚加入星辰科技的新团队，将在第一个冲刺周期里体验真实的软件工程协作。"
+    setting: "你是一名刚加入\"星辰科技\"的初级软件工程师，今天是你在一个新项目上的第一个冲刺周期。"
+    base_score: 50
+    point_step: 10
+    abilities:
+      - code: T
+        name: 技术决策
+        description: 衡量代码质量、架构合理性的能力
+      - code: S
+        name: 沟通协作
+        description: 衡量与团队、产品经理沟通的能力
+      - code: P
+        name: 项目管理
+        description: 衡量对时间、优先级和风险的把控
+      - code: Q
+        name: 工匠精神
+        description: 衡量对代码规范、可维护性的追求
+
+    scenes:
+      - id: scene_1
+        title: 模糊的需求
+        narrative: "产品经理发来一条消息：‘我们需要一个能让用户快速分享内容到社交媒体的功能。’"
+        options:
+          - id: option_1
+            text: "【好的，我马上开始做。】"
+            description: "你根据自己的理解开始编写一键分享按钮。"
+            effects:
+              S: -1
+              P: -1
+              Q: -1
+            feedback: "你匆忙开工，但后来发现产品经理需要的是能自定义分享文案和图片的复杂功能，导致大量返工。"
+          - id: option_2
+            text: "【主动约产品经理聊5分钟，明确具体细节。】"
+            description: "你主动询问分享平台、自定义文案、UI样式等问题。"
+            effects:
+              S: 2
+              P: 1
+            feedback: "清晰的沟通为你节省了大量时间，需求明确，开工顺利。"
+          - id: option_3
+            text: "【先研究市面上优秀的分享功能，写一份技术方案。】"
+            description: "你调研竞品并撰写技术方案。"
+            effects:
+              Q: 1
+              T: 1
+              P: -1
+            feedback: "你的方案很扎实，但花费了额外时间，产品经理有些担心进度。"
+
+      - id: scene_2
+        title: 腐烂的代码
+        narrative: "在实现功能时，你发现前任同事留下的代码混乱且没有注释，像一个‘屎山’。修改它很容易引入新的 bug。"
+        options:
+          - id: option_1
+            text: "【在‘屎山’上小心翼翼地打补丁，能跑就行。】"
+            description: "你尽量不动原结构，只是加上必要的改动。"
+            effects:
+              P: 1
+              Q: -2
+              T: -1
+            feedback: "功能按时上线，但代码更加混乱，为未来埋下隐患。"
+          - id: option_2
+            text: "【申请时间，对这部分代码进行重构，让它更清晰。】"
+            description: "你向团队说明需要重构，争取额外时间。"
+            effects:
+              Q: 2
+              T: 2
+              P: -2
+            feedback: "你顶住压力完成了重构，后续开发效率大大提升，导师称赞你有远见。"
+          - id: option_3
+            text: "【向导师或组长求助，说明情况，请求指导。】"
+            description: "你说明风险并寻求经验支持。"
+            effects:
+              S: 2
+              P: 1
+            feedback: "导师帮你评估风险，一起制定了更稳妥的修改计划。"
+
+      - id: scene_3
+        title: 突如其来的线上事故
+        narrative: "周五傍晚，监控系统报警！你上周上线的功能导致服务器 CPU 飙升，部分用户无法访问。"
+        options:
+          - id: option_1
+            text: "【立即回滚代码，先恢复服务再说。】"
+            description: "你果断回滚，保障现网用户。"
+            effects:
+              P: 2
+              T: -1
+            feedback: "服务快速恢复，但问题根因没找到，下周一可能再次爆发。"
+          - id: option_2
+            text: "【坚持线上调试，不找到根本原因不罢休。】"
+            description: "你坚守现场，排查底层问题。"
+            effects:
+              T: 1
+              Q: 1
+              P: -2
+            feedback: "你最终找到了一个隐蔽的循环 Bug，但因此导致服务停机时间较长。"
+          - id: option_3
+            text: "【一边准备回滚，一边通过日志和监控快速定位问题范围。】"
+            description: "你同步评估影响，协调团队协作。"
+            effects:
+              T: 2
+              P: 1
+              S: 1
+            feedback: "你高效定位问题，在最小影响范围内完成修复，团队对你更信任。"
+
+      - id: scene_4
+        title: 团队的分歧
+        narrative: "在技术评审会上，你和另一位同事对于新项目的技术架构方案产生了严重分歧。"
+        options:
+          - id: option_1
+            text: "【坚持己见，用技术和数据论证自己方案的优越性。】"
+            description: "你据理力争，希望说服所有人。"
+            effects:
+              T: 1
+              S: -1
+            feedback: "方案可能被采纳，但同事感到不被尊重，合作氛围变差。"
+          - id: option_2
+            text: "【妥协，采用对方的方案以避免冲突。】"
+            description: "你选择退一步，让项目继续。"
+            effects:
+              S: 1
+              T: -1
+            feedback: "项目顺利推进，但你知道方案在扩展性上存在隐患。"
+          - id: option_3
+            text: "【综合双方优点，提出一个融合的第三方案，并邀请对方一起完善。】"
+            description: "你尝试整合团队智慧。"
+            effects:
+              S: 2
+              T: 2
+              P: 1
+            feedback: "新方案汲取众长，团队凝聚力更强，大家对你刮目相看。"
+
+    evaluation_rules:
+      - key: T+Q
+        route: 技术专家路线
+        summary: "你对技术有深刻理解且追求代码质量，是团队的技术基石。"
+        advice: "建议深入钻研分布式系统、性能优化等核心技术，主动参与技术选型和架构设计。"
+      - key: T+P
+        route: 技术领袖路线
+        summary: "你技术过硬且善于把控项目节奏，能带领团队攻克技术难关。"
+        advice: "建议培养团队管理能力，学习项目规划和风险控制，成为技术团队的领路人。"
+      - key: T+S
+        route: 解决方案架构师路线
+        summary: "你既能设计优秀的技术方案，又善于与各方沟通协作。"
+        advice: "建议提升业务理解能力，学习如何将业务需求转化为可落地的技术方案。"
+      - key: P+Q
+        route: 质量保障专家路线
+        summary: "你对代码质量有极致追求且能有效管理开发流程。"
+        advice: "建议深耕 CI/CD、代码规范、自动化测试等领域，提升团队整体工程质量。"
+      - key: Q+S
+        route: 团队技术导师路线
+        summary: "你注重代码规范且乐于分享，能提升团队整体技术水平。"
+        advice: "建议建立团队代码规范，组织技术分享，培养新人，成为团队的技术标杆。"
+      - key: P+S
+        route: 项目管理路线
+        summary: "你善于协调资源、管理进度，是项目顺利推进的保障。"
+        advice: "建议系统学习项目管理方法论，提升风险识别和冲突解决能力。"
+      - key: balanced
+        route: 团队核心路线
+        summary: "你各项能力均衡发展，是团队中稳定可靠的伙伴。"
+        advice: "可以在保持全面能力的基础上，根据兴趣选择一个方向深入钻研。"
+
+  ui_designer:
+    title: 前端开发工程师
+    career_name: 前端开发工程师
+    summary: "加入星云设计工作室的首个大型项目，考验你平衡创意与协作的能力。"
+    setting: "你是一名新加入\"星云设计工作室\"的前端开发工程师，正负责一款全新社交 APP 的界面设计。"
+    base_score: 50
+    point_step: 10
+    abilities:
+      - code: U
+        name: 用户洞察
+        description: 理解用户需求与行为的能力
+      - code: C
+        name: 创意表达
+        description: 产生新颖视觉方案的能力
+      - code: Q
+        name: 工匠精神
+        description: 对细节、规范和一致性的追求
+      - code: S
+        name: 沟通协作
+        description: 与产品、开发团队协作的能力
+    scenes:
+      - id: scene_1
+        title: 矛盾的需求
+        narrative: "产品经理要求界面‘简洁现代’，而运营希望‘内容丰富、吸引眼球’，矛盾抛给了你。"
+        options:
+          - id: option_1
+            text: "【听从产品经理的，坚持简洁风格。】"
+            description: "你完全遵循产品经理的方向。"
+            effects:
+              U: -1
+              S: -1
+            feedback: "设计稿很简洁，但上线后数据平平，运营抱怨转化率低。"
+          - id: option_2
+            text: "【采纳运营的意见，把页面做得热闹丰富。】"
+            description: "你为页面加入大量元素。"
+            effects:
+              U: -1
+              Q: -1
+            feedback: "页面元素过多，用户体验杂乱，产品经理认为失去了调性。"
+          - id: option_3
+            text: "【组织小会，引导双方明确目标，并设计可动态配置的运营位。】"
+            description: "你搭建沟通桥梁，寻求平衡方案。"
+            effects:
+              S: 2
+              U: 1
+              C: 1
+            feedback: "你的方案平衡双方诉求，专业思考获得认可。"
+
+      - id: scene_2
+        title: 紧迫的排期
+        narrative: "开发排期紧张，项目经理希望你先出主要页面，细节规范后补。"
+        options:
+          - id: option_1
+            text: "【同意先出主视觉，细节后补。】"
+            description: "你优先交付主页面设计。"
+            effects:
+              S: 1
+              Q: -2
+            feedback: "开发依葫芦画瓢，最终效果参差不齐，后期补救代价高。"
+          - id: option_2
+            text: "【坚持必须先完成完整的设计规范。】"
+            description: "你坚持全部细节一次性定稿。"
+            effects:
+              Q: 2
+              S: -1
+            feedback: "设计规范完美，但项目进度被拖慢，团队意见很多。"
+          - id: option_3
+            text: "【先出核心页面和基础规范，与开发同步推进并持续完善。】"
+            description: "你平衡效率与质量，与团队保持同步。"
+            effects:
+              Q: 1
+              S: 2
+            feedback: "项目顺利启动，你持续沟通确保最终效果统一。"
+
+      - id: scene_3
+        title: 设计的妥协
+        narrative: "开发反馈你设计的交互动画实现成本太高，希望简化或取消。"
+        options:
+          - id: option_1
+            text: "【据理力争，强调必须实现。】"
+            description: "你坚持原方案不变。"
+            effects:
+              C: 1
+              S: -2
+            feedback: "动画实现了，但开发士气受挫，认为你不切实际。"
+          - id: option_2
+            text: "【好吧，那就取消吧，以开发为准。】"
+            description: "你选择放弃该动画。"
+            effects:
+              S: 1
+              C: -2
+              Q: -1
+            feedback: "功能上线但缺少亮点，你对自己的坚持产生怀疑。"
+          - id: option_3
+            text: "【与开发探讨替代方案，寻找成本更低的实现方式。】"
+            description: "你了解技术瓶颈并协作寻求折中方案。"
+            effects:
+              S: 2
+              C: 1
+              U: 1
+            feedback: "你们找到性价比高的方案，保住体验也赢得尊重。"
+
+      - id: scene_4
+        title: 设计系统的传承
+        narrative: "你维护设计系统，新同事的组件设计很创新但与现有规范冲突。"
+        options:
+          - id: option_1
+            text: "【否决设计，要求严格按规范执行。】"
+            description: "你坚持系统的一致性。"
+            effects:
+              Q: 1
+              C: -1
+              S: -1
+            feedback: "系统统一，但新同事感到创意被扼杀。"
+          - id: option_2
+            text: "【鼓励创新，通过设计并融入系统。】"
+            description: "你直接采纳并尝试兼容。"
+            effects:
+              C: 2
+              Q: -2
+              P: -1
+            feedback: "新同事备受鼓舞，但组件与系统格格不入，维护成本上升。"
+          - id: option_3
+            text: "【与同事共创，将创意抽象为可复用模式并迭代系统。】"
+            description: "你既肯定创意也保障规范。"
+            effects:
+              S: 2
+              U: 1
+              C: 1
+              Q: 1
+            feedback: "团队创新热情与系统生命力同步提升，你展现资深格局。"
+
+    evaluation_rules:
+      - key: U+C
+        route: 创新产品设计师
+        summary: "你深度理解用户并能将洞察转化为惊艳的视觉创新。"
+        advice: "主导设计系统从 0 到 1，关注前沿交互模式并持续迭代。"
+      - key: U+Q
+        route: 用户体验专家
+        summary: "你对用户需求敏感且追求极致细节体验，是体验守护者。"
+        advice: "深耕可用性测试与体验度量，打造标杆化用户旅程。"
+      - key: U+S
+        route: 设计策略师
+        summary: "你懂用户也善协调诉求，擅长推动多方共识。"
+        advice: "强化业务思维，成为设计与业务的桥梁。"
+      - key: C+Q
+        route: 视觉艺术专家
+        summary: "你的设计兼具创意美感和精湛执行，是视觉标杆。"
+        advice: "建立个人设计风格，持续提升视觉体系的辨识度。"
+      - key: C+S
+        route: 创意团队领袖
+        summary: "你能激发团队创意并带来突破性方案。"
+        advice: "学习团队管理与创意方法论，带领团队产出标杆作品。"
+      - key: Q+S
+        route: 设计系统专家
+        summary: "你兼顾规范与协作效率，是设计系统的守门员。"
+        advice: "深耕组件化设计与开发协作，提升团队交付力。"
+      - key: balanced
+        route: 团队核心路线
+        summary: "你在各项能力上均衡发展，是设计团队的稳定力量。"
+        advice: "保持全面能力，结合兴趣选择一个方向进行深度钻研。"
+
+  product_manager:
+    title: 产品经理
+    career_name: 产品经理
+    summary: "敏捷科技的核心迭代交到你手中，考验你的策略与执行力。"
+    setting: "你是\"敏捷科技\"的一名产品经理，正负责一款企业级 SaaS 产品的核心功能迭代。"
+    base_score: 50
+    point_step: 10
+    abilities:
+      - code: U
+        name: 用户洞察
+        description: 深度理解用户和市场需求的能力
+      - code: D
+        name: 数据思维
+        description: 基于数据和逻辑进行决策的能力
+      - code: S
+        name: 沟通协作
+        description: 协调团队、管理期望的能力
+      - code: P
+        name: 项目管理
+        description: 规划、执行和风险控制的能力
+
+    scenes:
+      - id: scene_1
+        title: 需求的优先级
+        narrative: "销售反馈大客户急需 A 功能，而调研数据显示中小客户更需要 B 功能。"
+        options:
+          - id: option_1
+            text: "【优先满足大客户，立即安排开发 A 功能。】"
+            description: "你以大客户需求为先。"
+            effects:
+              D: -1
+              U: -1
+            feedback: "大客户暂时满意，但产品对主流用户的吸引力下降。"
+          - id: option_2
+            text: "【坚持数据导向，优先开发 B 功能。】"
+            description: "你严格按照调研结论执行。"
+            effects:
+              D: 2
+              S: -1
+            feedback: "决策长远正确，但销售团队不满，觉得产品不支持业务。"
+          - id: option_3
+            text: "【深入分析，探索配置化方案兼顾 A 与 B 的需求。】"
+            description: "你寻找双赢突破口。"
+            effects:
+              U: 2
+              D: 1
+              S: 1
+            feedback: "你提出弹性方案，安抚销售也增强产品架构灵活性。"
+
+      - id: scene_2
+        title: 突如其来的变更
+        narrative: "开发到一半，老板提出颠覆性新想法，意味着当前版本要推倒重来。"
+        options:
+          - id: option_1
+            text: "【执行命令，立即组织团队变更。】"
+            description: "你立刻响应老板新方向。"
+            effects:
+              P: -2
+              S: -1
+            feedback: "团队士气大跌，大家对产品方向迷茫。"
+          - id: option_2
+            text: "【直接拒绝，坚持按原计划上线。】"
+            description: "你坚决捍卫当前计划。"
+            effects:
+              P: 1
+              S: -2
+            feedback: "你守住流程，但老板对你失去信任。"
+          - id: option_3
+            text: "【提出分阶段策略，现版本最小验证，下版本深度迭代。】"
+            description: "你用数据与资源评估平衡变化。"
+            effects:
+              S: 2
+              P: 1
+              D: 1
+            feedback: "老板接受你的专业建议，团队目标清晰。"
+
+      - id: scene_3
+        title: 上线的抉择
+        narrative: "上线前发现偶发 UI Bug，不影响主流程，但修复需延期两天。"
+        options:
+          - id: option_1
+            text: "【按计划上线，小问题下个版本再修。】"
+            description: "你选择如期发布。"
+            effects:
+              P: 2
+              U: -1
+            feedback: "版本准时发布，但个别用户遇到 bug，对品牌专业度质疑。"
+          - id: option_2
+            text: "【坚决修复，延期发布。】"
+            description: "你宁可推迟也要完美。"
+            effects:
+              U: 1
+              P: -2
+            feedback: "版本质量上乘，但错过市场窗口，业务不满。"
+          - id: option_3
+            text: "【评估影响面，与技术共决策并准备应急方案。】"
+            description: "你基于数据权衡并制定预案。"
+            effects:
+              D: 2
+              S: 1
+              P: 1
+            feedback: "基于充分数据做出最合理决策，团队对风险了然于胸。"
+
+      - id: scene_4
+        title: 商业伦理的抉择
+        narrative: "商业团队提议上线默认勾选的自动续费，能显著提升营收但可能伤害用户体验。"
+        options:
+          - id: option_1
+            text: "【批准上线，商业数据最重要。】"
+            description: "你支持激进商业策略。"
+            effects:
+              D: 2
+              U: -2
+              S: -1
+            feedback: "营收目标超额完成，但用户投诉激增，品牌受损。"
+          - id: option_2
+            text: "【断然拒绝，坚守用户体验底线。】"
+            description: "你完全否决该方案。"
+            effects:
+              U: 2
+              D: -1
+              S: -1
+            feedback: "你守住底线，但商业团队对你极度不满，协作受阻。"
+          - id: option_3
+            text: "【提出平衡方案：默认关闭但引导清晰，并承诺收益用于提升服务。】"
+            description: "你寻求兼顾体验与收益的方案。"
+            effects:
+              U: 2
+              S: 2
+              D: 1
+            feedback: "续费率稳定增长，品牌口碑提升，你赢得团队与用户尊重。"
+
+    evaluation_rules:
+      - key: U+D
+        route: 增长产品经理
+        summary: "你洞察用户并用数据驱动增长，是增长型产品的核心。"
+        advice: "深度学习 A/B 测试、漏斗分析与留存优化，带动持续增长。"
+      - key: U+S
+        route: 用户导向型 PM
+        summary: "你既懂用户需求又善协调资源，能快速落地价值。"
+        advice: "培养对特定用户群的深度理解，成为该领域的专家。"
+      - key: U+P
+        route: 产品战略家
+        summary: "你在用户价值与商业目标之间游刃有余。"
+        advice: "加强商业思维与战略规划，逐步承担更大业务版图。"
+      - key: D+S
+        route: 数据策略 PM
+        summary: "你善用数据说服团队并驱动决策。"
+        advice: "加强数据分析与指标体系搭建，构建数据驱动文化。"
+      - key: D+P
+        route: 效率优化专家
+        summary: "你通过数据和流程优化提升团队效率。"
+        advice: "学习系统思维与流程再造方法，打造高效协作体系。"
+      - key: S+P
+        route: 项目管理专家
+        summary: "你擅长组织协调，确保复杂项目顺利交付。"
+        advice: "深化敏捷与传统项目管理方法，持续提升交付力。"
+      - key: balanced
+        route: 团队核心路线
+        summary: "你全面均衡，是团队可信赖的中坚力量。"
+        advice: "在保持均衡的基础上，根据长期兴趣选择一个方向深入探索。"
