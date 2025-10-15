@@ -88,6 +88,17 @@ APIFox 文档: <https://vocastar.snowy.moe/>
 | `/api/career/exploration`  | GET  | 职业星球探索数据，支持分类、薪资均值与测评推荐过滤             |
 | `/api/career/{careerId}`   | GET  | 获取指定职业的详细信息                                         |
 
+**Cosplay 剧本相关**
+
+| API                                           | 方法 | 说明                                   |
+| --------------------------------------------- | ---- | -------------------------------------- |
+| `/api/cosplay/scripts`                        | GET  | 获取可用 Cosplay 剧本列表              |
+| `/api/cosplay/scripts/{scriptId}`             | GET  | 查看指定 Cosplay 剧本详情             |
+| `/api/cosplay/scripts/{scriptId}/sessions`    | POST | 创建或恢复用户 Cosplay 会话           |
+| `/api/cosplay/sessions/{sessionId}`           | GET  | 查询 Cosplay 会话当前状态             |
+| `/api/cosplay/sessions/{sessionId}/choice`    | POST | 在当前场景中提交选项                  |
+| `/api/cosplay/sessions/{sessionId}/report`    | GET  | 获取已完成会话的总结报告              |
+
 
 
 **🚧 计划中/开发中**
@@ -103,6 +114,7 @@ APIFox 文档: <https://vocastar.snowy.moe/>
 ```shell
 uv run scripts\import_quiz_from_yaml.py
 uv run scripts\import_careers_from_yaml.py
+uv run scripts\import_cosplay_from_yaml.py
 ```
 
 ## 数据库重置
