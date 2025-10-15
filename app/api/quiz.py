@@ -25,6 +25,7 @@ async def start_quiz(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> QuizStartResponse:
+    """开始新的测评会话，若存在有效会话则直接返回。"""
     service = QuizService(db)
     return await service.start_quiz(current_user, slug=slug)
 
@@ -35,6 +36,7 @@ async def get_questions(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> QuizQuestionsResponse:
+    """获取测评题目及当前的答题进度。"""
     service = QuizService(db)
     return await service.get_questions(session_id, current_user)
 
@@ -45,6 +47,7 @@ async def answer_questions(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> QuizAnswerResponse:
+    """保存用户对测评题目的作答。"""
     service = QuizService(db)
     return await service.answer_questions(request, current_user)
 
@@ -79,6 +82,7 @@ async def submit_quiz(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> QuizReportResponse:
+    """提交测评并生成测评报告。"""
     service = QuizService(db)
     return await service.submit_quiz(request, current_user)
 
@@ -90,5 +94,6 @@ async def get_report(
     current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> QuizReportResponse:
+    """查询最近一次测评报告或指定会话的报告。"""
     service = QuizService(db)
     return await service.get_report(current_user, session_id=session_id, slug=slug)

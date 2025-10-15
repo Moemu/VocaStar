@@ -20,11 +20,13 @@ router = APIRouter()
 
 
 def get_service(db: AsyncSession) -> CosplayService:
+    """基于当前数据库会话构造 Cosplay 服务。"""
     return CosplayService(db)
 
 
 @router.get("/scripts", response_model=CosplaySessionListResponse, summary="列出可用的 Cosplay 剧本")
 async def list_cosplay_scripts(db: AsyncSession = Depends(get_db)) -> CosplaySessionListResponse:
+    """列出所有可用的 Cosplay 剧本概要信息。"""
     service = get_service(db)
     return await service.list_scripts()
 
@@ -35,6 +37,7 @@ async def list_cosplay_scripts(db: AsyncSession = Depends(get_db)) -> CosplaySes
     summary="获取指定 Cosplay 剧本详情",
 )
 async def get_cosplay_script_detail(script_id: int, db: AsyncSession = Depends(get_db)) -> CosplayScriptDetailResponse:
+    """根据剧本 ID 获取详细内容与场景信息。"""
     service = get_service(db)
     return await service.get_script_detail(script_id)
 
@@ -50,6 +53,7 @@ async def create_or_resume_cosplay_session(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> CosplaySessionStateResponse:
+    """为当前用户创建新的 Cosplay 会话或恢复已存在的会话。"""
     service = get_service(db)
     return await service.start_session(script_id=script_id, user=current_user, request=request)
 
@@ -64,6 +68,7 @@ async def get_cosplay_session_state(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> CosplaySessionStateResponse:
+    """查询指定 Cosplay 会话的最新状态。"""
     service = get_service(db)
     return await service.get_session_state(session_id=session_id, user=current_user)
 
@@ -79,6 +84,7 @@ async def submit_cosplay_choice(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> CosplaySessionStateResponse:
+    """在指定会话的当前场景中提交用户的选项选择。"""
     service = get_service(db)
     return await service.choose_option(session_id=session_id, user=current_user, request=request)
 
@@ -93,5 +99,6 @@ async def get_cosplay_report(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> CosplayReportPayload:
+    """获取已经完成的 Cosplay 会话的总结报告。"""
     service = get_service(db)
     return await service.get_report(session_id=session_id, user=current_user)

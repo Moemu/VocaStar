@@ -27,7 +27,8 @@ router = APIRouter()
 
 
 @router.post("/login", tags=["auth"])
-async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
+async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)) -> dict[str, str]:
+    """使用用户名和密码换取访问令牌。"""
     logger.info(f"收到登录请求: {form_data.username}")
 
     repo = UserRepository(db)
@@ -51,7 +52,8 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSessi
 
 
 @router.post("/register", tags=["auth"])
-async def register(register_request: RegisterRequest, db: AsyncSession = Depends(get_db)):
+async def register(register_request: RegisterRequest, db: AsyncSession = Depends(get_db)) -> dict[str, str]:
+    """注册一个新用户账号。"""
     logger.info(f"收到注册请求: {register_request.username}")
 
     repo = UserRepository(db)
@@ -89,21 +91,31 @@ async def logout(
     current_user: Annotated[User, Depends(get_current_user)],
     redis: Annotated[Redis, Depends(get_redis_client)],
     token: str = Depends(oauth2_scheme),
-):
+) -> dict[str, str]:
+    """注销当前用户并将访问令牌加入黑名单。"""
     logger.info(f"收到登出请求: {current_user.username}")
 
     payload = jwt.decode(token, config.secret_key, algorithms=config.algorithm)
-    jti = payload.get("jti")
-    exp = payload.get("exp")
+    jti_raw = payload.get("jti")
+    exp_raw = payload.get("exp")
+
+    if not isinstance(jti_raw, str):
+        logger.warning("JWT 缺少合法的 jti 字段，跳过黑名单写入")
+        return {"msg": "Logged out"}
+
+    if not isinstance(exp_raw, int):
+        logger.warning("JWT 缺少合法的 exp 字段，跳过黑名单写入")
+        return {"msg": "Logged out"}
+
     now = int(time.time())
-    ttl = exp - now
+    ttl = exp_raw - now
 
-    if ttl is None or ttl <= 0:
-        logger.warning("TTL 非法，跳过黑名单写入: jti=%s ttl=%s", jti, ttl)
-        return
+    if ttl <= 0:
+        logger.warning("TTL 非法，跳过黑名单写入: jti=%s ttl=%s", jti_raw, ttl)
+        return {"msg": "Logged out"}
 
-    logger.debug(f"将 jti {jti[-5:]} 加入到 redis 黑名单中...")
-    await add_token_to_blacklist(redis, jti, ttl)
+    logger.debug(f"将 jti {jti_raw[-5:]} 加入到 redis 黑名单中...")
+    await add_token_to_blacklist(redis, jti_raw, ttl)
 
     logger.info(f"用户 {current_user.username} 登出成功，jti 已禁用")
     return {"msg": "Logged out"}

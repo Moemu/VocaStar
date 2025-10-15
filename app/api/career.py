@@ -20,6 +20,7 @@ router = APIRouter()
 
 
 def get_service(db: AsyncSession) -> CareerService:
+    """基于当前数据库会话构造职业服务实例。"""
     return CareerService(db)
 
 
@@ -32,6 +33,7 @@ def _parse_int_param(
     min_value: int,
     max_value: Optional[int] = None,
 ) -> int:
+    """解析整数类型的查询参数并应用边界校验。"""
     if raw_value is None or raw_value == "":
         return default
     try:
@@ -63,6 +65,7 @@ def _parse_optional_int_param(
     min_value: int,
     max_value: Optional[int] = None,
 ) -> Optional[int]:
+    """解析可选的整数查询参数，支持空值。"""
     if raw_value is None or raw_value == "":
         return None
     try:
@@ -87,6 +90,7 @@ def _parse_optional_int_param(
 
 # pragma: no cover
 def _parse_bool_param(name: str, raw_value: Optional[str]) -> bool:
+    """解析布尔类型查询参数，将常见表示映射为 True/False。"""
     if raw_value is None or raw_value == "":
         return False
     normalized = raw_value.strip().lower()

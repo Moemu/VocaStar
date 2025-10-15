@@ -53,7 +53,8 @@ async def reset_password(
     redis: Annotated[Redis, Depends(get_redis_client)],
     db: Annotated[AsyncSession, Depends(get_db)],
     token: str = Depends(oauth2_scheme),
-):
+) -> dict[str, str]:
+    """校验旧密码后更新用户密码，并使当前令牌失效。"""
     logger.info(f"用户 {current_user.username} 请求重置密码")
 
     # 获取用户
@@ -90,7 +91,8 @@ async def set_profile(
     form_data: UserSetProfileRequest,
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
-):
+) -> dict[str, str]:
+    """更新当前用户的昵称、邮箱和头像地址。"""
     logger.info(f"用户 {current_user.username} 请求更新个人资料")
 
     # 获取用户
@@ -116,7 +118,8 @@ async def upload_avatar(
     current_user: Annotated[User, Depends(get_current_user)],
     db: Annotated[AsyncSession, Depends(get_db)],
     file: UploadFile = File(...),
-):
+) -> dict[str, str]:
+    """校验头像文件并保存至本地后更新用户头像地址。"""
     logger.info(f"用户 {current_user.username} 请求上传头像")
 
     user_repo = UserRepository(db)
