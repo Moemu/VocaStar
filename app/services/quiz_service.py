@@ -10,6 +10,7 @@ from fastapi import HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.logger import logger
 from app.models.career import Career
 from app.models.extensions import PointTransaction, UserPoints
 from app.models.quiz import (
@@ -26,11 +27,14 @@ from app.repositories.quiz import QuizRepository
 from app.schemas.quiz import (
     QuestionSettings,
     QuestionSettingsModel,
-    QuizAllocationAnswer,
     QuizAnswerRequest,
     QuizAnswerResponse,
-    QuizMetricsAnswer,
-    QuizMultipleChoiceAnswer,
+    QuizClassicScenarioAnswer,
+    QuizImagePreferenceAnswer,
+    QuizLegacyAllocationAnswer,
+    QuizLegacyMetricsAnswer,
+    QuizLegacyMultipleChoiceAnswer,
+    QuizLegacySingleChoiceAnswer,
     QuizOption,
     QuizProfileRequest,
     QuizProfileResponse,
@@ -42,9 +46,11 @@ from app.schemas.quiz import (
     QuizReportResponse,
     QuizScoringConfig,
     QuizScoringConfigModel,
-    QuizSingleChoiceAnswer,
     QuizStartResponse,
     QuizSubmitRequest,
+    QuizTimeAllocationAnswer,
+    QuizValueBalanceAnswer,
+    QuizWordChoiceAnswer,
 )
 
 SESSION_DURATION_MINUTES = 30
@@ -240,21 +246,25 @@ class QuizService:
                 raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="题目不存在或已失效")
             question_type = question.question_type
 
-            if isinstance(answer, QuizMultipleChoiceAnswer):
+            if isinstance(
+                answer,
+                (QuizWordChoiceAnswer, QuizImagePreferenceAnswer, QuizLegacyMultipleChoiceAnswer),
+            ):
+                if isinstance(answer, QuizLegacyMultipleChoiceAnswer):
+                    logger.warning("检测到已弃用的答案类型 multiple_choice，请迁移至题目类型字符串")
+
                 option_ids = self._deduplicate_option_ids(answer.option_ids)
                 if not option_ids:
                     raise HTTPException(
                         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="多选题需至少选择一个选项"
                     )
-                # 使用 Pydantic 验证配置
                 try:
                     settings = QuestionSettingsModel.model_validate(question.settings or {})
                     max_select = settings.max_select
                 except Exception as e:
-                    # Provide specific error message for validation failures
                     raise HTTPException(
                         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=f"题目配置验证失败: {str(e)}"
-                    )
+                    ) from e
 
                 if max_select is not None and len(option_ids) > max_select:
                     raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="超过可选择的最大数量")
@@ -262,19 +272,22 @@ class QuizService:
                     option = option_map.get(option_id)
                     if not option or option.question_id != answer.question_id:
                         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="存在非法选项")
-            elif isinstance(answer, QuizSingleChoiceAnswer):
+            elif isinstance(answer, (QuizClassicScenarioAnswer, QuizLegacySingleChoiceAnswer)):
+                if isinstance(answer, QuizLegacySingleChoiceAnswer):
+                    logger.warning("检测到已弃用的答案类型 single_choice，请迁移至题目类型字符串")
+
                 option = option_map.get(answer.option_id)
                 if not option or option.question_id != answer.question_id:
                     raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="存在非法选项")
             elif isinstance(answer, QuizRatingAnswer):
                 if answer.rating_value is None:
                     raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="评分题答案无效")
-            elif isinstance(answer, QuizMetricsAnswer):
+            elif isinstance(answer, (QuizValueBalanceAnswer, QuizLegacyMetricsAnswer)):
                 if question_type != QuestionType.value_balance:
                     raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="答案类型与题目不匹配")
                 if not answer.values:
                     raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="请完成滑块题的填写")
-            elif isinstance(answer, QuizAllocationAnswer):
+            elif isinstance(answer, (QuizTimeAllocationAnswer, QuizLegacyAllocationAnswer)):
                 if question_type != QuestionType.time_allocation:
                     raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="答案类型与题目不匹配")
                 if not answer.allocations:
@@ -285,7 +298,10 @@ class QuizService:
         await self.repo.clear_answers_for_questions(submission.id, question_ids)
 
         for answer in request.answers:
-            if isinstance(answer, QuizMultipleChoiceAnswer):
+            if isinstance(
+                answer,
+                (QuizWordChoiceAnswer, QuizImagePreferenceAnswer, QuizLegacyMultipleChoiceAnswer),
+            ):
                 option_ids = self._deduplicate_option_ids(answer.option_ids)
                 await self.repo.add_answer(
                     submission_id=submission.id,
@@ -306,7 +322,7 @@ class QuizService:
                     response_time=answer.response_time,
                     extra_payload=None,
                 )
-            elif isinstance(answer, QuizMetricsAnswer):
+            elif isinstance(answer, (QuizValueBalanceAnswer, QuizLegacyMetricsAnswer)):
                 normalized_values = {str(key): float(value) for key, value in answer.values.items()}
                 await self.repo.add_answer(
                     submission_id=submission.id,
@@ -317,7 +333,7 @@ class QuizService:
                     response_time=answer.response_time,
                     extra_payload={"values": normalized_values},
                 )
-            elif isinstance(answer, QuizAllocationAnswer):
+            elif isinstance(answer, (QuizTimeAllocationAnswer, QuizLegacyAllocationAnswer)):
                 normalized_allocations = {str(key): float(value) for key, value in answer.allocations.items()}
                 await self.repo.add_answer(
                     submission_id=submission.id,
@@ -328,7 +344,7 @@ class QuizService:
                     response_time=answer.response_time,
                     extra_payload={"allocations": normalized_allocations},
                 )
-            elif isinstance(answer, QuizSingleChoiceAnswer):
+            elif isinstance(answer, (QuizClassicScenarioAnswer, QuizLegacySingleChoiceAnswer)):
                 await self.repo.add_answer(
                     submission_id=submission.id,
                     question_id=answer.question_id,

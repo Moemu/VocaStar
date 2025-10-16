@@ -241,48 +241,101 @@ class QuizAnswerBase(BaseModel):
     response_time: Optional[int] = Field(None, ge=0, description="答题耗时(秒)")
 
 
-class QuizSingleChoiceAnswer(QuizAnswerBase):
-    """单选题答案。"""
+class _SingleOptionAnswer(QuizAnswerBase):
+    """单选题答案公共字段。"""
 
-    type: Literal["single_choice"] = Field("single_choice", description="答案类型-单选")
-    option_id: int = Field(..., description="被选中的单选选项ID")
+    option_id: int = Field(..., description="被选中的选项ID")
 
 
-class QuizMultipleChoiceAnswer(QuizAnswerBase):
-    """多选题答案。"""
+class _MultiOptionAnswer(QuizAnswerBase):
+    """多选题答案公共字段。"""
 
-    type: Literal["multiple_choice"] = Field("multiple_choice", description="答案类型-多选")
-    option_ids: List[int] = Field(..., min_length=1, description="被选中的多选选项ID列表")
+    option_ids: List[int] = Field(..., min_length=1, description="被选中的选项ID列表")
+
+
+class QuizClassicScenarioAnswer(_SingleOptionAnswer):
+    """经典情景题答案（单选）。"""
+
+    type: Literal["classic_scenario"] = Field("classic_scenario", description="题目类型-经典情景（单选）")
+
+
+class QuizWordChoiceAnswer(_MultiOptionAnswer):
+    """词汇选择题答案（多选）。"""
+
+    type: Literal["word_choice"] = Field("word_choice", description="题目类型-词汇多选")
+
+
+class QuizImagePreferenceAnswer(_MultiOptionAnswer):
+    """图片偏好题答案（多选）。"""
+
+    type: Literal["image_preference"] = Field("image_preference", description="题目类型-图片偏好多选")
 
 
 class QuizRatingAnswer(QuizAnswerBase):
     """评分题答案。"""
 
-    type: Literal["rating"] = Field("rating", description="答案类型-评分")
+    type: Literal["rating"] = Field("rating", description="题目类型-评分题")
     rating_value: float = Field(..., description="用户给出的评分值")
 
 
-class QuizMetricsAnswer(QuizAnswerBase):
-    """多维滑块题答案。"""
+class QuizValueBalanceAnswer(QuizAnswerBase):
+    """价值平衡题答案（滑块）。"""
 
-    type: Literal["metrics"] = Field("metrics", description="答案类型-多维滑块")
+    type: Literal["value_balance"] = Field("value_balance", description="题目类型-价值平衡滑块题")
     values: Dict[str, float] = Field(..., description="各维度的评分百分比映射")
 
 
-class QuizAllocationAnswer(QuizAnswerBase):
+class QuizTimeAllocationAnswer(QuizAnswerBase):
     """资源/时间分配题答案。"""
 
-    type: Literal["allocation"] = Field("allocation", description="答案类型-资源分配")
+    type: Literal["time_allocation"] = Field("time_allocation", description="题目类型-时间/资源分配题")
+    allocations: Dict[str, float] = Field(..., description="各维度分配的数量 (小时数等)")
+
+
+class QuizLegacySingleChoiceAnswer(_SingleOptionAnswer):
+    """兼容旧版字段的单选题答案。"""
+
+    type: Literal["single_choice"] = Field(
+        "single_choice",
+        description="[兼容] 旧版答案类型-单选，请尽快迁移至 classic_scenario",
+    )
+
+
+class QuizLegacyMultipleChoiceAnswer(_MultiOptionAnswer):
+    """兼容旧版字段的多选题答案。"""
+
+    type: Literal["multiple_choice"] = Field(
+        "multiple_choice",
+        description="[兼容] 旧版答案类型-多选，请尽快迁移至具体题目类型",
+    )
+
+
+class QuizLegacyMetricsAnswer(QuizAnswerBase):
+    """兼容旧版字段的多维滑块题答案。"""
+
+    type: Literal["metrics"] = Field("metrics", description="[兼容] 旧版答案类型-多维滑块")
+    values: Dict[str, float] = Field(..., description="各维度的评分百分比映射")
+
+
+class QuizLegacyAllocationAnswer(QuizAnswerBase):
+    """兼容旧版字段的资源分配题答案。"""
+
+    type: Literal["allocation"] = Field("allocation", description="[兼容] 旧版答案类型-资源分配")
     allocations: Dict[str, float] = Field(..., description="各维度分配的数量 (小时数等)")
 
 
 QuizAnswerItem = Annotated[
     Union[
-        QuizSingleChoiceAnswer,
-        QuizMultipleChoiceAnswer,
+        QuizClassicScenarioAnswer,
+        QuizWordChoiceAnswer,
+        QuizImagePreferenceAnswer,
         QuizRatingAnswer,
-        QuizMetricsAnswer,
-        QuizAllocationAnswer,
+        QuizValueBalanceAnswer,
+        QuizTimeAllocationAnswer,
+        QuizLegacySingleChoiceAnswer,
+        QuizLegacyMultipleChoiceAnswer,
+        QuizLegacyMetricsAnswer,
+        QuizLegacyAllocationAnswer,
     ],
     Field(discriminator="type"),
 ]

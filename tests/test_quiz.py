@@ -58,7 +58,7 @@ async def test_quiz_flow(
     answers = [
         {
             "question_id": question["question_id"],
-            "type": "single_choice",
+            "type": "classic_scenario",
             "option_id": question["options"][0]["id"],
             "response_time": 5,
         }
