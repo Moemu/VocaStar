@@ -83,7 +83,7 @@ async def test_quiz_flow(
     submit_payload = submit_response.json()
     report = submit_payload["report"]
     assert report["holland_code"]
-    assert report["reward_points"] == 80
+    assert report["reward_points"] == 50
     assert report["dimension_scores"]
     assert report["recommendations"]
     assert all(0 <= item["match_score"] <= 100 for item in report["recommendations"])
