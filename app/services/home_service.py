@@ -219,6 +219,7 @@ class HomeService:
                 CareerGalaxy.name.label("galaxy_name"),
                 func.coalesce(counts_subquery.c.explorer_count, 0).label("explorer_count"),
             )
+            .select_from(CareerRecommendation)
             .join(Career, CareerRecommendation.career_id == Career.id)
             .join(CareerGalaxy, Career.galaxy_id == CareerGalaxy.id, isouter=True)
             .outerjoin(counts_subquery, counts_subquery.c.career_id == Career.id)
@@ -247,6 +248,7 @@ class HomeService:
                 CareerGalaxy.name.label("galaxy_name"),
                 func.coalesce(counts_subquery.c.explorer_count, 0).label("explorer_count"),
             )
+            .select_from(Career)
             .join(CareerGalaxy, Career.galaxy_id == CareerGalaxy.id, isouter=True)
             .outerjoin(counts_subquery, counts_subquery.c.career_id == Career.id)
             .order_by(func.random())
