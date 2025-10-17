@@ -54,7 +54,7 @@ from app.schemas.quiz import (
 )
 
 SESSION_DURATION_MINUTES = 30
-REWARD_POINTS = 80
+REWARD_POINTS = 50
 DIMENSION_PRIORITY = ["R", "I", "A", "S", "E", "C"]
 DIMENSION_LABELS = {
     "R": "现实型 R",

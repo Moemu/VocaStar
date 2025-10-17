@@ -51,12 +51,14 @@ class Career(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True, comment="主键ID")
     name: Mapped[str] = mapped_column(String(100), nullable=False, index=True, comment="职业名称")
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True, comment="职业简介")
+    cover: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, comment="职业描述图")
+    planet_image_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True, comment="星球图片URL")
+
     holland_dimensions: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True, comment="匹配的霍兰德维度列表")
     work_contents: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True, comment="主要工作内容列表")
     career_outlook: Mapped[Optional[str]] = mapped_column(Text, nullable=True, comment="职业前景")
     development_path: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True, comment="发展路径列表")
     required_skills: Mapped[Optional[str]] = mapped_column(Text, nullable=True, comment="核心技能要求")
-    planet_image_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True, comment="星球图片URL")
     related_courses: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True, comment="相关课程列表")
     core_competency_model: Mapped[Optional[dict[str, float]]] = mapped_column(
         JSON,
