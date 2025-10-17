@@ -14,12 +14,18 @@ from __future__ import annotations
 
 import asyncio
 import json
+import sys
+from pathlib import Path
 
 from sqlalchemy import inspect, text
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import AsyncEngine
 
-from app.core.sql import async_session_maker
+ROOT_PATH = Path(__file__).resolve().parents[1]
+if str(ROOT_PATH) not in sys.path:
+    sys.path.insert(0, str(ROOT_PATH))
+
+from app.core.sql import async_session_maker  # noqa: E402
 
 DEFAULT_STATE_PAYLOAD = {
     "current_scene_index": 0,
