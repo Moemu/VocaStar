@@ -8,6 +8,7 @@ from app.deps.sql import get_db
 from app.models.user import User
 from app.schemas.cosplay import (
     CosplayChoiceRequest,
+    CosplayChoiceResponse,
     CosplayReportPayload,
     CosplayScriptDetailResponse,
     CosplaySessionListResponse,
@@ -75,7 +76,7 @@ async def get_cosplay_session_state(
 
 @router.post(
     "/sessions/{session_id}/choice",
-    response_model=CosplaySessionStateResponse,
+    response_model=CosplayChoiceResponse,
     summary="在当前场景中选择一个选项",
 )
 async def submit_cosplay_choice(
@@ -83,7 +84,7 @@ async def submit_cosplay_choice(
     request: CosplayChoiceRequest,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> CosplaySessionStateResponse:
+) -> CosplayChoiceResponse:
     """在指定会话的当前场景中提交用户的选项选择。"""
     service = get_service(db)
     return await service.choose_option(session_id=session_id, user=current_user, request=request)

@@ -56,8 +56,8 @@ class CareerRepository:
         return list(items), int(total)
 
     async def get_career_by_id(self, career_id: int) -> Optional[Career]:
-        """根据职业 ID 获取单条职业记录"""
-        stmt = select(Career).where(Career.id == career_id)
+        """根据职业 ID 获取单条职业记录，预加载 galaxy 以避免异步懒加载错误"""
+        stmt = select(Career).options(selectinload(Career.galaxy)).where(Career.id == career_id)
         result = await self.session.execute(stmt)
         return result.scalars().first()
 

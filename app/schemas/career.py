@@ -41,6 +41,7 @@ class CareerDetail(CareerSummary):
     updated_at: datetime = Field(..., description="最近更新时间")
     galaxy_description: Optional[str] = Field(None, description="所属星系简介")
     galaxy_cover_image_url: Optional[str] = Field(None, description="所属星系封面图")
+    cosplay_script_id: Optional[int] = Field(None, description="关联的Cosplay剧本ID")
 
 
 class CareerListResponse(BaseModel):

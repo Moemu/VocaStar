@@ -33,6 +33,8 @@ from app.models.career import Career  # noqa: E402
 from app.models.cosplay import CosplayScript  # noqa: E402
 from app.schemas.cosplay import CosplayScriptContent  # noqa: E402
 
+DEFAULT_BASE_SCORE = 50
+
 SCRIPTS_SECTION_KEY = "scripts"
 
 
@@ -44,6 +46,71 @@ def load_yaml(path: Path) -> dict[str, Any]:
     if not isinstance(payload, Mapping):
         raise ValueError("cosplay 配置文件的根节点必须是对象")
     return dict(payload)
+
+
+def _coerce_legacy_content(data: dict[str, Any]) -> dict[str, Any]:
+    """将旧版/不规范的剧本内容转换为当前 schema 期望的结构。
+
+    - scenes: 允许 list，转换为以 id 为键的 dict
+    - option.description -> option.outcome
+    - 缺失 effects 则补 {}
+    - 缺失 initial_scores：按 abilities + base_score 生成
+    - 缺失 evaluations/abilities：补空列表
+    - 缺失 is_end：False
+    """
+    from copy import deepcopy
+
+    payload = deepcopy(data)
+
+    scenes = payload.get("scenes")
+    if isinstance(scenes, list):
+        scenes_dict: dict[str, Any] = {}
+        for scene in scenes:
+            if not isinstance(scene, dict):
+                continue
+            sid = scene.get("id")
+            if not sid:
+                continue
+            opts = []
+            for opt in scene.get("options", []) or []:
+                if not isinstance(opt, dict):
+                    continue
+                outcome = opt.get("outcome")
+                if outcome is None and "description" in opt:
+                    outcome = opt.get("description")
+                opts.append(
+                    {
+                        "id": opt.get("id"),
+                        "text": opt.get("text"),
+                        "outcome": outcome or "",
+                        "effects": opt.get("effects") or {},
+                    }
+                )
+            scenes_dict[str(sid)] = {
+                "id": scene.get("id"),
+                "title": scene.get("title", ""),
+                "text": scene.get("narrative", ""),
+                "options": opts,
+                "is_end": bool(scene.get("is_end", False)),
+            }
+        payload["scenes"] = scenes_dict
+
+    if "initial_scores" not in payload:
+        abilities = payload.get("abilities") or []
+        base = payload.get("base_score") or DEFAULT_BASE_SCORE
+        init_scores: dict[str, int] = {}
+        for ab in abilities:
+            if isinstance(ab, dict) and ab.get("code"):
+                init_scores[ab["code"]] = int(base)
+        payload["initial_scores"] = init_scores
+
+    if "evaluations" not in payload or payload.get("evaluations") is None:
+        payload["evaluations"] = []
+
+    if "abilities" not in payload or payload.get("abilities") is None:
+        payload["abilities"] = []
+
+    return payload
 
 
 def normalize_script_payload(identifier: str, payload: Any) -> tuple[str, str, dict[str, Any]]:
@@ -60,7 +127,12 @@ def normalize_script_payload(identifier: str, payload: Any) -> tuple[str, str, d
     career_name = career_name_raw.strip()
 
     content_payload = {k: v for k, v in payload.items() if k not in {"title", "career_name"}}
-    CosplayScriptContent.model_validate(content_payload)
+    # 先尝试严格校验，不通过则进行一次兼容性规整后再校验
+    try:
+        CosplayScriptContent.model_validate(content_payload)
+    except Exception:
+        content_payload = _coerce_legacy_content(content_payload)
+        CosplayScriptContent.model_validate(content_payload)
     return title, career_name, content_payload
 
 

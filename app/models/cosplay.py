@@ -50,7 +50,7 @@ class CosplayScript(Base):
     )
 
     # 关系
-    career: Mapped["Career"] = relationship("Career", back_populates="scripts")
+    career: Mapped["Career"] = relationship("Career", foreign_keys=[career_id])
     sessions: Mapped[list["CosplaySession"]] = relationship("CosplaySession", back_populates="script")
 
     __table_args__ = (Index("idx_script_career_id", "career_id"),)

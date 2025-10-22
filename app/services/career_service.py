@@ -111,6 +111,7 @@ class CareerService:
         return CareerDetail(
             id=career.id,
             name=career.name,
+            cosplay_script_id=career.cosplay_script_id,
             description=career.description,
             holland_dimensions=career.holland_dimensions,
             planet_image_url=career.planet_image_url,

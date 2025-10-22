@@ -12,6 +12,7 @@ from app.models.cosplay import (
     CosplaySession,
     SessionState,
 )
+from app.schemas.cosplay import CosplayReportPayload
 
 
 class CosplayRepository:
@@ -68,8 +69,8 @@ class CosplayRepository:
         await self.session.refresh(session)
         return session
 
-    async def create_report(self, session_id: int, payload: dict[str, Any]) -> CosplayReport:
-        report = CosplayReport(session_id=session_id, result_json=payload)
+    async def create_report(self, session_id: int, payload: CosplayReportPayload) -> CosplayReport:
+        report = CosplayReport(session_id=session_id, result_json=payload.model_dump(mode="json"))
         self.session.add(report)
         await self.session.flush()
         await self.session.refresh(report)

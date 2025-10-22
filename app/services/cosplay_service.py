@@ -15,6 +15,7 @@ from app.repositories.cosplay import CosplayRepository
 from app.schemas.cosplay import (
     CosplayAbilityDescriptor,
     CosplayChoiceRequest,
+    CosplayChoiceResponse,
     CosplayEvaluationRule,
     CosplayHistoryRecord,
     CosplayOptionDefinition,
@@ -125,7 +126,7 @@ class CosplayService:
         session_id: int,
         user: User,
         request: CosplayChoiceRequest,
-    ) -> CosplaySessionStateResponse:
+    ) -> CosplayChoiceResponse:
         """Apply the selected option to the current scene and advance the session."""
         record = await self.repo.get_session_by_id(session_id)
         if not record or record.user_id != user.id:
@@ -138,51 +139,53 @@ class CosplayService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="剧本不存在")
         content = self._parse_content(script.content)
 
-        normalized_state = self._normalize_state(record.state_payload, content)
-        current_index = normalized_state["current_scene_index"]
-        total_scenes = len(content.scenes)
+        state_payload = self._normalize_state(record.state_payload, content)
+        scene_list = list(content.scenes.values())
+        current_index = state_payload["current_scene_index"]
+        total_scenes = len(scene_list)
+
         if current_index >= total_scenes:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="剧本流程已结束")
 
-        scene = content.scenes[current_index]
-        option = self._find_option(scene, request.option_id)
-        if option is None:
+        scene_def = scene_list[current_index]
+        option_def = self._find_option(scene_def, request.option_id)
+        if option_def is None:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="选项不存在")
 
-        updated_scores, delta_points = self._apply_effects(
-            normalized_state["scores"],
-            option,
+        previous_scores = state_payload["scores"].copy()
+        updated_scores, score_changes = self._apply_effects(
+            previous_scores,
+            option_def,
             abilities=content.abilities,
             point_step=content.point_step,
             base_score=content.base_score,
         )
-        history_entry = self._build_history_entry(
-            scene=scene,
-            option=option,
-            delta_points=delta_points,
-            updated_scores=updated_scores,
-        )
-        normalized_state["history"].append(history_entry)
-        normalized_state["scores"] = updated_scores
-        normalized_state["current_scene_index"] = current_index + 1
 
-        record.state_payload = deepcopy(normalized_state)
+        history_entry = CosplayHistoryRecord(scene_id=scene_def.id, choice_id=option_def.id)
+        state_payload["history"].append(history_entry.model_dump())
+        state_payload["scores"] = updated_scores
+        state_payload["current_scene_index"] = current_index + 1
+
+        record.state_payload = deepcopy(state_payload)
         flag_modified(record, "state_payload")
-        record.progress = self._calculate_progress(normalized_state["current_scene_index"], total_scenes)
+        record.progress = self._calculate_progress(state_payload["current_scene_index"], total_scenes)
 
-        report_payload: CosplayReportPayload | None = None
-        if normalized_state["current_scene_index"] >= total_scenes:
+        if state_payload["current_scene_index"] >= total_scenes:
             record.state = SessionState.completed
             record.finished_at = datetime.now(timezone.utc)
-            report_payload = await self._ensure_report(record, content, normalized_state)
+            await self._ensure_report(record, content, state_payload)
+
         await self.session.commit()
+        await self.session.refresh(record, attribute_names=["report"])
 
-        # 刷新报告以便返回最新信息
-        if report_payload is None and record.report:
-            report_payload = CosplayReportPayload.model_validate(record.report.result_json)
+        next_state = self._build_state_payload(record, content, script.title)
 
-        state = self._build_state_payload(record, content, script.title, override_report=report_payload)
-        return CosplaySessionStateResponse(state=state)
+        return CosplayChoiceResponse(
+            outcome=option_def.outcome,
+            score_changes=score_changes,
+            current_scores=updated_scores,
+            next_scene=next_state,
+        )
 
     async def get_report(self, *, session_id: int, user: User) -> CosplayReportPayload:
         """Return the final report for a completed session, generating it if needed."""
@@ -200,42 +203,169 @@ class CosplayService:
             report = await self._ensure_report(record, content, normalized_state)
             await self.session.commit()
             return report
+
         return CosplayReportPayload.model_validate(record.report.result_json)
 
-    async def _ensure_report(
+    def _parse_content(self, content_data: dict[str, Any] | None) -> CosplayScriptContent:
+        if not content_data:
+            raise ValueError("剧本内容为空")
+        try:
+            return CosplayScriptContent.model_validate(content_data)
+        except ValidationError as e:
+            # 尝试对旧版/不规范内容进行兼容性规整后再校验
+            try:
+                coerced = self._coerce_legacy_content(content_data)
+                return CosplayScriptContent.model_validate(coerced)
+            except Exception:
+                raise ValueError(f"剧本内容格式错误: {e}") from e
+
+    def _coerce_legacy_content(self, data: dict[str, Any]) -> dict[str, Any]:
+        """将旧版或不规范的剧本内容转换为当前 schema 期望的结构。
+
+        处理要点：
+        - scenes: 允许 list，转换为以 id 为键的 dict
+        - option.description -> option.outcome
+        - 缺失的 effects 补为空 dict
+        - 缺失的 initial_scores：按 abilities 生成默认初始分（base_score 或 DEFAULT_BASE_SCORE）
+        - 缺失的 evaluations：补为空列表
+        - 缺失的 is_end：默认为 False
+        """
+        payload = deepcopy(data)
+
+        # 1) scenes 列表转字典，并规整 option 字段
+        scenes = payload.get("scenes")
+        if isinstance(scenes, list):
+            scenes_dict: dict[str, Any] = {}
+            for scene in scenes:
+                if not isinstance(scene, dict):
+                    continue
+                scene_id = scene.get("id")
+                if not scene_id:
+                    continue
+                options = []
+                for opt in scene.get("options", []) or []:
+                    if not isinstance(opt, dict):
+                        continue
+                    # 兼容旧字段 description -> outcome
+                    outcome = opt.get("outcome")
+                    if outcome is None and "description" in opt:
+                        outcome = opt.get("description")
+                    options.append(
+                        {
+                            "id": opt.get("id"),
+                            "text": opt.get("text"),
+                            "outcome": outcome or "",
+                            "effects": opt.get("effects") or {},
+                        }
+                    )
+                # 兼容旧字段 narrative/narration -> text；text 为空则退回 title
+                raw_text = scene.get("text")
+                if not raw_text or (isinstance(raw_text, str) and not raw_text.strip()):
+                    raw_text = scene.get("narrative") or scene.get("narration")
+                if not raw_text or (isinstance(raw_text, str) and not raw_text.strip()):
+                    raw_text = scene.get("title", "")
+                scenes_dict[str(scene_id)] = {
+                    "id": scene.get("id"),
+                    "title": scene.get("title", ""),
+                    "text": raw_text or "",
+                    "options": options,
+                    "is_end": bool(scene.get("is_end", False)),
+                }
+            payload["scenes"] = scenes_dict
+
+        # 2) 若 initial_scores 缺失，则依据 abilities + base_score 填充
+        if "initial_scores" not in payload:
+            abilities = payload.get("abilities") or []
+            base = payload.get("base_score") or DEFAULT_BASE_SCORE
+            init_scores: dict[str, int] = {}
+            for ab in abilities:
+                if isinstance(ab, dict) and ab.get("code"):
+                    init_scores[ab["code"]] = int(base)
+            payload["initial_scores"] = init_scores
+
+        # 3) evaluations 缺失则补空列表
+        if "evaluations" not in payload or payload.get("evaluations") is None:
+            payload["evaluations"] = []
+
+        # 4) abilities 缺失则补空列表
+        if "abilities" not in payload or payload.get("abilities") is None:
+            payload["abilities"] = []
+
+        # 其余字段（summary/setting/base_score/point_step）按原值透传
+        return payload
+
+    def _find_option(self, scene_def: CosplaySceneDefinition, option_id: str) -> CosplayOptionDefinition | None:
+        """Find a specific option definition within a scene."""
+        return next((opt for opt in scene_def.options if opt.id == option_id), None)
+
+    def _build_initial_payload(self, content: CosplayScriptContent) -> dict[str, Any]:
+        return {
+            "scores": content.initial_scores.copy(),
+            "history": [],
+            "current_scene_index": 0,
+        }
+
+    def _apply_effects(
         self,
-        record: CosplaySession,
-        content: CosplayScriptContent,
-        normalized_state: dict[str, Any],
-    ) -> CosplayReportPayload:
-        """Ensure a report record exists for the session and return its payload."""
-        if record.report is not None:
-            return CosplayReportPayload.model_validate(record.report.result_json)
-        report_payload = self._build_report(content, normalized_state)
-        report_model = await self.repo.create_report(record.id, report_payload.model_dump(mode="json"))
-        record.report = report_model
-        return report_payload
+        current_scores: dict[str, int],
+        option: CosplayOptionDefinition,
+        *,
+        abilities: list[CosplayAbilityDescriptor],
+        point_step: int | None,
+        base_score: int | None,
+    ) -> tuple[dict[str, int], dict[str, int]]:
+        """Apply score changes based on option effects and return new scores and deltas."""
+        step = point_step or DEFAULT_POINT_STEP
+        score_changes: dict[str, int] = {}
+        updated_scores = current_scores.copy()
+        ability_codes = {ability.code for ability in abilities}
+
+        for ability_code, points in option.effects.items():
+            if ability_code in ability_codes:
+                change = points * step
+                updated_scores[ability_code] = updated_scores.get(ability_code, 0) + change
+                score_changes[ability_code] = change
+
+        return updated_scores, score_changes
+
+    def _calculate_progress(self, current_index: int, total_scenes: int) -> int:
+        if total_scenes == 0:
+            return 100
+        progress = int((current_index / total_scenes) * 100)
+        return min(progress, 100)
 
     def _build_state_payload(
         self,
         record: CosplaySession,
         content: CosplayScriptContent,
         script_title: str,
-        *,
         override_report: CosplayReportPayload | None = None,
     ) -> CosplaySessionState:
-        """Construct a rich session state response payload from persisted data."""
-        normalized_state = self._normalize_state(record.state_payload, content)
-        current_scene = None
-        if record.state == SessionState.in_progress:
-            current_scene_index = normalized_state["current_scene_index"]
-            if 0 <= current_scene_index < len(content.scenes):
-                scene_def = content.scenes[current_scene_index]
-                current_scene = self._build_scene_view(scene_def)
-        history_models = [CosplayHistoryRecord.model_validate(entry) for entry in normalized_state["history"]]
-        report_payload = override_report
-        if report_payload is None and record.report is not None:
+        """Construct the comprehensive session state object from various data sources."""
+        state_payload = record.state_payload or {}
+        scene_list = list(content.scenes.values())
+        total_scenes = len(scene_list)
+        current_index = state_payload.get("current_scene_index", 0)
+
+        current_scene_view: CosplaySceneView | None = None
+        if current_index < total_scenes:
+            scene_def = scene_list[current_index]
+            current_scene_view = CosplaySceneView(
+                id=scene_def.id,
+                title=scene_def.title,
+                text=scene_def.text or scene_def.title,
+                options=[CosplayOptionView(id=opt.id, text=opt.text) for opt in scene_def.options],
+                is_end=scene_def.is_end,
+            )
+
+        report_payload: CosplayReportPayload | None = None
+        if override_report:
+            report_payload = override_report
+        elif record.report:
             report_payload = CosplayReportPayload.model_validate(record.report.result_json)
+
+        history_records = [CosplayHistoryRecord.model_validate(h) for h in state_payload.get("history", [])]
+
         return CosplaySessionState(
             session_id=record.id,
             script_id=record.script_id,
@@ -243,221 +373,94 @@ class CosplayService:
             setting=content.setting,
             progress=record.progress,
             completed=record.state == SessionState.completed,
-            current_scene_index=normalized_state["current_scene_index"],
-            total_scenes=len(content.scenes),
-            scores=normalized_state["scores"],
+            current_scene_index=current_index,
+            total_scenes=total_scenes,
+            scores=state_payload.get("scores", {}),
             abilities=content.abilities,
-            current_scene=current_scene,
-            history=history_models,
+            current_scene=current_scene_view,
+            history=history_records,
             report=report_payload,
         )
 
-    def _build_scene_view(self, scene: CosplaySceneDefinition) -> CosplaySceneView:
-        """Return the lightweight view of a scene for front-end consumption."""
-        return CosplaySceneView(
-            id=scene.id,
-            title=scene.title,
-            narrative=scene.narrative,
-            options=[
-                CosplayOptionView(id=option.id, text=option.text, description=option.description)
-                for option in scene.options
-            ],
-        )
-
-    def _build_initial_payload(self, content: CosplayScriptContent) -> dict[str, Any]:
-        """Create the default session state payload before any user choices."""
-        base = content.base_score or DEFAULT_BASE_SCORE
-        ability_codes = [ability.code for ability in content.abilities]
-        scores = {code: base for code in ability_codes}
-        return {
-            "current_scene_index": 0,
-            "scores": scores,
-            "history": [],
-        }
-
-    def _normalize_state(
+    async def _ensure_report(
         self,
-        raw_state: Any,
+        record: CosplaySession,
         content: CosplayScriptContent,
-    ) -> dict[str, Any]:
-        """Normalize persisted state payloads to a predictable structure."""
-        state: dict[str, Any] = {}
-        if isinstance(raw_state, dict):
-            state.update(raw_state)
-        current_scene_index = int(state.get("current_scene_index") or 0)
-        current_scene_index = max(0, min(current_scene_index, len(content.scenes)))
-        history = state.get("history") or []
-        if not isinstance(history, list):
-            history = []
-        normalized_scores = self._ensure_scores_dict(state.get("scores"), content)
-        return {
-            "current_scene_index": current_scene_index,
-            "history": list(history),
-            "scores": normalized_scores,
-        }
-
-    def _ensure_scores_dict(
-        self,
-        raw_scores: Any,
-        content: CosplayScriptContent,
-    ) -> dict[str, int]:
-        """Guarantee every ability code has an integer score within the state payload."""
-        scores: dict[str, int] = {}
-        base = content.base_score or DEFAULT_BASE_SCORE
-        if isinstance(raw_scores, dict):
-            for key, value in raw_scores.items():
-                try:
-                    scores[str(key)] = int(value)
-                except (TypeError, ValueError):
-                    continue
-        for ability in content.abilities:
-            scores.setdefault(ability.code, base)
-        return scores
-
-    def _apply_effects(
-        self,
-        current_scores: dict[str, int],
-        option: CosplayOptionDefinition,
-        *,
-        abilities: Sequence[CosplayAbilityDescriptor],
-        point_step: int,
-        base_score: int | None,
-    ) -> tuple[dict[str, int], dict[str, int]]:
-        """Apply the option scoring effects and return updated totals with deltas."""
-        step = point_step or DEFAULT_POINT_STEP
-        baseline = base_score or DEFAULT_BASE_SCORE
-        updated = {key: int(value) for key, value in current_scores.items()}
-        deltas: dict[str, int] = {}
-        for code, value in option.effects.items():
-            try:
-                delta_units = int(value)
-            except (TypeError, ValueError):
-                continue
-            delta_points = delta_units * step
-            target_code = str(code)
-            # Extract fallback logic for base_value for clarity
-            if target_code in updated:
-                base_value = updated[target_code]
-            elif target_code in current_scores:
-                base_value = current_scores[target_code]
-            else:
-                base_value = baseline
-            new_score = base_value + delta_points
-            new_score = max(0, min(100, new_score))
-            updated[target_code] = new_score
-            if delta_points:
-                deltas[target_code] = delta_points
-        # 确保所有能力维度都存在
-        for ability in abilities:
-            updated.setdefault(ability.code, current_scores.get(ability.code, baseline))
-        return updated, deltas
-
-    def _build_history_entry(
-        self,
-        *,
-        scene: CosplaySceneDefinition,
-        option: CosplayOptionDefinition,
-        delta_points: dict[str, int],
-        updated_scores: dict[str, int],
-    ) -> dict[str, Any]:
-        """Create a historic record describing a single user choice."""
-        return {
-            "scene_id": scene.id,
-            "scene_title": scene.title,
-            "option_id": option.id,
-            "option_text": option.text,
-            "feedback": option.feedback,
-            "delta": delta_points,
-            "scores_after": updated_scores,
-            "occurred_at": datetime.now(timezone.utc).isoformat(),
-        }
-
-    def _build_report(
-        self,
-        content: CosplayScriptContent,
-        normalized_state: dict[str, Any],
+        state_payload: dict[str, Any],
     ) -> CosplayReportPayload:
-        """Compile the final report summary based on accumulated scores."""
-        scores = deepcopy(normalized_state["scores"])
-        rules_map = self._build_rules_map(content.evaluation_rules)
-        for ability in content.abilities:
-            scores.setdefault(ability.code, content.base_score or DEFAULT_BASE_SCORE)
-        ranked = sorted(scores.items(), key=lambda item: item[1], reverse=True)
-        ranked_codes = [code for code, _ in ranked]
-        max_score = ranked[0][1] if ranked else content.base_score or DEFAULT_BASE_SCORE
-        min_score = ranked[-1][1] if ranked else content.base_score or DEFAULT_BASE_SCORE
-        highlight_threshold = content.point_step or DEFAULT_POINT_STEP
-        highlight_dimensions = [code for code, score in ranked if max_score - score <= highlight_threshold]
-        if not highlight_dimensions:
-            highlight_dimensions = [ranked_codes[0]] if ranked_codes else []
-        if not ranked_codes or max_score - min_score < highlight_threshold:
-            route_rule = rules_map.get("balanced")
-            route_key = "balanced"
-        else:
-            first_two = tuple(sorted(ranked_codes[:2]))
-            combination_key = "+".join(first_two)
-            route_rule = rules_map.get(combination_key)
-            route_key = combination_key
-            if route_rule is None:
-                route_rule = rules_map.get("balanced")
-                route_key = "balanced"
-        if route_rule is None:
-            route_rule = CosplayEvaluationRule(
-                key="balanced",
-                route="团队核心路线",
-                summary="你在各项能力上保持均衡发展，是团队中可靠的伙伴。",
-                advice="继续保持全面发展，适时根据兴趣领域进行深化。",
-            )
-            route_key = "balanced"
-        ability_labels = {ability.code: ability.name for ability in content.abilities}
-        ability_desc = {ability.code: ability.description or "" for ability in content.abilities}
-        history_models = [CosplayHistoryRecord.model_validate(item) for item in normalized_state["history"]]
+        """Generate and save a report if it doesn't exist, then return it."""
+        if record.report:
+            return CosplayReportPayload.model_validate(record.report.result_json)
+
+        final_scores = state_payload.get("scores", {})
+        report_payload = self._build_report_payload(content, final_scores, state_payload.get("history", []))
+        await self.repo.create_report(
+            session_id=record.id,
+            payload=report_payload,
+        )
+        # Commit here to ensure the report is persisted, as the caller may not always commit.
+        await self.session.commit()
+        return report_payload
+        return report_payload
+
+    def _build_report_payload(
+        self,
+        content: CosplayScriptContent,
+        final_scores: dict[str, int],
+        history: list[dict[str, Any]],
+    ) -> CosplayReportPayload:
+        """Construct the final report content based on scores and evaluation rules."""
+        best_route = self._evaluate_best_route(content.evaluations, final_scores)
+        history_records = [CosplayHistoryRecord.model_validate(h) for h in history]
+
         return CosplayReportPayload(
-            scores=scores,
-            highlight_dimensions=highlight_dimensions,
-            ranked_dimensions=ranked_codes,
-            route_key=route_key,
-            route_name=route_rule.route,
-            summary=route_rule.summary,
-            advice=route_rule.advice,
-            ability_labels=ability_labels,
-            ability_descriptions=ability_desc,
-            history=history_models,
+            final_scores=final_scores,
+            summary=best_route.summary,
+            advice=best_route.advice,
+            ability_labels={ability.code: ability.name for ability in content.abilities},
+            ability_descriptions={
+                ability.code: ability.description for ability in content.abilities if ability.description is not None
+            },
+            history=history_records,
         )
 
-    def _build_rules_map(
-        self,
-        rules: Sequence[CosplayEvaluationRule],
-    ) -> dict[str, CosplayEvaluationRule]:
-        """Index evaluation rules by normalized key for quick lookup."""
-        mapping: dict[str, CosplayEvaluationRule] = {}
-        for rule in rules:
-            key = rule.key.strip()
-            if not key:
-                continue
-            if key != "balanced" and "+" in key:
-                parts = [segment.strip() for segment in key.split("+") if segment.strip()]
-                key = "+".join(sorted(parts))
-            mapping[key] = rule
-        return mapping
+    def _evaluate_best_route(
+        self, evaluations: Sequence[CosplayEvaluationRule], final_scores: dict[str, int]
+    ) -> CosplayEvaluationRule:
+        """Determine the most fitting evaluation rule based on the final scores."""
+        if not evaluations:
+            return CosplayEvaluationRule(
+                summary="旅程已完成。",
+                advice="你已经走完了这段独特的职业道路，希望这段经历能为你带来启发。",
+                thresholds={},
+            )
 
-    def _find_option(self, scene: CosplaySceneDefinition, option_id: str) -> CosplayOptionDefinition | None:
-        """Locate the option definition within the scene by its identifier."""
-        for option in scene.options:
-            if option.id == option_id:
-                return option
-        return None
+        # Find the route with the highest minimum score that is met
+        best_route = evaluations[0]
+        max_min_score = -1.0
 
-    def _calculate_progress(self, current_scene_index: int, total_scenes: int) -> int:
-        """Convert scene index into a rounded percentage progress value."""
-        if total_scenes <= 0:
-            return 0
-        ratio = current_scene_index / total_scenes
-        return max(0, min(100, round(ratio * 100)))
+        for route in evaluations:
+            min_score_for_route = float("inf")
+            possible = True
+            for ability, required_score in route.thresholds.items():
+                if final_scores.get(ability, 0) < required_score:
+                    possible = False
+                    break
+                min_score_for_route = min(min_score_for_route, final_scores.get(ability, 0))
 
-    def _parse_content(self, content: Any) -> CosplayScriptContent:
-        """Validate raw JSON content into the strongly typed script model."""
-        try:
-            return CosplayScriptContent.model_validate(content)
-        except ValidationError as exc:  # pragma: no cover - safeguards invalid data
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="剧本内容格式异常") from exc
+            if possible and min_score_for_route > max_min_score:
+                max_min_score = min_score_for_route
+                best_route = route
+
+        return best_route
+
+    def _normalize_state(self, state_payload: dict[str, Any] | None, content: CosplayScriptContent) -> dict[str, Any]:
+        """Ensure the state payload is well-formed and contains all necessary keys."""
+        if not state_payload:
+            return self._build_initial_payload(content)
+
+        # Ensure essential keys exist
+        state_payload.setdefault("scores", self._build_initial_payload(content)["scores"])
+        state_payload.setdefault("history", [])
+        state_payload.setdefault("current_scene_index", 0)
+        return state_payload

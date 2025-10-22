@@ -81,6 +81,14 @@ class Career(Base):
     salary_max: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, comment="建议薪资范围最大值")
     skills_snapshot: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True, comment="技能亮点简表(JSON 列表)")
 
+    cosplay_script_id: Mapped[Optional[int]] = mapped_column(
+        Integer,
+        ForeignKey("cosplay_scripts.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+        comment="关联的Cosplay剧本ID",
+    )
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         nullable=False,
@@ -99,7 +107,14 @@ class Career(Base):
     recommendations: Mapped[list["CareerRecommendation"]] = relationship(
         "CareerRecommendation", back_populates="career"
     )
-    scripts: Mapped[list["CosplayScript"]] = relationship("CosplayScript", back_populates="career")
+    # NOTE: The relationship name was changed from 'scripts' to 'cosplay_script' for clarity.
+    # This is a breaking change from the previous schema. Please update any code referencing the old relationship name.
+    cosplay_script: Mapped[Optional["CosplayScript"]] = relationship(
+        "CosplayScript",
+        primaryjoin="Career.cosplay_script_id==CosplayScript.id",
+        foreign_keys=[cosplay_script_id],
+        uselist=False,
+    )
     galaxy: Mapped[Optional[CareerGalaxy]] = relationship("CareerGalaxy", back_populates="careers")
 
     __table_args__ = (
