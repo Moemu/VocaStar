@@ -38,12 +38,12 @@ careers:
       - 数据库原理
       - 编译原理
     knowledge_background:
-      industry_knowledge: 参与过一定规模的软件开发工作,积极参与开源社区并贡献过代码,自己编写过一定规模的代码。
-      professional_knowledge: 对于计算机科学的基本知识：操作系统、计算机组成原理、数据结构、算法分析与设计、基本的编程语言、编译原理等学科;要求能熟练掌握其概念和原理，并能将其应用到实际场景。特别地，对于软件工程方面的实验训练，能够熟悉基本的软件开发流程和工具，包括版本控制软件(Git\SVN等)，代码质量分析工具(Gerrit等)
+      industry_knowledge: 熟悉互联网/企业级软件的典型项目形态（单体到微服务演进、云原生落地、DevOps 与 CI/CD 流水线）；理解常见技术场景（高并发与限流降级、分布式事务与一致性、可观测性与故障演练）；明确上下游协作关系（上游为产品/设计/需求方，下游为测试/运维/平台/安全），能在迭代节奏下高效协同；具备开源协作经验或在企业内主导过核心模块改造/性能优化。
+      professional_knowledge: 计算机科学体系化能力（数据结构与算法、操作系统、计算机网络、数据库、编译与虚拟机基础）；工程与架构方法（面向对象与设计模式、领域驱动设计、性能与容量规划、安全与合规、测试与质量体系）；工程化与平台能力（Git 工作流、代码评审、CI/CD、容器与编排、灰度与回滚、监控与告警）。
 
   data_analyst:
     name: 数据分析师
-    description: 进行组织研究和评估，设计系统和流程，开展工作简化和测量研究，并编制运营和程序手册，以帮助管理层更高效、更有效地运作。包括项目分析师和管理顾问。
+    description: 数据分析师通过数据采集与治理、探索性分析（EDA）、指标体系搭建、建模与实验（如 A/B 测试）、可视化与洞察传达，帮助业务识别问题、评估方案并驱动增长。常用技术与工具包括 SQL、Python/R、Tableau/Power BI、Excel、Airflow/ETL、数据仓库/湖；典型场景涵盖电商转化与漏斗分析、用户增长与留存预警、运营效果评估、金融风控与定价优化等，需要与产品、运营、工程、数据平台与合规团队紧密协作。
     planet_image_url: /static/career_planets/data_analyst.webp
     holland_dimensions: ["I", "C", "E"]
     galaxy: 硅基星系
@@ -80,12 +80,12 @@ careers:
       - Python 编程
       - R 语言编程
     knowledge_background:
-      industry_knowledge: 了解所处行业的基本业务流程和数据需求，熟悉行业内常用的数据分析工具和技术，掌握数据隐私和安全相关法规。
-      professional_knowledge: 掌握统计学、数据挖掘、机器学习等专业知识，熟悉数据库管理和编程语言（如Python、R），具备数据可视化技能，能够有效传达分析结果。
+      industry_knowledge: 了解所在行业的核心业务流程与关键指标（如电商 GMV/转化/复购、互联网 DAU/留存/ARPU、金融风控的逾期与违约指标）；熟悉典型项目实践（增长分析、漏斗与路径分析、用户细分与流失预警、策略 AB 实验与归因评估）；明确上下游协作（上游为产品/运营/市场需求方，下游为数据工程/BI/平台与合规审计）；关注数据治理与合规（数据血缘、质量监控、脱敏与权限、隐私与本地监管要求）。
+      professional_knowledge: 统计与机器学习方法（抽样与估计、假设检验、回归/时间序列、树模型与特征工程、因果推断与实验设计）；数据工程与分析技术（SQL 建模、ETL/ELT、数仓分层与指标口径管理、Python/R 数据处理与可视化）；分析表达与决策支持（可视化设计原则、数据叙事、指标看板与自动化报告）；具备将分析方案落地为可运营的指标体系与评估框架的能力。
 
   accountant:
     name: 会计师
-    description: 审查、分析并解释会计记录，以编制财务报表、提供建议，或审计和评估他人编制的报表。安装或建议成本记录或其他财务和预算数据的系统。
+    description: 会计师通过建立并维护企业会计核算体系，完成凭证处理、账务核对、成本归集、税务申报与合规披露，编制并解读财务报表，为经营决策提供数据支持；在内外部审计中评估内部控制与合规性，识别风险并提出改进建议。典型工作场景包括月结年结、预算与滚动预测、成本控制与费用分析、资金与票据管理、并购与税务筹划，常用工具涵盖 ERP/财务软件、办公与数据分析工具、电子发票与税务系统对接等。
     planet_image_url: /static/career_planets/accountant.webp
     holland_dimensions: ["C", "I", "E"]
     galaxy: 基石星系
@@ -123,8 +123,8 @@ careers:
       - 高级财务会计
       - 管理会计
     knowledge_background:
-      industry_knowledge: 要时刻关注会计准则和税法的公告更新，因为中国会计准则是向IFRS趋同，而IFRS最近几年的概念框架发生大幅变动，所以很多条例在根本上会发生改变；现在的新兴行业越来越多，国家对企业的支持力度也在加大，所以税收法规更新快。作为和数字打交道的职业，其与金融的影响密不可分，所以掌握一定的金融知识是很有必要。同时从业人员所在企业的行业有些基础知识需要了解，方便对资金流动性、税收筹划以及融资方式做出决策。
-      professional_knowledge: 金融、会计、经济等相关知识。大学期间学习到的专业知识非常重要，是做好工作的基础，是理论与实践的结合。当然在工作中还需要保持边工作边学习的精神和态度，努力使自己成为能够为社会所欣赏吸纳的高级人才，在不同企业间游刃有余。
+      industry_knowledge: 持续关注会计准则与税收法规更新（中国会计准则与 IFRS 趋同、税收优惠与征管变化）；理解企业所处行业的收入确认、成本结构与业务模式差异（如互联网平台、制造、履约/存货特点）；明确上下游协作（上游为业务/采购/销售/人事等单据与流程，下游为税务机关/银行/审计与监管披露）；熟悉月结年结、资金管理与合并报表流程，能在系统（ERP/费控/票据/税务）之间完成对账与闭环。
+      professional_knowledge: 会计要素与会计科目体系、复式记账与凭证/账簿/报表衔接；财报编制与分析（资产负债表、利润表、现金流量表及附注）、成本核算与管理会计、预算与绩效；税务合规（增值税/企业所得税/个税等）与纳税申报；内控与审计基础（流程与控制点、舞弊三角、抽样与函证）；信息化能力（财务软件、Excel/数据分析、报税与票据系统对接）。
 
   frontend_development_engineer:
     name: 前端开发工程师
@@ -160,12 +160,12 @@ careers:
       - 计算机网络
       - 用户体验设计
     knowledge_background:
-      industry_knowledge: 参与过网站或应用的前端开发项目，熟悉常见的前端开发流程。
-      professional_knowledge: 掌握计算机网络、浏览器渲染机制、前端工程化工具（Webpack、Vite 等）。
+      industry_knowledge: 熟悉不同行业的前端典型项目（中后台管理、营销活动页、C 端电商/内容、小程序与多端适配）；理解常见技术场景（SSR/CSR、路由与状态管理、性能优化与稳定性、Web 安全与风控）与产品/设计/后端/测试/运维的上下游协作；具备端到端交付经验（需求拆解、排期、联调、灰度发布与监控回归）。
+      professional_knowledge: 浏览器与网络基础（渲染与事件循环、缓存与安全、HTTP/HTTP2/HTTP3）；语言与框架原理（JavaScript/TypeScript、React/Vue/Angular、组件化与状态管理、同构与微前端）；工程化与质量（模块化/构建工具、CI/CD、单元/端到端测试、性能与可用性监测、可观测性与错误上报）。
 
   communications_engineer:
     name: 通信工程师
-    description: 通信工程师负责通信系统的设计、建设与维护，包括无线通信、光纤通信和网络传输。他们需要掌握通信原理、信号处理和网络协议，确保通信系统的稳定性和高效性。
+    description: 通信工程师负责蜂窝/专网/承载网等通信系统的规划、设计、建设与优化，涵盖无线接入（RAN）、传输与核心网，确保网络容量、覆盖与质量达标。工作涉及仿真与参数规划、站点选址与开通、协议栈调测、驱动测试与指标优化（掉话率、切换成功率、时延与吞吐），并与运营商/设备商/集成商等上下游协同推进项目。
     planet_image_url: /static/career_planets/communications_engineer.webp
     holland_dimensions: ["R", "I", "C"]
     galaxy: 硅基星系
@@ -196,12 +196,12 @@ careers:
       - 无线通信
       - 网络工程
     knowledge_background:
-      industry_knowledge: 参与过通信网络建设或优化项目。
-      professional_knowledge: 掌握通信系统设计、信号处理、网络协议。
+      industry_knowledge: 了解运营商/设备商/集成商典型项目流程（无线室分/宏站建设、城域/骨干传输、核心网演进与割接）；熟悉网络规划与优化的关键指标与常见问题（覆盖/容量/干扰、切换与重选、QoS/QoE）；理解频谱监管、设备入网、工程验收的法规与合规要求；明确与设计/施工/优化/运维团队的协作关系与交付里程碑。
+      professional_knowledge: 通信与信号处理基础（调制解调、信道编码、MIMO、OFDM）；网络与协议（TCP/IP、移动核心网架构、5G NR/VoNR、IMS、MEC）；网络工程与虚拟化（SDN/NFV、网络切片、时钟同步与精密时序）；工具与方法（仿真与规划、Drive Test 数据分析、拥塞与干扰定位、参数优化策略）。
 
   architectural_designer:
     name: 建筑设计师
-    description: 建筑设计师负责建筑物的外观与空间设计，兼顾美学、功能与安全。他们需要掌握建筑学原理、设计软件和施工规范，能够与工程师、客户沟通，完成建筑方案。
+    description: 建筑设计师在满足功能与安全规范的前提下，完成建筑的方案构思、扩初深化与施工图设计，并在招投标与施工阶段提供技术支持与现场配合。工作需统筹美学、功能、成本、工期与可持续性，熟练使用 CAD/BIM 与分析工具，与结构/机电/幕墙/景观等专业协同完成可落地的综合方案。
     planet_image_url: /static/career_planets/architectural_designer.webp
     holland_dimensions: ["A", "I", "C"]
     galaxy: 基石星系
@@ -216,7 +216,7 @@ careers:
       - 设计建筑方案并绘制图纸
       - 使用 BIM/CAD 工具进行建模
       - 与客户沟通需求并优化设计
-    career_outlook: 城市化进程推动建筑设计需求，未来可发展为建筑总设计师或城市规划师。
+    career_outlook: 城市更新、保障性住房与公共设施建设、绿色建筑与低碳政策、BIM 全生命周期管理等驱动设计需求持续增长；细分方向包括公共建筑/住宅/商业综合体/医疗教育/文旅等，可晋升为专业负责人、主创建筑师、总建筑师或转向城市更新与咨询管理。
     development_path:
       - 助理建筑师
       - 建筑设计师
@@ -232,12 +232,12 @@ careers:
       - 城市规划
       - 建筑美学
     knowledge_background:
-      industry_knowledge: 参与过建筑设计或施工图绘制。
-      professional_knowledge: 掌握建筑学、结构学、材料学。
+      industry_knowledge: 理解项目全生命周期与报批报建流程（方案—扩初—施工图—招投标—施工配合—竣工）；熟悉上下游协作（甲方/规划报审、结构/给排水/暖通/电气/幕墙/景观、施工与监理、材料与供应链）；了解常见项目类型与交付特征（住宅、商业、公共建筑、装配式/BIM 协同）。
+      professional_knowledge: 建筑设计与空间原理、建筑史与地域文化、结构基础与材料构造、机电与建筑物理（声/光/热）、绿色建筑与节能、BIM 建模与碰撞检查、日照/风环境等模拟分析，规范体系与可实施性把控。
 
   civil_engineer:
     name: 土木工程师
-    description: 土木工程师负责基础设施的设计、施工与维护，包括道路、桥梁、隧道和建筑结构。他们需要掌握结构力学、施工技术和工程管理。
+    description: 土木工程师围绕道路/桥梁/隧道/市政与房建等基础设施，开展勘察设计、施工组织与现场管理、质量安全与成本进度控制、运维检测与加固改造。需协调多专业与多承包方，处理材料、工艺与环境等复杂约束，确保工程按期、保质、安全交付。
     planet_image_url: /static/career_planets/civil_engineer.webp
     holland_dimensions: ["R", "C", "I"]
     galaxy: 基石星系
@@ -252,7 +252,7 @@ careers:
       - 进行结构设计与计算
       - 监督施工质量与进度
       - 进行工程安全评估
-    career_outlook: 基建投资持续，土木工程师需求稳定，未来可发展为项目经理或总工程师。
+    career_outlook: 受益于城市更新、交通强国与新型基础设施建设，土木工程需求稳定；装配式建造、数字孪生与智慧工地、绿色低碳等技术趋势提升工程效率与质量。可向专业总工、项目经理、设计负责人或工程咨询/造价/监理方向发展。
     development_path:
       - 助理工程师
       - 工程师
@@ -268,12 +268,12 @@ careers:
       - 建筑材料
       - 工程管理
     knowledge_background:
-      industry_knowledge: 参与过土木工程项目施工或设计。
-      professional_knowledge: 掌握土木工程学科基础与施工规范。
+      industry_knowledge: 了解勘察—设计—招投标—施工—监理—验收—运维的工程全流程；熟悉现场质量/安全/进度/成本四控管理与信息化手段（BIM/智慧工地）；明确与建设单位、设计院、总包/分包、监理、政府主管部门的协作关系与验收标准。
+      professional_knowledge: 结构力学与材料、地基与基础、施工工艺与组织、测量与监控、工程经济与招投标、规范标准与质量检验；掌握常用软件（结构分析、BIM、进度成本工具）与实验/检测方法。
 
   medical_data_analyst:
     name: 医学数据分析师
-    description: 医学数据分析师负责收集、清洗和分析医疗数据，支持临床研究和医疗决策。他们需要掌握统计学、数据挖掘和医学知识。
+    description: 医学数据分析师基于临床、科研与运营数据开展清洗与标准化（如标准术语映射）、统计与建模、真实世界研究（RWS）与药物警戒（PV）分析、指标与看板建设，支持临床试验、诊疗优化与医院精细化管理；常用工具包括 SQL、Python/R、SAS、可视化平台与电子病历/随访系统数据对接，需与临床科室、伦理与合规、药物与器械企业协作。
     planet_image_url: /static/career_planets/medical_data_analyst.webp
     holland_dimensions: ["I", "C", "R"]
     galaxy: 巨构星系
@@ -288,7 +288,10 @@ careers:
       - 收集与清洗医疗数据
       - 构建统计模型支持临床研究
       - 撰写数据分析报告
-    career_outlook: 医疗大数据发展
+    career_outlook: 医疗大数据与医疗信息化快速发展，电子病历标准化、真实世界证据（RWE）、智能随访与分级诊疗等场景持续扩大需求；可向高级数据分析师、医学统计专家、临床数据经理、真实世界研究专家或数据产品方向发展。
+    knowledge_background:
+      industry_knowledge: 熟悉医疗机构与科研机构数据生态（EMR/HIS/LIS/PACS、临床试验数据、医保与公共卫生数据），了解伦理审查、隐私保护与数据共享合规要求；理解医疗业务流程（门急诊、住院、诊疗路径）与多方协作机制（临床/统计/药企/监管）。
+      professional_knowledge: 医学统计与生物统计（生存分析、倾向评分、贝叶斯方法）、流行病学与研究设计、数据标准与互操作（CDISC/HL7/FHIR）、机器学习在医疗中的稳健应用与因果推断、数据治理与可视化表达。
 
   bio_engineers:
     name: 生物工程师
@@ -323,8 +326,8 @@ careers:
       - 生物工艺学
       - 生物信息学
     knowledge_background:
-      industry_knowledge: 参与过生物制药或生物材料研发项目。
-      professional_knowledge: 掌握生物学、化学与工程学交叉知识。
+      industry_knowledge: 了解医药/食品/环保等产业链条（上游原料与试剂、中游工艺开发与放大、下游质控与注册申报）；具备从研发到中试/产业化的项目实践认知（工艺验证、GMP 合规、技术转移）。
+      professional_knowledge: 分子与细胞工程（基因编辑、表达与纯化）、发酵与生物反应器设计、分离纯化与质量分析、生物信息学与数据建模、法规与注册路径基础。
 
   drug_development_specialist:
     name: 药物研发专家
@@ -359,8 +362,8 @@ careers:
       - 临床试验设计
       - 生物统计学
     knowledge_background:
-      industry_knowledge: 参与过药物研发或临床试验项目。
-      professional_knowledge: 掌握药物研发流程与相关法规。
+      industry_knowledge: 熟悉创新药/仿制药从发现到临床各阶段（靶点筛选、先导优化、CMC、IND、I-III 期临床、注册与上市后再评价）；理解药企、CRO/SMO、医院与监管的协作模式与里程碑管理。
+      professional_knowledge: 药理与毒理、药代动力学与暴露-反应分析、临床试验设计与数据管理、GxP 规范与药品注册法规、统计方法与不良事件评价。
 
   agrotechnician:
     name: 农艺师
@@ -395,8 +398,8 @@ careers:
       - 作物栽培学
       - 农业工程
     knowledge_background:
-      industry_knowledge: 参与过农业生产或科研项目。
-      professional_knowledge: 掌握农学与农业工程基础。
+      industry_knowledge: 了解农业产业链与种业/农资/加工/流通协同，熟悉示范田、农技推广与农机社会化服务等典型项目实践，关注绿色与可持续种植、智慧农业与物联网应用。
+      professional_knowledge: 作物生理与遗传育种、栽培与病虫害综合治理、土壤与养分管理、农业信息化与遥感监测、试验设计与数据分析。
 
   animal_husbandry_and_veterinary_medicine:
     name: 畜牧兽医
@@ -431,8 +434,8 @@ careers:
       - 兽医学
       - 畜牧学
     knowledge_background:
-      industry_knowledge: 参与过畜牧养殖或动物诊疗工作。
-      professional_knowledge: 掌握兽医学与畜牧学基础。
+      industry_knowledge: 熟悉规模化养殖场运营与防疫体系，上下游包括饲料/疫苗/兽药/设备供应与冷链/屠宰/加工环节；理解监管要求与生物安全标准，具备产地检疫与应急处置意识。
+      professional_knowledge: 动物疾病诊断与治疗、免疫与流行病学、繁殖与遗传改良、营养配方与饲养管理、动物福利与临床操作规范。
 
   agricultural_economic_analyst:
     name: 农业经济分析师
@@ -466,12 +469,12 @@ careers:
       - 统计学
       - 农业经济学
     knowledge_background:
-      industry_knowledge: 了解农业生产与市场运作。
-      professional_knowledge: 掌握经济学与统计学基础。
+      industry_knowledge: 了解农产品从生产到流通的价值链与价格形成机制，熟悉补贴政策、期现市场与风险管理；具备产业调研与政策评估实践，对涉农企业经营指标与现金流特征有基本认识。
+      professional_knowledge: 微观与计量经济学、农业经济学与区域发展、投入产出与供需模型、时间序列与面板数据分析、政策评估方法（DID、RDD 等）。
 
   product_manager:
     name: 产品经理
-    description: 产品经理，是从用户角度出发，做产品策划，推动产品成型的职业。
+    description: 产品经理基于用户与业务目标进行问题定义与价值判断，完成需求洞察与优先级排序、方案设计与原型产出、跨部门推进与项目落地、指标体系与 A/B 实验设计、上线后的数据分析与持续迭代。需要在用户体验、商业目标与技术可行性之间做权衡，并对产品全生命周期负责。
     planet_image_url: /static/career_planets/product_manager.webp
     holland_dimensions: ["E", "C", "R"]
     galaxy: 硅基星系
@@ -504,8 +507,8 @@ careers:
       - 用户体验设计
       - 项目管理
     knowledge_background:
-      industry_knowledge: 需要一些计算机方面的知识背景，另外还要掌握些市场的基本原理、互联网产品的基本运作原理
-      professional_knowledge: 产品经理需要了解项目管理的相关内容。计算机相关专业最好，因为可能涉及到与技术研发人员的沟通，但职业本身对学科没有太大的要求
+      industry_knowledge: 理解所处行业的商业模式与价值链（如平台撮合、订阅、广告、交易抽佣等），熟悉从立项到上线的端到端流程（需求—方案—评审—研发—测试—灰度—运营—复盘），明确上下游协作（用户研究/设计/研发/测试/运营/法务与合规/数据），关注竞品与行业趋势并形成策略对比与定位。
+      professional_knowledge: 用户研究与需求分析、产品策略与路线图、信息架构与交互设计、指标体系与实验设计（A/B 与因果评估）、项目管理与风险控制（Scrum/Kanban）、商业分析与增长方法、数据分析与可视化能力；能够将业务目标拆解为可度量的产品指标并闭环验证。
 
 galaxies:
   silicon:
