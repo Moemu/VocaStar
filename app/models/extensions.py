@@ -277,3 +277,50 @@ class Feedback(Base):
         Index("idx_feedback_status", "status"),
         Index("idx_feedback_created_at", "created_at"),
     )
+
+
+# =========================
+#  User Center New Features
+# =========================
+
+
+class FavoriteItemType(str, enum.Enum):
+    career = "career"
+
+
+class Favorite(Base):
+    """通用收藏表（目前仅支持收藏职业星球）。"""
+
+    __tablename__ = "favorites"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    item_type: Mapped[FavoriteItemType] = mapped_column(Enum(FavoriteItemType), nullable=False, index=True)
+    item_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, server_default=sqlalchemy.func.now(), index=True
+    )
+
+    user: Mapped["User"] = relationship("User", backref="favorites")
+
+    __table_args__ = (Index("idx_favorite_user_item", "user_id", "item_type", "item_id", unique=True),)
+
+
+class ExplorationProgress(Base):
+    """职业星球探索进度（按 4 个核心区块计）。"""
+
+    __tablename__ = "exploration_progress"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    career_id: Mapped[int] = mapped_column(Integer, index=True)
+    explored_blocks: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, server_default=sqlalchemy.func.now(), onupdate=sqlalchemy.func.now(), index=True
+    )
+
+    user: Mapped["User"] = relationship("User", backref="exploration_progress")
+
+    __table_args__ = (Index("idx_explore_user_career", "user_id", "career_id", unique=True),)

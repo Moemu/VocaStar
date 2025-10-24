@@ -28,6 +28,7 @@ class User(Base):
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False, comment="密码哈希")
     nickname: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, comment="昵称")
     avatar_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True, comment="头像URL")
+    bio: Mapped[Optional[str]] = mapped_column(String(1000), nullable=True, comment="个人描述/签名")
 
     role: Mapped[UserRole] = mapped_column(Enum(UserRole), nullable=False, comment="角色", default=UserRole.user)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True, comment="账户状态")

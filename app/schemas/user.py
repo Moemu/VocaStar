@@ -35,6 +35,8 @@ class UserSetProfileRequest(BaseModel):
         examples=["https://example.com/avatar.png"],
     )
     """头像URL"""
+    description: Optional[str] = Field(None, description="个人描述/签名")
+    """个人描述/签名"""
 
 
 class UserInfoResponse(BaseModel):
@@ -49,3 +51,12 @@ class UserInfoResponse(BaseModel):
     is_active: bool
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class UserProfileSummary(BaseModel):
+    """个人中心-资料视图（合并 ProfileGetResponse）"""
+
+    avatar_url: str | None = Field(None, description="头像URL")
+    nickname: str | None = Field(None, description="昵称")
+    description: str | None = Field(None, description="个人描述/签名")
+    total_points: int = Field(0, description="总积分")
