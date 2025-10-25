@@ -12,6 +12,10 @@ class HollandPortrait(BaseModel):
     code: str = Field(..., description="霍兰德三字母代码，如 ASE")
     dimension_scores: dict[str, int] = Field(..., description="各维度分数 R/I/A/S/E/C")
     analysis: str = Field(..., description="个性化分析文案")
+    unique_advantage: Optional[str] = Field(
+        None,
+        description="基于霍兰德组合的核心优势文案",
+    )
 
 
 class DashboardRecommendation(BaseModel):

@@ -8,6 +8,7 @@ from app.api import auth, career, cosplay, home, profile_center, quiz, user
 from app.core.config import config
 from app.core.logger import logger
 from app.core.sql import close_db, load_db
+from app.services.report_queue import report_task_queue
 
 logger.info("初始化 Server...")
 
@@ -16,10 +17,14 @@ logger.info("初始化 Server...")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await load_db()
-    yield
-    logger.info("正在退出...")
-    await close_db()  # type:ignore
-    logger.info("已安全退出")
+    await report_task_queue.start()
+    try:
+        yield
+    finally:
+        logger.info("正在退出...")
+        await report_task_queue.stop()
+        await close_db()  # type:ignore
+        logger.info("已安全退出")
 
 
 app = FastAPI(title=config.title, version=config.version, lifespan=lifespan)

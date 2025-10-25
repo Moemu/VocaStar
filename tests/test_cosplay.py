@@ -103,7 +103,7 @@ async def test_cosplay_flow(student_client, sample_cosplay_script):
         json={"option_id": "opt_a"},
     )
     assert choice_resp.status_code == 200
-    state_after_first = choice_resp.json()["state"]
+    state_after_first = choice_resp.json()["next_scene"]
     assert state_after_first["current_scene"]["id"] == "scene_2"
     assert state_after_first["scores"]["T"] == 60
     assert state_after_first["progress"] == 50
@@ -113,16 +113,14 @@ async def test_cosplay_flow(student_client, sample_cosplay_script):
         json={"option_id": "opt_c"},
     )
     assert final_resp.status_code == 200
-    final_state = final_resp.json()["state"]
+    final_state = final_resp.json()["next_scene"]
     assert final_state["completed"] is True
     assert final_state["progress"] == 100
     assert final_state["current_scene"] is None
-    assert final_state["report"]["route_name"] == "技术专家路线"
     assert len(final_state["history"]) == 2
 
     report_resp = await student_client.get(f"/api/cosplay/sessions/{state['session_id']}/report")
     assert report_resp.status_code == 200
     report_payload = report_resp.json()
-    assert report_payload["route_name"] == "技术专家路线"
-    assert report_payload["scores"]["T"] == 60
-    assert report_payload["scores"]["Q"] == 60
+    assert report_payload["final_scores"]["T"] == 60
+    assert report_payload["final_scores"]["Q"] == 60

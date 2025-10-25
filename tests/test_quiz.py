@@ -86,7 +86,12 @@ async def test_quiz_flow(
     assert report["reward_points"] == 50
     assert report["dimension_scores"]
     assert report["recommendations"]
-    assert all(0 <= item["match_score"] <= 100 for item in report["recommendations"])
+    assert len(report["recommendations"]) <= 3
+    for item in report["recommendations"]:
+        assert "profession_id" in item
+        assert "name" in item
+        assert item.get("description")
+        assert "reason" not in item
 
     recommendation_result = await database.execute(select(CareerRecommendation))
     recommendation_records = recommendation_result.scalars().all()

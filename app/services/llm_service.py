@@ -1,13 +1,16 @@
 from __future__ import annotations
 
-from typing import Any, Iterable, Optional
+from typing import Any, Iterable, Optional, Type, TypeVar
 
 from fastapi import HTTPException, status
 from openai import AsyncOpenAI, OpenAIError
 from openai.types.chat import ChatCompletionMessageParam
+from pydantic import BaseModel
 
 from app.core.config import config
 from app.core.logger import logger
+
+TModel = TypeVar("TModel", bound=BaseModel)
 
 HistoryChatMessage = list[tuple[str, str]]
 
@@ -93,7 +96,12 @@ class LLMService:
 
         try:
             response = await self._client.chat.completions.create(
-                messages=messages, model=model, temperature=temperature, max_tokens=max_tokens, extra_body=extra_body
+                messages=messages,
+                model=model,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                response_format={"type": "json_object"},
+                extra_body=extra_body,
             )
         except OpenAIError as exc:
             logger.error("调用 LLM 接口失败: %s", exc)
@@ -113,3 +121,54 @@ class LLMService:
             raise RuntimeError("LLM 服务返回内容为空: %s", message_content)
 
         return message_content
+
+    async def generate_structured_completion(
+        self,
+        message: str,
+        *,
+        response_model: Type[TModel],
+        history: Optional[HistoryChatMessage] = None,
+        system: Optional[str] = None,
+        model: Optional[str] = None,
+        temperature: float = 0.7,
+        max_tokens: Optional[int] = None,
+        extra_body: Optional[dict[str, Any]] = None,
+    ) -> TModel:
+        """使用 SDK parse 功能返回结构化 Pydantic 对象。"""
+
+        self._ensure_configured()
+
+        model = model or self.default_model
+        messages = list(self._build_messages(message, history=history, system=system))
+
+        try:
+            response = await self._client.chat.completions.parse(
+                model=model,
+                messages=messages,
+                temperature=temperature,
+                max_tokens=max_tokens,
+                response_format=response_model,
+                extra_body=extra_body,
+            )
+        except OpenAIError as exc:
+            logger.error("调用结构化 LLM 接口失败: %s", exc)
+            raise
+        except Exception as exc:  # pragma: no cover - 意外异常兜底
+            logger.exception("调用结构化 LLM 接口出现未知异常: ", exc)
+            raise
+
+        choices = response.choices
+        if not choices:
+            logger.warning("结构化 LLM 返回缺少 choices: %s", response)
+            raise RuntimeError("LLM 服务返回数据缺少 choices 字段")
+
+        parsed = getattr(choices[0].message, "parsed", None)
+        if parsed is None:
+            logger.warning("结构化 LLM 返回内容缺少 parsed 字段: %s", choices[0].message)
+            raise RuntimeError("LLM 返回的结构化数据缺失")
+
+        if not isinstance(parsed, response_model):  # type: ignore[arg-type]
+            logger.warning("结构化 LLM 返回类型不匹配: %s", parsed)
+            raise RuntimeError("LLM 返回的结构化数据类型不匹配")
+
+        return parsed

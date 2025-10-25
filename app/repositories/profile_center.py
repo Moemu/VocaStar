@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.models.career import Career
+from app.models.career import Career, CareerRecommendation
 from app.models.extensions import (
     ExplorationProgress,
     Favorite,
@@ -49,7 +49,11 @@ class ProfileCenterRepository:
             .where(QuizSubmission.user_id == user_id, QuizSubmission.status == QuizSubmissionStatus.completed)
             .order_by(order_key.desc(), QuizSubmission.id.desc())
             .limit(1)
-            .options(selectinload(QuizSubmission.report))
+            .options(
+                selectinload(QuizSubmission.report)
+                .selectinload(QuizReport.career_recommendations)
+                .selectinload(CareerRecommendation.career)
+            )
         )
         result = await self.session.execute(stmt)
         submission = result.scalars().first()

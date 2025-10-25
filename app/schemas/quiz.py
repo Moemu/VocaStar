@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Annotated, Dict, List, Literal, NotRequired, Optional, Union
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import TypedDict
 
 
@@ -179,8 +179,31 @@ class AnswerExtraPayload(TypedDict, total=False):
 class QuizRecommendationPayload(TypedDict):
     profession_id: int
     name: str
-    match_score: int
-    reason: str
+    description: str
+    match_score: NotRequired[int]
+    reason: NotRequired[str]
+
+
+class SmallGoalPayload(TypedDict):
+    title: str
+    content: str
+
+
+class CareerSuggestionPayload(TypedDict):
+    career: str
+    description: str
+    recommended_action: List[str]
+
+
+class ActionRoadMapPayload(TypedDict):
+    small_goals: List[SmallGoalPayload]
+    need_attention: str
+    conclusion: str
+
+
+class HollandReportPayload(TypedDict):
+    career_directions: List[CareerSuggestionPayload]
+    action_roadmap: ActionRoadMapPayload
 
 
 class QuizReportPayload(TypedDict):
@@ -189,6 +212,8 @@ class QuizReportPayload(TypedDict):
     recommendations: List[QuizRecommendationPayload]
     reward_points: int
     component_scores: NotRequired[dict[str, dict[str, float]]]
+    unique_advantage: NotRequired[str]
+    holland_report: NotRequired[HollandReportPayload]
 
 
 class QuizStartResponse(BaseModel):
@@ -392,8 +417,42 @@ class QuizRecommendation(BaseModel):
 
     profession_id: int = Field(..., description="匹配的职业ID (对应 careers 表)")
     name: str = Field(..., description="职业名称")
-    match_score: int = Field(..., description="与用户匹配度(0-100)")
-    reason: str = Field(..., description="推荐理由摘要")
+    description: str = Field(..., description="该职业的简要介绍或为何适合用户")
+
+    model_config = ConfigDict(extra="ignore")
+
+    @model_validator(mode="before")
+    @classmethod
+    def _migrate_legacy(cls, data: object) -> object:
+        if isinstance(data, dict) and not data.get("description"):
+            fallback = data.get("reason") or ""
+            if fallback:
+                data = {**data, "description": fallback}
+        return data
+
+
+class CareerSuggestion(BaseModel):
+    career: str = Field(..., description="职业名称")
+    description: str = Field(..., description="为什么适合用户。也就是对该职业方向的分析说明，结合霍兰德类型特点")
+    recommended_action: List[str] = Field(..., description="立即可以做的事。简短说明。比如去哪里学习知识/应用知识")
+
+
+class SmallGoal(BaseModel):
+    title: str = Field(..., description="目标标题，例如“第一步：体验领导力")
+    content: str = Field(..., description="行动建议的具体内容")
+
+
+class ActionRoadMap(BaseModel):
+    small_goals: List[SmallGoal] = Field(..., description="用户接下来的一个月小目标")
+    need_attention: str = Field(..., description="用户需要关注的成长点")
+    conclusion: str = Field(..., description="结论。用于肯定用户的性格特征和建议")
+
+
+class HollandReport(BaseModel):
+    career_directions: List[CareerSuggestion] = Field(
+        ..., description="为用户量身打造的职业方向列表，每项包含推荐职业和推荐原因，只生成两个推荐职业"
+    )
+    action_roadmap: ActionRoadMap = Field(..., description="用户的行动路线图，分步骤提供职业探索或发展建议")
 
 
 class QuizReportData(BaseModel):
@@ -404,8 +463,16 @@ class QuizReportData(BaseModel):
     recommendations: List[QuizRecommendation] = Field(..., description="系统推荐的职业列表")
     reward_points: int = Field(..., description="完成测评获得的积分")
     component_scores: Optional[Dict[str, Dict[str, float]]] = Field(
-        None,
+        default=None,
         description="按题型拆分的各维度得分 (百分制)",
+    )
+    unique_advantage: Optional[str] = Field(
+        default=None,
+        description="基于霍兰德组合的核心优势描述",
+    )
+    holland_report: Optional[HollandReport] = Field(
+        default=None,
+        description="LLM 生成的霍兰德测评个性化报告 (为空表示暂未生成或生成失败)",
     )
 
 

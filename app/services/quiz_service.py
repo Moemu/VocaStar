@@ -52,19 +52,16 @@ from app.schemas.quiz import (
     QuizValueBalanceAnswer,
     QuizWordChoiceAnswer,
 )
-
-SESSION_DURATION_MINUTES = 30
-REWARD_POINTS = 50
-DIMENSION_PRIORITY = ["R", "I", "A", "S", "E", "C"]
-DIMENSION_LABELS = {
-    "R": "现实型 R",
-    "I": "研究型 I",
-    "A": "艺术型 A",
-    "S": "社会型 S",
-    "E": "企业型 E",
-    "C": "常规型 C",
-}
-MAX_RECOMMENDATIONS = 6
+from app.services.quiz_constants import (
+    DIMENSION_ADVANTAGE_BENEFITS,
+    DIMENSION_ADVANTAGE_KEYWORDS,
+    DIMENSION_LABELS,
+    DIMENSION_PRIORITY,
+    MAX_RECOMMENDATIONS,
+    REWARD_POINTS,
+    SESSION_DURATION_MINUTES,
+)
+from app.services.report_queue import ReportJob, report_task_queue
 
 
 @dataclass(frozen=True)
@@ -89,18 +86,7 @@ class QuizService:
         self.repo = QuizRepository(session)
 
     async def start_quiz(self, user: User, *, slug: Optional[str] = None) -> QuizStartResponse:
-        """创建或返回用户的进行中测评会话。
-
-        Args:
-            user: 当前登录用户。
-            slug: 指定的测评题库标识，若为空则默认选择最新发布的测评。
-
-        Returns:
-            QuizStartResponse: 包含会话标识、过期时间与服务器时间。
-
-        Raises:
-            HTTPException: 当没有可用测评时返回 404; 当未填写个性化档案时返回 400。
-        """
+        """创建或返回用户的进行中测评会话。"""
         if slug:
             quiz = await self.repo.get_published_quiz_by_slug(slug)
             if not quiz:
@@ -110,7 +96,6 @@ class QuizService:
             if not quiz:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="当前没有可用的测评")
 
-        # 检查用户是否已有进行中的测评
         submission = await self.repo.get_active_submission_by_user(user.id, quiz_id=quiz.id)
         now = datetime.now(timezone.utc)
 
@@ -120,18 +105,12 @@ class QuizService:
                 submission.status = QuizSubmissionStatus.expired
                 await self.session.commit()
             else:
-                return QuizStartResponse(
-                    session_id=submission.session_token,
-                    expires_at=expires_at,
-                    server_time=now,
-                )
+                return QuizStartResponse(session_id=submission.session_token, expires_at=expires_at, server_time=now)
 
-        # 检查用户是否已完成个性化档案的填写
-        # profile = await self.get_profile(user)
-        # if not profile:
-        #     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="请先完成个性化档案的填写")
+        profile = await self.get_profile(user)
+        if not profile:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="请先完成个性化档案的填写")
 
-        # 创建新的测评会话
         session_token = uuid4().hex
         expires_at = now + timedelta(minutes=SESSION_DURATION_MINUTES)
         submission = await self.repo.create_submission(
@@ -393,11 +372,12 @@ class QuizService:
             QuizRecommendation(
                 profession_id=result.career.id,
                 name=result.career.name,
-                match_score=result.match_score,
-                reason=result.reason,
+                description=self._build_recommendation_description(result.career, result.reason),
             )
             for result in recommendation_results
         ]
+
+        unique_advantage = self._build_unique_advantage(holland_code, dimension_scores)
 
         report_data = QuizReportData(
             holland_code=holland_code,
@@ -405,6 +385,7 @@ class QuizService:
             recommendations=recommendation_payload,
             reward_points=REWARD_POINTS,
             component_scores=component_scores or None,
+            unique_advantage=unique_advantage,
         )
 
         report = await self.repo.create_report(submission.id, report_data.model_dump())
@@ -416,6 +397,11 @@ class QuizService:
         submission.completed_at = datetime.now(timezone.utc)
         await self._award_points(user.id, REWARD_POINTS, reason="完成职业兴趣测评")
         await self.session.commit()
+
+        try:
+            await report_task_queue.enqueue(ReportJob(report_id=report.id))
+        except Exception as exc:  # pragma: no cover - 队列异常兜底
+            logger.warning("HollandReport 任务入队失败 report_id=%s: %s", report.id, exc)
 
         return QuizReportResponse(
             session_id=request.session_id,
@@ -468,19 +454,26 @@ class QuizService:
                 key=lambda item: (-item.score, item.career_id),
             )
             payload_lookup = {
-                entry.get("profession_id"): entry.get("name")
+                entry.get("profession_id"): {
+                    "name": entry.get("name"),
+                    "description": entry.get("description"),
+                }
                 for entry in payload.get("recommendations", [])
                 if isinstance(entry, dict)
             }
             recommendations = []
-            for record in sorted_records:
-                name = (record.career.name if record.career else payload_lookup.get(record.career_id)) or "职业推荐"
+            for record in sorted_records[:MAX_RECOMMENDATIONS]:
+                lookup = payload_lookup.get(record.career_id, {})
+                name = (record.career.name if record.career else lookup.get("name")) or "职业推荐"
+                description = lookup.get("description") or self._build_recommendation_description(
+                    record.career,
+                    record.match_reason or "",
+                )
                 recommendations.append(
                     QuizRecommendation(
                         profession_id=record.career_id,
                         name=name,
-                        match_score=int(record.score),
-                        reason=record.match_reason or "",
+                        description=description,
                     )
                 )
             report_data = report_data.model_copy(update={"recommendations": recommendations})
@@ -507,6 +500,52 @@ class QuizService:
         if dt.tzinfo is None:
             return dt.replace(tzinfo=timezone.utc)
         return dt.astimezone(timezone.utc)
+
+    def _build_unique_advantage(self, holland_code: str, dimension_scores: dict[str, int]) -> Optional[str]:
+        """根据霍兰德代码生成通用的核心优势文案。"""
+
+        letters = [ch for ch in holland_code if ch in DIMENSION_ADVANTAGE_KEYWORDS]
+        if not letters:
+            sorted_dimensions = sorted(
+                DIMENSION_PRIORITY,
+                key=lambda dim: (-dimension_scores.get(dim, 0), DIMENSION_PRIORITY.index(dim)),
+            )
+            letters = [dim for dim in sorted_dimensions if dimension_scores.get(dim, 0) > 0][:3]
+
+        letters = [dim for dim in letters if dim in DIMENSION_ADVANTAGE_KEYWORDS]
+        if not letters:
+            return None
+
+        keywords = [DIMENSION_ADVANTAGE_KEYWORDS[dim] for dim in letters]
+        benefits = [DIMENSION_ADVANTAGE_BENEFITS[dim] for dim in letters]
+
+        phrase = self._compose_trait_phrase(keywords)
+        if len(letters) == 1:
+            label = DIMENSION_LABELS[letters[0]]
+            return f'你的核心优势在于"{phrase}"，这是 {label} 的典型特质，' f"能{benefits[0]}。"
+        if len(letters) == 2:
+            label_a = DIMENSION_LABELS[letters[0]]
+            label_b = DIMENSION_LABELS[letters[1]]
+            return (
+                f'你的核心优势在于"{phrase}"，分别来源于 {label_a} 和 {label_b} 的特质，'
+                f"让你既能{benefits[0]}，也能{benefits[1]}。"
+            )
+
+        label_text = "、".join(DIMENSION_LABELS[dim] for dim in letters[:3])
+        return (
+            f'你的核心优势在于"{phrase}"，融合了 {label_text} 的特质，'
+            f"因此你既能{benefits[0]}，也能{benefits[1]}，还可以{benefits[2]}。"
+        )
+
+    @staticmethod
+    def _compose_trait_phrase(keywords: list[str]) -> str:
+        if not keywords:
+            return "发挥多元潜力"
+        if len(keywords) == 1:
+            return keywords[0]
+        if len(keywords) == 2:
+            return f"既{keywords[0]}，又{keywords[1]}"
+        return f"既{keywords[0]}，又{keywords[1]}，还{keywords[2]}"
 
     def _calculate_dimension_scores(
         self,
@@ -1047,6 +1086,35 @@ class QuizService:
         if summary[-1] not in "。.!！?:？":
             summary = f"{summary}。"
         return f"您在 {dimension_scores} 维度表现出色，{summary}"
+
+    def _build_recommendation_description(self, career: Optional[Career], fallback: str) -> str:
+        """生成推荐展示用的简短职业描述。"""
+        candidates: list[str] = []
+        if career:
+            if career.description:
+                candidates.append(career.description)
+            if career.career_outlook:
+                candidates.append(career.career_outlook)
+        if fallback:
+            candidates.append(fallback)
+
+        for text in candidates:
+            normalized = self._normalize_summary(text)
+            if normalized:
+                return self._truncate_summary(normalized, limit=140)
+        return "这是一条与您兴趣高度契合的职业方向，值得进一步了解。"
+
+    @staticmethod
+    def _normalize_summary(text: str) -> str:
+        cleaned = text.strip().replace("\r", " ").replace("\n", " ")
+        return " ".join(segment for segment in cleaned.split() if segment)
+
+    @staticmethod
+    def _truncate_summary(text: str, *, limit: int) -> str:
+        if len(text) <= limit:
+            return text
+        truncated = text[: limit - 3].rstrip()
+        return f"{truncated}..."
 
     def _format_dimension_label(self, dimension: str) -> str:
         """将维度代码转成更易理解的标签。"""

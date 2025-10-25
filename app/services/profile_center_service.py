@@ -78,14 +78,23 @@ class ProfileCenterService:
             payload = report.result_json
             code = payload.get("holland_code") or ""
             dim_scores = payload.get("dimension_scores") or {}
-            holland = HollandPortrait(code=code, dimension_scores=dim_scores, analysis=_analysis_for_code(code))
+            holland = HollandPortrait(
+                code=code,
+                dimension_scores=dim_scores,
+                analysis=_analysis_for_code(code),
+                unique_advantage=payload.get("unique_advantage"),
+            )
             # 推荐结果可直接使用测评时生成的推荐
             recs = payload.get("recommendations") or []
+            score_map = {}
+            if getattr(report, "career_recommendations", None):
+                for item in report.career_recommendations:
+                    score_map[item.career_id] = int(item.score)
             for item in recs:
-                # item: { profession_id, name, match_score, reason }
+                # item: { profession_id, name, description }
                 career_id = item.get("profession_id")
                 name = item.get("name")
-                ms = int(item.get("match_score")) if item.get("match_score") is not None else 0
+                ms = score_map.get(career_id, 0) if isinstance(career_id, int) else 0
                 if isinstance(career_id, int):
                     recommendations.append(
                         DashboardRecommendation(career_id=career_id, name=name or "", match_score=ms)
