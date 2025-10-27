@@ -14,7 +14,8 @@ async def test_list_careers(student_client, sample_careers):
     assert payload["total"] >= len(sample_careers)
     assert len(payload["items"]) == 2
     first = payload["items"][0]
-    assert "core_competency_model" in first
+    assert first.get("competency_requirements")
+    assert first["competency_requirements"]["core_competency_model"]
     assert first["name"]
     assert isinstance(first.get("related_courses"), list)
     assert first["skills_snapshot"]
@@ -37,10 +38,10 @@ async def test_get_career_detail(student_client, sample_careers):
     assert response.status_code == 200
     detail = response.json()
     assert detail["name"] == target.name
-    assert detail["required_skills"] and isinstance(detail["required_skills"], list)
-    assert detail["core_competency_model"]["basic_ability"] == pytest.approx(4)
+    assert detail["skill_map"]["skills_snapshot"]
+    assert detail["competency_requirements"]["core_competency_model"]["basic_ability"] == pytest.approx(4)
     assert detail["related_courses"] and isinstance(detail["related_courses"], list)
-    assert detail["knowledge_background"]["industry_knowledge"]
+    assert detail["competency_requirements"]["knowledge_background"]["industry_knowledge"]
     assert detail["galaxy_name"]
     assert detail["salary_min"] is not None
     assert detail["skills_snapshot"]

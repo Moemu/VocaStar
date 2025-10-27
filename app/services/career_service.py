@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Type, TypeVar
 
 from fastapi import HTTPException, status
+from pydantic import BaseModel, ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.career import Career, CareerGalaxy
@@ -17,11 +18,17 @@ from app.schemas.career import (
     CareerExploreResponse,
     CareerExploreSalaryRange,
     CareerListResponse,
+    CareerOverview,
     CareerSummary,
+    CompetencyRequirements,
+    SalaryAndDistribution,
+    SkillMap,
 )
 
 MAX_PAGE_SIZE = 50
 DEFAULT_PAGE_SIZE = 20
+
+_ModelT = TypeVar("_ModelT", bound=BaseModel)
 
 
 class CareerService:
@@ -41,11 +48,126 @@ class CareerService:
         return items or None
 
     @staticmethod
+    def _coerce_section(model_cls: Type[_ModelT], data: object) -> _ModelT | None:
+        """将数据库中的 JSON 字段安全转换为 Pydantic 模型，容错异常数据"""
+        if not data:
+            return None
+        if isinstance(data, model_cls):
+            return data
+        if isinstance(data, dict):
+            try:
+                return model_cls.model_validate(data)
+            except ValidationError:
+                return None
+        return None
+
+    @staticmethod
+    def _build_overview_section(career: Career) -> CareerOverview | None:
+        """返回结构化的职业总览数据，兼容旧字段回填"""
+        overview_model = CareerService._coerce_section(CareerOverview, career.overview)
+        if overview_model:
+            return overview_model
+        fallback: dict[str, object] = {}
+        if career.description:
+            fallback["description"] = career.description
+        if career.work_contents:
+            fallback["work_contents"] = [item for item in career.work_contents if item]
+        if career.career_outlook:
+            fallback["career_outlook"] = career.career_outlook
+        if career.development_path:
+            fallback["development_path"] = [item for item in career.development_path if item]
+        if not fallback:
+            return None
+        try:
+            return CareerOverview.model_validate(fallback)
+        except ValidationError:
+            return None
+
+    @staticmethod
+    def _build_competency_section(career: Career) -> CompetencyRequirements | None:
+        """返回结构化的胜任力信息，兼容旧字段回填"""
+        competency_model = CareerService._coerce_section(CompetencyRequirements, career.competency_requirements)
+        if competency_model:
+            return competency_model
+        fallback: dict[str, object] = {}
+        if career.core_competency_model:
+            fallback["core_competency_model"] = career.core_competency_model
+        if career.knowledge_background:
+            fallback["knowledge_background"] = career.knowledge_background
+        if not fallback:
+            return None
+        try:
+            return CompetencyRequirements.model_validate(fallback)
+        except ValidationError:
+            return None
+
+    @staticmethod
+    def _build_salary_section(career: Career) -> SalaryAndDistribution | None:
+        """返回结构化的薪资信息，兼容旧字段回填"""
+        salary_model = CareerService._coerce_section(SalaryAndDistribution, career.salary_and_distribution)
+        if salary_model:
+            return salary_model
+        if career.salary_min is None and career.salary_max is None:
+            return None
+        try:
+            return SalaryAndDistribution.model_validate(
+                {
+                    "salary_level": {},
+                    "distribution_of_popular_cities": {},
+                }
+            )
+        except ValidationError:
+            return None
+
+    @staticmethod
+    def _build_skill_map_section(career: Career) -> SkillMap | None:
+        """返回结构化的技能图谱，兼容旧字段回填"""
+        skill_model = CareerService._coerce_section(SkillMap, career.skill_map)
+        if skill_model:
+            return skill_model
+        fallback: dict[str, object] = {}
+        snapshot = CareerService._extract_skills_snapshot(career)
+        if snapshot:
+            fallback["skills_snapshot"] = snapshot
+        courses = CareerService._extract_related_courses(career)
+        if courses:
+            fallback["related_courses"] = courses
+        if career.required_skills and not snapshot:
+            fallback["skills_snapshot"] = CareerService._split_lines(career.required_skills) or []
+        if not fallback:
+            return None
+        try:
+            return SkillMap.model_validate(fallback)
+        except ValidationError:
+            return None
+
+    @staticmethod
     def _extract_skills_snapshot(career: Career) -> list[str] | None:
         """提取职业的技能亮点摘要，优先使用结构化字段"""
+        skill_map = career.skill_map if isinstance(career.skill_map, dict) else None
+        if skill_map:
+            snapshot = skill_map.get("skills_snapshot")
+            if isinstance(snapshot, list):
+                cleaned = [str(item).strip() for item in snapshot if str(item).strip()]
+                if cleaned:
+                    return cleaned
         if career.skills_snapshot:
             return [item for item in career.skills_snapshot if item]
         return CareerService._split_lines(career.required_skills)
+
+    @staticmethod
+    def _extract_related_courses(career: Career) -> list[str] | None:
+        """提取职业关联课程列表，兼容旧字段"""
+        skill_map = career.skill_map if isinstance(career.skill_map, dict) else None
+        if skill_map:
+            courses = skill_map.get("related_courses")
+            if isinstance(courses, list):
+                cleaned = [str(item).strip() for item in courses if str(item).strip()]
+                if cleaned:
+                    return cleaned
+        if career.related_courses:
+            return [item for item in career.related_courses if item]
+        return None
 
     @staticmethod
     def _resolve_galaxy_meta(career: Career) -> tuple[Optional[int], Optional[str], Optional[str]]:
@@ -68,9 +190,12 @@ class CareerService:
             description=career.description,
             holland_dimensions=career.holland_dimensions,
             planet_image_url=career.planet_image_url,
-            related_courses=career.related_courses,
-            core_competency_model=career.core_competency_model,
-            knowledge_background=career.knowledge_background,
+            career_header_image=career.career_header_image,
+            overview=CareerService._build_overview_section(career),
+            competency_requirements=CareerService._build_competency_section(career),
+            salary_and_distribution=CareerService._build_salary_section(career),
+            skill_map=CareerService._build_skill_map_section(career),
+            related_courses=CareerService._extract_related_courses(career),
             galaxy_id=galaxy_id,
             galaxy_name=galaxy_name,
             category=category,
@@ -90,6 +215,7 @@ class CareerService:
             holland_dimensions=career.holland_dimensions,
             salary_min=career.salary_min,
             salary_max=career.salary_max,
+            career_header_image=career.career_header_image,
             skills_snapshot=CareerService._extract_skills_snapshot(career),
         )
 
@@ -108,28 +234,13 @@ class CareerService:
     def _build_detail(self, career: Career) -> CareerDetail:
         """构建职业详情响应，补充星系与技能信息"""
         galaxy = career.galaxy
+        summary = self._build_summary(career)
+        summary_data = summary.model_dump()
         return CareerDetail(
-            id=career.id,
-            name=career.name,
+            **summary_data,
             cosplay_script_id=career.cosplay_script_id,
-            description=career.description,
-            holland_dimensions=career.holland_dimensions,
-            planet_image_url=career.planet_image_url,
-            work_contents=career.work_contents,
-            career_outlook=career.career_outlook,
-            development_path=career.development_path,
-            required_skills=self._split_lines(career.required_skills),
-            core_competency_model=career.core_competency_model,
-            related_courses=career.related_courses,
-            knowledge_background=career.knowledge_background,
             created_at=career.created_at,
             updated_at=career.updated_at,
-            galaxy_id=galaxy.id if galaxy else None,
-            galaxy_name=galaxy.name if galaxy else None,
-            category=galaxy.category if galaxy else None,
-            salary_min=career.salary_min,
-            salary_max=career.salary_max,
-            skills_snapshot=CareerService._extract_skills_snapshot(career),
             galaxy_description=galaxy.description if galaxy else None,
             galaxy_cover_image_url=galaxy.cover_image_url if galaxy else None,
         )

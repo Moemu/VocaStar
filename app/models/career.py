@@ -1,7 +1,7 @@
 """职业星球相关模型"""
 
 from datetime import datetime
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Any, Optional
 
 import sqlalchemy
 from sqlalchemy import JSON, DateTime, Float, ForeignKey, Index, Integer, String, Text
@@ -53,6 +53,7 @@ class Career(Base):
     description: Mapped[Optional[str]] = mapped_column(Text, nullable=True, comment="职业简介")
     cover: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, comment="职业描述图")
     planet_image_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True, comment="星球图片URL")
+    career_header_image: Mapped[Optional[str]] = mapped_column(String(500), nullable=True, comment="职业详情页头图")
 
     holland_dimensions: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True, comment="匹配的霍兰德维度列表")
     work_contents: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True, comment="主要工作内容列表")
@@ -65,10 +66,8 @@ class Career(Base):
         nullable=True,
         comment="核心胜任力模型分布(JSON)",
     )
-    knowledge_background: Mapped[Optional[dict[str, str]]] = mapped_column(
-        JSON,
-        nullable=True,
-        comment="知识背景要求(JSON)",
+    knowledge_background: Mapped[Optional[dict[str, Any]]] = mapped_column(
+        JSON, nullable=True, comment="知识背景要求(JSON)"
     )
     galaxy_id: Mapped[Optional[int]] = mapped_column(
         Integer,
@@ -80,6 +79,18 @@ class Career(Base):
     salary_min: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, comment="建议薪资范围最小值")
     salary_max: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, comment="建议薪资范围最大值")
     skills_snapshot: Mapped[Optional[list[str]]] = mapped_column(JSON, nullable=True, comment="技能亮点简表(JSON 列表)")
+    overview: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON, nullable=True, comment="职业总览信息(JSON)")
+    competency_requirements: Mapped[Optional[dict[str, Any]]] = mapped_column(
+        JSON,
+        nullable=True,
+        comment="能力要求结构化信息(JSON)",
+    )
+    salary_and_distribution: Mapped[Optional[dict[str, Any]]] = mapped_column(
+        JSON,
+        nullable=True,
+        comment="薪资与地域分布(JSON)",
+    )
+    skill_map: Mapped[Optional[dict[str, Any]]] = mapped_column(JSON, nullable=True, comment="技能图谱(JSON)")
 
     cosplay_script_id: Mapped[Optional[int]] = mapped_column(
         Integer,
