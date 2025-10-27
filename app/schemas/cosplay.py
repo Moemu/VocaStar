@@ -91,7 +91,6 @@ class CosplayReportPayload(BaseModel):
     """Cosplay 报告的详细内容"""
 
     final_scores: dict[str, int] = Field(..., description="最终的各项能力得分")
-    summary: str = Field(..., description="最终评价摘要")
     advice: str = Field(..., description="发展建议文案")
     ability_labels: dict[str, str] = Field(..., description="能力编码到展示名称的映射")
     ability_descriptions: dict[str, str] = Field(..., description="能力编码到说明的映射")

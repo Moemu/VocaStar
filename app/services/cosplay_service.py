@@ -410,19 +410,67 @@ class CosplayService:
         history: list[dict[str, Any]],
     ) -> CosplayReportPayload:
         """Construct the final report content based on scores and evaluation rules."""
-        best_route = self._evaluate_best_route(content.evaluations, final_scores)
         history_records = [CosplayHistoryRecord.model_validate(h) for h in history]
+        advice_text = self._compose_advice(content, final_scores)
 
         return CosplayReportPayload(
             final_scores=final_scores,
-            summary=best_route.summary,
-            advice=best_route.advice,
+            advice=advice_text,
             ability_labels={ability.code: ability.name for ability in content.abilities},
             ability_descriptions={
                 ability.code: ability.description for ability in content.abilities if ability.description is not None
             },
             history=history_records,
         )
+
+    def _compose_advice(self, content: CosplayScriptContent, final_scores: dict[str, int]) -> str:
+        """根据能力分数生成职业发展建议文案。
+
+        规则：
+                - 直接基于分数找出最高分(优势)与最低分(待提升)的维度
+        - 文案模板：
+          职业发展建议：你在{核心维度}方面表现良好，是项目顺利推进的保障。发展方向：{核心维度角色}。建议{弱势维度建议}。
+        """
+        # code -> name 映射（如 T -> 技术决策）
+        code_to_name: dict[str, str] = {ab.code: ab.name for ab in content.abilities}
+
+        # 名称 -> 角色&建议映射（默认覆盖）
+        default_desc: dict[str, dict[str, str]] = {
+            "技术决策": {"role": "架构师、技术负责人", "advice": "学习架构设计与技术选型方法"},
+            "沟通协作": {"role": "团队负责人、项目经理", "advice": "提升沟通表达与协调技巧"},
+            "项目管理": {"role": "项目经理、Scrum Master", "advice": "学习项目管理方法论"},
+            "工匠精神": {"role": "技术专家、质量负责人", "advice": "强化质量意识与代码规范"},
+        }
+
+        # 构建名称维度分数
+        name_scores: dict[str, int] = {}
+        for code, score in (final_scores or {}).items():
+            name = code_to_name.get(code, code)
+            name_scores[name] = score
+
+        if not name_scores:
+            return "职业发展建议：建议补充基础能力训练，逐步在实践中提升协作与质量意识。"
+
+        # 直接使用原始分值比较出优势与劣势维度
+        max_val = max(name_scores.values())
+        min_val = min(name_scores.values())
+        core_dims = [name for name, v in name_scores.items() if v == max_val]
+        weak_dims = [name for name, v in name_scores.items() if v == min_val]
+
+        # 角色与建议拼接
+        def get_role(n: str) -> str:
+            return default_desc.get(n, {}).get("role", "骨干岗位")
+
+        def get_advice(n: str) -> str:
+            return default_desc.get(n, {}).get("advice", "补齐短板，形成闭环能力")
+
+        core_roles = "、".join(get_role(n) for n in core_dims) if core_dims else "骨干岗位"
+        weak_hint = get_advice(weak_dims[0]) if weak_dims else "持续巩固优势并拓展协作能力"
+
+        advice = f"你在{'、'.join(core_dims)}方面表现良好，是项目顺利推进的保障。"
+        advice += f"发展方向：{core_roles}。"
+        advice += f"建议{weak_hint}。"
+        return advice
 
     def _evaluate_best_route(
         self, evaluations: Sequence[CosplayEvaluationRule], final_scores: dict[str, int]
