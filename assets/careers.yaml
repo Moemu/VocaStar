@@ -1,514 +1,653 @@
 careers:
   software_engineer:
     name: 软件工程师
-    description: 软件工程师负责设计、开发和维护软件系统，解决复杂技术问题。他们需要掌握多种编程语言和开发工具，持续学习新技术，并与团队协作完成项目。 软件工程师需要具备扎实的编程基础，能够理解和实现复杂的业务逻辑，同时需要具备良好的沟通能力和团队协作精神。随着技术的不断发展，软件工程师需要保持持续学习的热情，关注行业动态和新技术趋势，不断提升自己的专业技能和解决问题的能力。
-    planet_image_url: /static/career_planets/software_engineer.webp
-    holland_dimensions: ["I", "C", "R"]
     galaxy: 硅基星系
-    salary_min: 15000
-    salary_max: 32000
-    skills_snapshot:
-      - 云原生开发
-      - 系统架构设计
-      - 敏捷协作
-    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 3}
-    work_contents:
-      - 参与软件系统的设计与开发，编写高质量代码
-      - 进行代码审查，确保代码质量和性能
-      - 诊断和修复软件缺陷，优化系统性能
-      - 与产品经理和设计师协作，理解需求并转化为技术方案
-      - 参与技术文档的编写和维护
-    career_outlook: 随着数字化转型的加速，软件工程师的需求持续增长。职业发展路径清晰，可向资深工程师、技术专家、架构师或技术管理方向发展。
-    development_path:
-      - 初级工程师
-      - 中级工程师
-      - 高级工程师
-      - 技术专家/架构师
-    required_skills:
-      - 熟悉常用编程语言，诸如 C/C++, Java, Python 等，并对某一门或多门语言的特性有着较深入的理解
-      - 基本的数据结构和算法设计能力，熟练掌握数据结构的应用和复杂度分析并灵活运用
-      - 操作系统和网络方面：能够熟练运用系统 API 接口，设计良好的程序，熟悉 Linux 操作系统，熟悉 TCP/IP、HTTP 等通信协议，有 socket 网络编程和大规模并发服务器开发经验或有搜索相关领域(如信息检索、索引、排序)经验
-      - 具备沟通能力、表达能力以及团队合作能力，能够与团队中的成员协同开发，共同完成任务
-    related_courses:
-      - 算法分析与设计
-      - 操作系统
-      - 数据结构
-      - 程序设计语言
-      - 软件工程
-      - 数据库原理
-      - 编译原理
-    knowledge_background:
-      industry_knowledge: 熟悉互联网/企业级软件的典型项目形态（单体到微服务演进、云原生落地、DevOps 与 CI/CD 流水线）；理解常见技术场景（高并发与限流降级、分布式事务与一致性、可观测性与故障演练）；明确上下游协作关系（上游为产品/设计/需求方，下游为测试/运维/平台/安全），能在迭代节奏下高效协同；具备开源协作经验或在企业内主导过核心模块改造/性能优化。
-      professional_knowledge: 计算机科学体系化能力（数据结构与算法、操作系统、计算机网络、数据库、编译与虚拟机基础）；工程与架构方法（面向对象与设计模式、领域驱动设计、性能与容量规划、安全与合规、测试与质量体系）；工程化与平台能力（Git 工作流、代码评审、CI/CD、容器与编排、灰度与回滚、监控与告警）。
+    planet_image_url: /static/career_planets/software_engineer.webp
+    career_header_image: /static/career_headers/software_engineer_header.webp
+    holland_dimensions: ["I", "C", "R"]
+
+    overview:
+      description: 软件工程师负责设计、开发和维护软件系统，解决复杂技术问题。他们需要掌握多种编程语言和开发工具，持续学习新技术，并与团队协作完成项目。 软件工程师需要具备扎实的编程基础，能够理解和实现复杂的业务逻辑，同时需要具备良好的沟通能力和团队协作精神。随着技术的不断发展，软件工程师需要保持持续学习的热情，关注行业动态和新技术趋势，不断提升自己的专业技能和解决问题的能力。
+      work_contents:
+        - 参与软件系统的设计与开发，编写高质量代码
+        - 进行代码审查，确保代码质量和性能
+        - 诊断和修复软件缺陷，优化系统性能
+        - 与产品经理和设计师协作，理解需求并转化为技术方案
+        - 参与技术文档的编写和维护
+      career_outlook: 随着数字化转型的加速，软件工程师的需求持续增长。职业发展路径清晰，可向资深工程师、技术专家、架构师或技术管理方向发展。
+      development_path:
+        - 初级工程师
+        - 中级工程师
+        - 高级工程师
+        - 技术专家/架构师
+
+    competency_requirements:
+      core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 3}
+      knowledge_background:
+        education_requirements: 本科及以上
+        industry_knowledge: 熟悉互联网/企业级软件的典型项目形态（单体到微服务演进、云原生落地、DevOps 与 CI/CD 流水线）；理解常见技术场景（高并发与限流降级、分布式事务与一致性、可观测性与故障演练）；明确上下游协作关系（上游为产品/设计/需求方，下游为测试/运维/平台/安全），能在迭代节奏下高效协同；具备开源协作经验或在企业内主导过核心模块改造/性能优化。
+        professional_knowledge: 计算机科学体系化能力（数据结构与算法、操作系统、计算机网络、数据库、编译与虚拟机基础）；工程与架构方法（面向对象与设计模式、领域驱动设计、性能与容量规划、安全与合规、测试与质量体系）；工程化与平台能力（Git 工作流、代码评审、CI/CD、容器与编排、灰度与回滚、监控与告警）。
+        professional_requirements: ["电子信息工程", "计算机科学与技术", "软件工程"]
+
+    salary_and_distribution:
+      salary_level: {"初级": 12000, "中级": 25000, "高级": 45000}
+      distribution_of_popular_cities: {"北京": 1200, "上海": 1050, "广州": 800, "深圳": 950, "杭州": 750, "成都": 650}
+
+    skill_map:
+      skills_snapshot:
+        - JavaScript
+        - React
+        - TypeScript
+        - Node.js
+        - HTML/CSS
+        - Webpack
+        - Git
+        - 算法
+        - 数据库
+        - RESTful API
+      related_courses:
+        - 算法分析与设计
+        - 操作系统
+        - 数据结构
+        - 程序设计语言
+        - 软件工程
+        - 数据库原理
+        - 编译原理
+      important_but_not_offered_courses:
+        - 演讲与口才
+        - 机器学习
+        - 自动机理论
+        - 形式语言概论
+        - 专业英语
+      skill_enhancement_path:
+        - name: 基础阶段
+          description: 掌握HTML/CSS/JavaScript基础
+          tags: ["HTML5", "CSS3", "JavaScript", "基础算法"]
+        - name: 进阶阶段
+          description: 学习前端框架和工程化
+          tags: ["React/Vue", "TypeScript", "Webpack", "HTTP"]
+        - name: 高级阶段
+          description: 深入学习性能优化和架构设计
+          tags: ["性能优化", "架构设计", "微前端", "跨端开发"]
+
 
   data_analyst:
     name: 数据分析师
-    description: 数据分析师通过数据采集与治理、探索性分析（EDA）、指标体系搭建、建模与实验（如 A/B 测试）、可视化与洞察传达，帮助业务识别问题、评估方案并驱动增长。常用技术与工具包括 SQL、Python/R、Tableau/Power BI、Excel、Airflow/ETL、数据仓库/湖；典型场景涵盖电商转化与漏斗分析、用户增长与留存预警、运营效果评估、金融风控与定价优化等，需要与产品、运营、工程、数据平台与合规团队紧密协作。
-    planet_image_url: /static/career_planets/data_analyst.webp
-    holland_dimensions: ["I", "C", "E"]
     galaxy: 硅基星系
-    salary_min: 12000
-    salary_max: 22000
-    skills_snapshot:
-      - SQL 建模
-      - 数据可视化
-      - 业务洞察
-    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 4, "team_collaboration": 4, "innovative_ability": 4, "task_execution": 3}
-    work_contents:
-      - 收集和整理有关问题或程序的信息
-      - 与相关人员协商，确保新实施的系统或程序能够成功运行
-      - 分析信息并评估结果以选择最佳解决方案和解决问题
-      - 就技术、系统或流程相关主题向管理层或其他团体提供指导和专家建议
-    career_outlook: 数据分析师在各行各业的需求不断增长，职业发展路径包括高级数据分析师、数据科学家和数据工程师等方向。
-    development_path:
-      - 初级数据分析师
-      - 中级数据分析师
-      - 高级数据分析师
-      - 数据科学家/数据工程师
-    required_skills:
-      - 数据库用户界面和查询软件
-      - 开发环境软件
-      - 企业资源规划 ERP 软件
-      - 面向对象或组件式开发软件
-      - Web 平台开发软件
-    related_courses:
-      - 统计学
-      - 数据挖掘
-      - 机器学习
-      - 数据库系统
-      - 大数据技术
-      - Python 编程
-      - R 语言编程
-    knowledge_background:
-      industry_knowledge: 了解所在行业的核心业务流程与关键指标（如电商 GMV/转化/复购、互联网 DAU/留存/ARPU、金融风控的逾期与违约指标）；熟悉典型项目实践（增长分析、漏斗与路径分析、用户细分与流失预警、策略 AB 实验与归因评估）；明确上下游协作（上游为产品/运营/市场需求方，下游为数据工程/BI/平台与合规审计）；关注数据治理与合规（数据血缘、质量监控、脱敏与权限、隐私与本地监管要求）。
-      professional_knowledge: 统计与机器学习方法（抽样与估计、假设检验、回归/时间序列、树模型与特征工程、因果推断与实验设计）；数据工程与分析技术（SQL 建模、ETL/ELT、数仓分层与指标口径管理、Python/R 数据处理与可视化）；分析表达与决策支持（可视化设计原则、数据叙事、指标看板与自动化报告）；具备将分析方案落地为可运营的指标体系与评估框架的能力。
+    planet_image_url: /static/career_planets/data_analyst.webp
+    career_header_image: /static/career_headers/data_analyst_header.webp
+    holland_dimensions: ["I", "C", "E"]
+
+    overview:
+      description: 数据分析师通过数据采集与治理、探索性分析（EDA）、指标体系搭建、建模与实验（如 A/B 测试）、可视化与洞察传达，帮助业务识别问题、评估方案并驱动增长。常用技术与工具包括 SQL、Python/R、Tableau/Power BI、Excel、Airflow/ETL、数据仓库/湖；典型场景涵盖电商转化与漏斗分析、用户增长与留存预警、运营效果评估、金融风控与定价优化等，需要与产品、运营、工程、数据平台与合规团队紧密协作。
+      work_contents:
+        - 收集和整理有关问题或程序的信息
+        - 与相关人员协商，确保新实施的系统或程序能够成功运行
+        - 分析信息并评估结果以选择最佳解决方案和解决问题
+        - 就技术、系统或流程相关主题向管理层或其他团体提供指导和专家建议
+      career_outlook: 数据分析师在各行各业的需求不断增长，职业发展路径包括高级数据分析师、数据科学家和数据工程师等方向。
+      development_path:
+        - 初级数据分析师
+        - 中级数据分析师
+        - 高级数据分析师
+        - 数据科学家/数据工程师
+
+    competency_requirements:
+      core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 4, "team_collaboration": 4, "innovative_ability": 4, "task_execution": 3}
+      knowledge_background:
+        education_requirements: 本科及以上
+        industry_knowledge: 了解所在行业的核心业务流程与关键指标（如电商 GMV/转化/复购、互联网 DAU/留存/ARPU、金融风控的逾期与违约指标）；熟悉典型项目实践（增长分析、漏斗与路径分析、用户细分与流失预警、策略 AB 实验与归因评估）；明确上下游协作（上游为产品/运营/市场需求方，下游为数据工程/BI/平台与合规审计）；关注数据治理与合规（数据血缘、质量监控、脱敏与权限、隐私与本地监管要求）。
+        professional_knowledge: 统计与机器学习方法（抽样与估计、假设检验、回归/时间序列、树模型与特征工程、因果推断与实验设计）；数据工程与分析技术（SQL 建模、ETL/ELT、数仓分层与指标口径管理、Python/R 数据处理与可视化）；分析表达与决策支持（可视化设计原则、数据叙事、指标看板与自动化报告）；具备将分析方案落地为可运营的指标体系与评估框架的能力。
+        professional_requirements: ["统计学", "计算机科学与技术", "信息管理与信息系统", "经济学/金融学"]
+
+    salary_and_distribution:
+      salary_level: {"初级": 12000, "中级": 17000, "高级": 22000}
+      distribution_of_popular_cities: {"北京": 900, "上海": 850, "广州": 600, "深圳": 800, "杭州": 700, "成都": 600}
+
+    skill_map:
+      skills_snapshot:
+        - SQL 建模
+        - 数据可视化
+        - 业务洞察
+      related_courses:
+        - 统计学
+        - 数据挖掘
+        - 机器学习
+        - 数据库系统
+        - 大数据技术
+        - Python 编程
+        - R 语言编程
+      important_but_not_offered_courses:
+        - 因果推断
+        - 实验设计
+        - 数据产品
 
   accountant:
     name: 会计师
-    description: 会计师通过建立并维护企业会计核算体系，完成凭证处理、账务核对、成本归集、税务申报与合规披露，编制并解读财务报表，为经营决策提供数据支持；在内外部审计中评估内部控制与合规性，识别风险并提出改进建议。典型工作场景包括月结年结、预算与滚动预测、成本控制与费用分析、资金与票据管理、并购与税务筹划，常用工具涵盖 ERP/财务软件、办公与数据分析工具、电子发票与税务系统对接等。
-    planet_image_url: /static/career_planets/accountant.webp
-    holland_dimensions: ["C", "I", "E"]
     galaxy: 基石星系
-    salary_min: 8000
-    salary_max: 18000
-    skills_snapshot:
-      - 财务报表分析
-      - 成本控制
-      - 法规合规
-    core_competency_model: {"basic_ability": 3, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 3}
-    work_contents:
-      - 准备关于审计发现的详细报告
-      - 向管理层汇报资产利用情况和审计结果，并建议运营和财务活动的变更
-      - 收集和分析数据，以发现控制缺陷、重复工作、浪费、欺诈或违反法律法规和管理政策的情况
-      - 检查账簿和会计系统，确保其效率、效果，并使用公认的会计程序记录交易
-      - 监督机构的审计工作，并确定所需调查的范围
-    career_outlook: 会计人员各行各业都有需求，但是目前电算化的推行，基础会计有饱和的趋势，但是高级会计人员管理会计方向的需求是非常大的，所以需要在工作中不断的提升自己，既懂得会计知识，又懂得管理的高级会计人员将会有好的职业发展前景。
-    development_path:
-      - 基础会计
-      - 主管会计
-      - 财务经理
-      - 单位财务负责人
-      - 财务总监
-    required_skills:
-      - 了解经济和会计原则与实践、金融市场、银行以及财务数据的分析与报告
-      - 对算术、代数、几何、微积分、统计学及其应用的知识
-      - 熟悉战略规划、资源分配、人力资源建模、领导技巧、生产方法和协调人员与资源所涉及的商业与管理原则
-      - 提供客户和个人服务的原则和流程知识。这包括客户需求评估、服务质量标准的满足以及客户满意度的评价
-    related_courses:
-      - 宏观、微观经济学
-      - 会计学原理
-      - 财务管理
-      - 成本会计
-      - 中级财务会计
-      - 高级财务会计
-      - 管理会计
-    knowledge_background:
-      industry_knowledge: 持续关注会计准则与税收法规更新（中国会计准则与 IFRS 趋同、税收优惠与征管变化）；理解企业所处行业的收入确认、成本结构与业务模式差异（如互联网平台、制造、履约/存货特点）；明确上下游协作（上游为业务/采购/销售/人事等单据与流程，下游为税务机关/银行/审计与监管披露）；熟悉月结年结、资金管理与合并报表流程，能在系统（ERP/费控/票据/税务）之间完成对账与闭环。
-      professional_knowledge: 会计要素与会计科目体系、复式记账与凭证/账簿/报表衔接；财报编制与分析（资产负债表、利润表、现金流量表及附注）、成本核算与管理会计、预算与绩效；税务合规（增值税/企业所得税/个税等）与纳税申报；内控与审计基础（流程与控制点、舞弊三角、抽样与函证）；信息化能力（财务软件、Excel/数据分析、报税与票据系统对接）。
+    planet_image_url: /static/career_planets/accountant.webp
+    career_header_image: /static/career_headers/accountant_header.webp
+    holland_dimensions: ["C", "I", "E"]
+
+    overview:
+      description: 会计师通过建立并维护企业会计核算体系，完成凭证处理、账务核对、成本归集、税务申报与合规披露，编制并解读财务报表，为经营决策提供数据支持；在内外部审计中评估内部控制与合规性，识别风险并提出改进建议。典型工作场景包括月结年结、预算与滚动预测、成本控制与费用分析、资金与票据管理、并购与税务筹划，常用工具涵盖 ERP/财务软件、办公与数据分析工具、电子发票与税务系统对接等。
+      work_contents:
+        - 准备关于审计发现的详细报告
+        - 向管理层汇报资产利用情况和审计结果，并建议运营和财务活动的变更
+        - 收集和分析数据，以发现控制缺陷、重复工作、浪费、欺诈或违反法律法规和管理政策的情况
+        - 检查账簿和会计系统，确保其效率、效果，并使用公认的会计程序记录交易
+        - 监督机构的审计工作，并确定所需调查的范围
+      career_outlook: 会计人员各行各业都有需求，但是目前电算化的推行，基础会计有饱和的趋势，但是高级会计人员管理会计方向的需求是非常大的，所以需要在工作中不断的提升自己，既懂得会计知识，又懂得管理的高级会计人员将会有好的职业发展前景。
+      development_path:
+        - 基础会计
+        - 主管会计
+        - 财务经理
+        - 单位财务负责人
+        - 财务总监
+
+    competency_requirements:
+      core_competency_model: {"basic_ability": 3, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 3}
+      knowledge_background:
+        education_requirements: 本科及以上
+        industry_knowledge: 持续关注会计准则与税收法规更新（中国会计准则与 IFRS 趋同、税收优惠与征管变化）；理解企业所处行业的收入确认、成本结构与业务模式差异（如互联网平台、制造、履约/存货特点）；明确上下游协作（上游为业务/采购/销售/人事等单据与流程，下游为税务机关/银行/审计与监管披露）；熟悉月结年结、资金管理与合并报表流程，能在系统（ERP/费控/票据/税务）之间完成对账与闭环。
+        professional_knowledge: 会计要素与会计科目体系、复式记账与凭证/账簿/报表衔接；财报编制与分析（资产负债表、利润表、现金流量表及附注）、成本核算与管理会计、预算与绩效；税务合规（增值税/企业所得税/个税等）与纳税申报；内控与审计基础（流程与控制点、舞弊三角、抽样与函证）；信息化能力（财务软件、Excel/数据分析、报税与票据系统对接）。
+        professional_requirements: ["会计学", "财务管理", "审计学", "税务", "经济学"]
+
+    salary_and_distribution:
+      salary_level: {"初级": 8000, "中级": 13000, "高级": 18000}
+      distribution_of_popular_cities: {"北京": 700, "上海": 680, "广州": 500, "深圳": 600, "杭州": 450, "成都": 420}
+
+    skill_map:
+      skills_snapshot:
+        - 财务报表分析
+        - 成本控制
+        - 法规合规
+      related_courses:
+        - 宏观、微观经济学
+        - 会计学原理
+        - 财务管理
+        - 成本会计
+        - 中级财务会计
+        - 高级财务会计
+        - 管理会计
+      important_but_not_offered_courses:
+        - 税务筹划
+        - 内部控制与风险管理
 
   frontend_development_engineer:
     name: 前端开发工程师
-    description: 前端开发工程师负责实现网站和应用的用户界面，确保页面在不同设备和浏览器上的兼容性与交互体验。他们需要精通 HTML、CSS、JavaScript 及相关框架，能够与设计师和后端工程师协作，将设计稿转化为高效、可维护的代码。
-    planet_image_url: /static/career_planets/frontend_development_engineer.webp
-    holland_dimensions: ["A", "C", "R"]
     galaxy: 硅基星系
-    salary_min: 12000
-    salary_max: 25000
-    skills_snapshot:
-      - 响应式设计
-      - 前端框架（React/Vue）
-      - 跨浏览器调试
-    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 4, "innovative_ability": 3, "task_execution": 4}
-    work_contents:
-      - 将设计稿转化为高质量的网页代码
-      - 优化页面性能和加载速度
-      - 处理跨浏览器兼容性问题
-      - 与后端工程师协作实现数据交互
-    career_outlook: 随着互联网应用的普及，前端开发工程师需求持续增长，未来可向全栈开发、前端架构师或技术管理方向发展。
-    development_path:
-      - 初级前端工程师
-      - 中级前端工程师
-      - 高级前端工程师
-      - 前端架构师/技术负责人
-    required_skills:
-      - 熟悉 HTML5、CSS3、JavaScript
-      - 掌握主流前端框架（React、Vue、Angular）
-      - 了解 Web 性能优化与安全
-    related_courses:
-      - Web 前端开发
-      - JavaScript 高级编程
-      - 计算机网络
-      - 用户体验设计
-    knowledge_background:
-      industry_knowledge: 熟悉不同行业的前端典型项目（中后台管理、营销活动页、C 端电商/内容、小程序与多端适配）；理解常见技术场景（SSR/CSR、路由与状态管理、性能优化与稳定性、Web 安全与风控）与产品/设计/后端/测试/运维的上下游协作；具备端到端交付经验（需求拆解、排期、联调、灰度发布与监控回归）。
-      professional_knowledge: 浏览器与网络基础（渲染与事件循环、缓存与安全、HTTP/HTTP2/HTTP3）；语言与框架原理（JavaScript/TypeScript、React/Vue/Angular、组件化与状态管理、同构与微前端）；工程化与质量（模块化/构建工具、CI/CD、单元/端到端测试、性能与可用性监测、可观测性与错误上报）。
+    planet_image_url: /static/career_planets/frontend_development_engineer.webp
+    career_header_image: /static/career_headers/frontend_development_engineer_header.webp
+    holland_dimensions: ["A", "C", "R"]
+
+    overview:
+      description: 前端开发工程师负责实现网站和应用的用户界面，确保页面在不同设备和浏览器上的兼容性与交互体验。他们需要精通 HTML、CSS、JavaScript 及相关框架，能够与设计师和后端工程师协作，将设计稿转化为高效、可维护的代码。
+      work_contents:
+        - 将设计稿转化为高质量的网页代码
+        - 优化页面性能和加载速度
+        - 处理跨浏览器兼容性问题
+        - 与后端工程师协作实现数据交互
+      career_outlook: 随着互联网应用的普及，前端开发工程师需求持续增长，未来可向全栈开发、前端架构师或技术管理方向发展。
+      development_path:
+        - 初级前端工程师
+        - 中级前端工程师
+        - 高级前端工程师
+        - 前端架构师/技术负责人
+
+    competency_requirements:
+      core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 4, "innovative_ability": 3, "task_execution": 4}
+      knowledge_background:
+        education_requirements: 本科及以上
+        industry_knowledge: 熟悉不同行业的前端典型项目（中后台管理、营销活动页、C 端电商/内容、小程序与多端适配）；理解常见技术场景（SSR/CSR、路由与状态管理、性能优化与稳定性、Web 安全与风控）与产品/设计/后端/测试/运维的上下游协作；具备端到端交付经验（需求拆解、排期、联调、灰度发布与监控回归）。
+        professional_knowledge: 浏览器与网络基础（渲染与事件循环、缓存与安全、HTTP/HTTP2/HTTP3）；语言与框架原理（JavaScript/TypeScript、React/Vue/Angular、组件化与状态管理、同构与微前端）；工程化与质量（模块化/构建工具、CI/CD、单元/端到端测试、性能与可用性监测、可观测性与错误上报）。
+        professional_requirements: ["软件工程", "计算机科学与技术", "数字媒体技术"]
+
+    salary_and_distribution:
+      salary_level: {"初级": 12000, "中级": 18500, "高级": 25000}
+      distribution_of_popular_cities: {"北京": 1000, "上海": 900, "广州": 650, "深圳": 850, "杭州": 800, "成都": 600}
+
+    skill_map:
+      skills_snapshot:
+        - 响应式设计
+        - 前端框架（React/Vue）
+        - 跨浏览器调试
+      related_courses:
+        - Web 前端开发
+        - JavaScript 高级编程
+        - 计算机网络
+        - 用户体验设计
 
   communications_engineer:
     name: 通信工程师
-    description: 通信工程师负责蜂窝/专网/承载网等通信系统的规划、设计、建设与优化，涵盖无线接入（RAN）、传输与核心网，确保网络容量、覆盖与质量达标。工作涉及仿真与参数规划、站点选址与开通、协议栈调测、驱动测试与指标优化（掉话率、切换成功率、时延与吞吐），并与运营商/设备商/集成商等上下游协同推进项目。
-    planet_image_url: /static/career_planets/communications_engineer.webp
-    holland_dimensions: ["R", "I", "C"]
     galaxy: 硅基星系
-    salary_min: 13000
-    salary_max: 28000
-    skills_snapshot:
-      - 无线通信技术
-      - 网络协议分析
-      - 信号处理
-    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 4}
-    work_contents:
-      - 设计和优化通信网络
-      - 进行信号测试与故障排查
-      - 研究新一代通信技术（如 5G/6G）
-    career_outlook: 随着 5G、物联网的发展，通信工程师需求旺盛，未来可发展为网络架构师或通信专家。
-    development_path:
-      - 初级通信工程师
-      - 中级通信工程师
-      - 高级通信工程师
-      - 通信架构师/专家
-    required_skills:
-      - 掌握通信原理与信号处理
-      - 熟悉 TCP/IP、5G 等通信协议
-      - 具备网络优化与排障能力
-    related_courses:
-      - 通信原理
-      - 数字信号处理
-      - 无线通信
-      - 网络工程
-    knowledge_background:
-      industry_knowledge: 了解运营商/设备商/集成商典型项目流程（无线室分/宏站建设、城域/骨干传输、核心网演进与割接）；熟悉网络规划与优化的关键指标与常见问题（覆盖/容量/干扰、切换与重选、QoS/QoE）；理解频谱监管、设备入网、工程验收的法规与合规要求；明确与设计/施工/优化/运维团队的协作关系与交付里程碑。
-      professional_knowledge: 通信与信号处理基础（调制解调、信道编码、MIMO、OFDM）；网络与协议（TCP/IP、移动核心网架构、5G NR/VoNR、IMS、MEC）；网络工程与虚拟化（SDN/NFV、网络切片、时钟同步与精密时序）；工具与方法（仿真与规划、Drive Test 数据分析、拥塞与干扰定位、参数优化策略）。
+    planet_image_url: /static/career_planets/communications_engineer.webp
+    career_header_image: /static/career_headers/communications_engineer_header.webp
+    holland_dimensions: ["R", "I", "C"]
+
+    overview:
+      description: 通信工程师负责蜂窝/专网/承载网等通信系统的规划、设计、建设与优化，涵盖无线接入（RAN）、传输与核心网，确保网络容量、覆盖与质量达标。工作涉及仿真与参数规划、站点选址与开通、协议栈调测、驱动测试与指标优化（掉话率、切换成功率、时延与吞吐），并与运营商/设备商/集成商等上下游协同推进项目。
+      work_contents:
+        - 设计和优化通信网络
+        - 进行信号测试与故障排查
+        - 研究新一代通信技术（如 5G/6G）
+      career_outlook: 随着 5G、物联网的发展，通信工程师需求旺盛，未来可发展为网络架构师或通信专家。
+      development_path:
+        - 初级通信工程师
+        - 中级通信工程师
+        - 高级通信工程师
+        - 通信架构师/专家
+
+    competency_requirements:
+      core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 4}
+      knowledge_background:
+        education_requirements: 本科及以上
+        industry_knowledge: 了解运营商/设备商/集成商典型项目流程（无线室分/宏站建设、城域/骨干传输、核心网演进与割接）；熟悉网络规划与优化的关键指标与常见问题（覆盖/容量/干扰、切换与重选、QoS/QoE）；理解频谱监管、设备入网、工程验收的法规与合规要求；明确与设计/施工/优化/运维团队的协作关系与交付里程碑。
+        professional_knowledge: 通信与信号处理基础（调制解调、信道编码、MIMO、OFDM）；网络与协议（TCP/IP、移动核心网架构、5G NR/VoNR、IMS、MEC）；网络工程与虚拟化（SDN/NFV、网络切片、时钟同步与精密时序）；工具与方法（仿真与规划、Drive Test 数据分析、拥塞与干扰定位、参数优化策略）。
+        professional_requirements: ["通信工程", "电子信息工程", "信息工程"]
+
+    salary_and_distribution:
+      salary_level: {"初级": 13000, "中级": 20500, "高级": 28000}
+      distribution_of_popular_cities: {"北京": 850, "上海": 800, "广州": 620, "深圳": 780, "杭州": 600, "成都": 550}
+
+    skill_map:
+      skills_snapshot:
+        - 无线通信技术
+        - 网络协议分析
+        - 信号处理
+      related_courses:
+        - 通信原理
+        - 数字信号处理
+        - 无线通信
+        - 网络工程
 
   architectural_designer:
     name: 建筑设计师
-    description: 建筑设计师在满足功能与安全规范的前提下，完成建筑的方案构思、扩初深化与施工图设计，并在招投标与施工阶段提供技术支持与现场配合。工作需统筹美学、功能、成本、工期与可持续性，熟练使用 CAD/BIM 与分析工具，与结构/机电/幕墙/景观等专业协同完成可落地的综合方案。
-    planet_image_url: /static/career_planets/architectural_designer.webp
-    holland_dimensions: ["A", "I", "C"]
     galaxy: 基石星系
-    salary_min: 10000
-    salary_max: 22000
-    skills_snapshot:
-      - 建筑设计
-      - CAD/BIM 建模
-      - 空间规划
-    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 4, "team_collaboration": 3, "innovative_ability": 4, "task_execution": 3}
-    work_contents:
-      - 设计建筑方案并绘制图纸
-      - 使用 BIM/CAD 工具进行建模
-      - 与客户沟通需求并优化设计
-    career_outlook: 城市更新、保障性住房与公共设施建设、绿色建筑与低碳政策、BIM 全生命周期管理等驱动设计需求持续增长；细分方向包括公共建筑/住宅/商业综合体/医疗教育/文旅等，可晋升为专业负责人、主创建筑师、总建筑师或转向城市更新与咨询管理。
-    development_path:
-      - 助理建筑师
-      - 建筑设计师
-      - 高级建筑设计师
-      - 总建筑师
-    required_skills:
-      - 熟练使用 CAD、Revit、SketchUp
-      - 掌握建筑规范与施工工艺
-      - 良好的审美与空间想象力
-    related_courses:
-      - 建筑设计原理
-      - 建筑构造
-      - 城市规划
-      - 建筑美学
-    knowledge_background:
-      industry_knowledge: 理解项目全生命周期与报批报建流程（方案—扩初—施工图—招投标—施工配合—竣工）；熟悉上下游协作（甲方/规划报审、结构/给排水/暖通/电气/幕墙/景观、施工与监理、材料与供应链）；了解常见项目类型与交付特征（住宅、商业、公共建筑、装配式/BIM 协同）。
-      professional_knowledge: 建筑设计与空间原理、建筑史与地域文化、结构基础与材料构造、机电与建筑物理（声/光/热）、绿色建筑与节能、BIM 建模与碰撞检查、日照/风环境等模拟分析，规范体系与可实施性把控。
+    planet_image_url: /static/career_planets/architectural_designer.webp
+    career_header_image: /static/career_headers/architectural_designer_header.webp
+    holland_dimensions: ["A", "I", "C"]
+
+    overview:
+      description: 建筑设计师在满足功能与安全规范的前提下，完成建筑的方案构思、扩初深化与施工图设计，并在招投标与施工阶段提供技术支持与现场配合。工作需统筹美学、功能、成本、工期与可持续性，熟练使用 CAD/BIM 与分析工具，与结构/机电/幕墙/景观等专业协同完成可落地的综合方案。
+      work_contents:
+        - 设计建筑方案并绘制图纸
+        - 使用 BIM/CAD 工具进行建模
+        - 与客户沟通需求并优化设计
+      career_outlook: 城市更新、保障性住房与公共设施建设、绿色建筑与低碳政策、BIM 全生命周期管理等驱动设计需求持续增长；细分方向包括公共建筑/住宅/商业综合体/医疗教育/文旅等，可晋升为专业负责人、主创建筑师、总建筑师或转向城市更新与咨询管理。
+      development_path:
+        - 助理建筑师
+        - 建筑设计师
+        - 高级建筑设计师
+        - 总建筑师
+
+    competency_requirements:
+      core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 4, "team_collaboration": 3, "innovative_ability": 4, "task_execution": 3}
+      knowledge_background:
+        education_requirements: 本科及以上
+        industry_knowledge: 理解项目全生命周期与报批报建流程（方案—扩初—施工图—招投标—施工配合—竣工）；熟悉上下游协作（甲方/规划报审、结构/给排水/暖通/电气/幕墙/景观、施工与监理、材料与供应链）；了解常见项目类型与交付特征（住宅、商业、公共建筑、装配式/BIM 协同）。
+        professional_knowledge: 建筑设计与空间原理、建筑史与地域文化、结构基础与材料构造、机电与建筑物理（声/光/热）、绿色建筑与节能、BIM 建模与碰撞检查、日照/风环境等模拟分析，规范体系与可实施性把控。
+        professional_requirements: ["建筑学", "城乡规划", "土木工程（偏建筑方向）"]
+
+    salary_and_distribution:
+      salary_level: {"初级": 10000, "中级": 16000, "高级": 22000}
+      distribution_of_popular_cities: {"北京": 650, "上海": 700, "广州": 500, "深圳": 600, "杭州": 520, "成都": 480}
+
+    skill_map:
+      skills_snapshot:
+        - 建筑设计
+        - CAD/BIM 建模
+        - 空间规划
+      related_courses:
+        - 建筑设计原理
+        - 建筑构造
+        - 城市规划
+        - 建筑美学
 
   civil_engineer:
     name: 土木工程师
-    description: 土木工程师围绕道路/桥梁/隧道/市政与房建等基础设施，开展勘察设计、施工组织与现场管理、质量安全与成本进度控制、运维检测与加固改造。需协调多专业与多承包方，处理材料、工艺与环境等复杂约束，确保工程按期、保质、安全交付。
-    planet_image_url: /static/career_planets/civil_engineer.webp
-    holland_dimensions: ["R", "C", "I"]
     galaxy: 基石星系
-    salary_min: 12000
-    salary_max: 26000
-    skills_snapshot:
-      - 结构设计
-      - 工程管理
-      - 施工监理
-    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 4, "innovative_ability": 3, "task_execution": 4}
-    work_contents:
-      - 进行结构设计与计算
-      - 监督施工质量与进度
-      - 进行工程安全评估
-    career_outlook: 受益于城市更新、交通强国与新型基础设施建设，土木工程需求稳定；装配式建造、数字孪生与智慧工地、绿色低碳等技术趋势提升工程效率与质量。可向专业总工、项目经理、设计负责人或工程咨询/造价/监理方向发展。
-    development_path:
-      - 助理工程师
-      - 工程师
-      - 高级工程师
-      - 项目经理/总工
-    required_skills:
-      - 掌握结构力学与施工技术
-      - 熟悉工程管理流程
-      - 具备项目协调能力
-    related_courses:
-      - 结构力学
-      - 工程测量
-      - 建筑材料
-      - 工程管理
-    knowledge_background:
-      industry_knowledge: 了解勘察—设计—招投标—施工—监理—验收—运维的工程全流程；熟悉现场质量/安全/进度/成本四控管理与信息化手段（BIM/智慧工地）；明确与建设单位、设计院、总包/分包、监理、政府主管部门的协作关系与验收标准。
-      professional_knowledge: 结构力学与材料、地基与基础、施工工艺与组织、测量与监控、工程经济与招投标、规范标准与质量检验；掌握常用软件（结构分析、BIM、进度成本工具）与实验/检测方法。
+    planet_image_url: /static/career_planets/civil_engineer.webp
+    career_header_image: /static/career_headers/civil_engineer_header.webp
+    holland_dimensions: ["R", "C", "I"]
+
+    overview:
+      description: 土木工程师围绕道路/桥梁/隧道/市政与房建等基础设施，开展勘察设计、施工组织与现场管理、质量安全与成本进度控制、运维检测与加固改造。需协调多专业与多承包方，处理材料、工艺与环境等复杂约束，确保工程按期、保质、安全交付。
+      work_contents:
+        - 进行结构设计与计算
+        - 监督施工质量与进度
+        - 进行工程安全评估
+      career_outlook: 受益于城市更新、交通强国与新型基础设施建设，土木工程需求稳定；装配式建造、数字孪生与智慧工地、绿色低碳等技术趋势提升工程效率与质量。可向专业总工、项目经理、设计负责人或工程咨询/造价/监理方向发展。
+      development_path:
+        - 助理工程师
+        - 工程师
+        - 高级工程师
+        - 项目经理/总工
+
+    competency_requirements:
+      core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 4, "innovative_ability": 3, "task_execution": 4}
+      knowledge_background:
+        education_requirements: 本科及以上
+        industry_knowledge: 了解勘察—设计—招投标—施工—监理—验收—运维的工程全流程；熟悉现场质量/安全/进度/成本四控管理与信息化手段（BIM/智慧工地）；明确与建设单位、设计院、总包/分包、监理、政府主管部门的协作关系与验收标准。
+        professional_knowledge: 结构力学与材料、地基与基础、施工工艺与组织、测量与监控、工程经济与招投标、规范标准与质量检验；掌握常用软件（结构分析、BIM、进度成本工具）与实验/检测方法。
+        professional_requirements: ["土木工程", "工程管理", "给排水科学与工程"]
+
+    salary_and_distribution:
+      salary_level: {"初级": 12000, "中级": 19000, "高级": 26000}
+      distribution_of_popular_cities: {"北京": 700, "上海": 750, "广州": 520, "深圳": 620, "杭州": 560, "成都": 530}
+
+    skill_map:
+      skills_snapshot:
+        - 结构设计
+        - 工程管理
+        - 施工监理
+      related_courses:
+        - 结构力学
+        - 工程测量
+        - 建筑材料
+        - 工程管理
 
   medical_data_analyst:
     name: 医学数据分析师
-    description: 医学数据分析师基于临床、科研与运营数据开展清洗与标准化（如标准术语映射）、统计与建模、真实世界研究（RWS）与药物警戒（PV）分析、指标与看板建设，支持临床试验、诊疗优化与医院精细化管理；常用工具包括 SQL、Python/R、SAS、可视化平台与电子病历/随访系统数据对接，需与临床科室、伦理与合规、药物与器械企业协作。
-    planet_image_url: /static/career_planets/medical_data_analyst.webp
-    holland_dimensions: ["I", "C", "R"]
     galaxy: 巨构星系
-    salary_min: 14000
-    salary_max: 28000
-    skills_snapshot:
-      - 医学统计
-      - 数据建模
-      - Python/R 编程
-    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 4}
-    work_contents:
-      - 收集与清洗医疗数据
-      - 构建统计模型支持临床研究
-      - 撰写数据分析报告
-    career_outlook: 医疗大数据与医疗信息化快速发展，电子病历标准化、真实世界证据（RWE）、智能随访与分级诊疗等场景持续扩大需求；可向高级数据分析师、医学统计专家、临床数据经理、真实世界研究专家或数据产品方向发展。
-    knowledge_background:
-      industry_knowledge: 熟悉医疗机构与科研机构数据生态（EMR/HIS/LIS/PACS、临床试验数据、医保与公共卫生数据），了解伦理审查、隐私保护与数据共享合规要求；理解医疗业务流程（门急诊、住院、诊疗路径）与多方协作机制（临床/统计/药企/监管）。
-      professional_knowledge: 医学统计与生物统计（生存分析、倾向评分、贝叶斯方法）、流行病学与研究设计、数据标准与互操作（CDISC/HL7/FHIR）、机器学习在医疗中的稳健应用与因果推断、数据治理与可视化表达。
+    planet_image_url: /static/career_planets/medical_data_analyst.webp
+    career_header_image: /static/career_headers/medical_data_analyst_header.webp
+    holland_dimensions: ["I", "C", "R"]
+
+    overview:
+      description: 医学数据分析师基于临床、科研与运营数据开展清洗与标准化（如标准术语映射）、统计与建模、真实世界研究（RWS）与药物警戒（PV）分析、指标与看板建设，支持临床试验、诊疗优化与医院精细化管理；常用工具包括 SQL、Python/R、SAS、可视化平台与电子病历/随访系统数据对接，需与临床科室、伦理与合规、药物与器械企业协作。
+      work_contents:
+        - 收集与清洗医疗数据
+        - 构建统计模型支持临床研究
+        - 撰写数据分析报告
+      career_outlook: 医疗大数据与医疗信息化快速发展，电子病历标准化、真实世界证据（RWE）、智能随访与分级诊疗等场景持续扩大需求；可向高级数据分析师、医学统计专家、临床数据经理、真实世界研究专家或数据产品方向发展。
+      development_path:
+        - 初级医学数据分析师
+        - 中级医学数据分析师
+        - 高级医学数据分析师/统计专家
+        - 临床数据经理/真实世界研究专家/数据产品负责人
+
+    competency_requirements:
+      core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 4}
+      knowledge_background:
+        education_requirements: 本科及以上
+        industry_knowledge: 熟悉医疗机构与科研机构数据生态（EMR/HIS/LIS/PACS、临床试验数据、医保与公共卫生数据），了解伦理审查、隐私保护与数据共享合规要求；理解医疗业务流程（门急诊、住院、诊疗路径）与多方协作机制（临床/统计/药企/监管）。
+        professional_knowledge: 医学统计与生物统计（生存分析、倾向评分、贝叶斯方法）、流行病学与研究设计、数据标准与互操作（CDISC/HL7/FHIR）、机器学习在医疗中的稳健应用与因果推断、数据治理与可视化表达。
+        professional_requirements: ["生物统计学", "流行病学", "医学信息学", "公共卫生"]
+
+    salary_and_distribution:
+      salary_level: {"初级": 14000, "中级": 21000, "高级": 28000}
+      distribution_of_popular_cities: {"北京": 650, "上海": 600, "广州": 420, "深圳": 500, "杭州": 450, "成都": 430}
+
+    skill_map:
+      skills_snapshot:
+        - 医学统计
+        - 数据建模
+        - Python/R 编程
+      related_courses:
+        - 生物统计学
+        - 流行病学
+        - 医学信息学
+        - 数据挖掘
 
   bio_engineers:
     name: 生物工程师
-    description: 生物工程师利用生物学、化学和工程学原理，开发新型生物产品和工艺，包括药物、食品、环保材料和能源。他们在实验室和产业界之间架起桥梁，将科研成果转化为实际应用。
-    planet_image_url: /static/career_planets/bio_engineers.webp
-    holland_dimensions: ["I", "R", "C"]
     galaxy: 巨构星系
-    salary_min: 13000
-    salary_max: 27000
-    skills_snapshot:
-      - 分子生物学实验
-      - 生物工艺设计
-      - 数据分析与建模
-    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 4, "innovative_ability": 4, "task_execution": 3}
-    work_contents:
-      - 设计和优化生物工艺流程
-      - 进行细胞培养与基因工程实验
-      - 将科研成果转化为产业应用
-    career_outlook: 生物工程在医药、农业、环保等领域应用广泛，未来发展潜力巨大。
-    development_path:
-      - 助理研究员
-      - 生物工程师
-      - 高级工程师
-      - 技术专家/研发主管
-    required_skills:
-      - 掌握分子生物学与生物化学
-      - 熟悉生物反应器与工艺设计
-      - 具备跨学科协作能力
-    related_courses:
-      - 分子生物学
-      - 生物化学
-      - 生物工艺学
-      - 生物信息学
-    knowledge_background:
-      industry_knowledge: 了解医药/食品/环保等产业链条（上游原料与试剂、中游工艺开发与放大、下游质控与注册申报）；具备从研发到中试/产业化的项目实践认知（工艺验证、GMP 合规、技术转移）。
-      professional_knowledge: 分子与细胞工程（基因编辑、表达与纯化）、发酵与生物反应器设计、分离纯化与质量分析、生物信息学与数据建模、法规与注册路径基础。
+    planet_image_url: /static/career_planets/bio_engineers.webp
+    career_header_image: /static/career_headers/bio_engineers_header.webp
+    holland_dimensions: ["I", "R", "C"]
+
+    overview:
+      description: 生物工程师利用生物学、化学和工程学原理，开发新型生物产品和工艺，包括药物、食品、环保材料和能源。他们在实验室和产业界之间架起桥梁，将科研成果转化为实际应用。
+      work_contents:
+        - 设计和优化生物工艺流程
+        - 进行细胞培养与基因工程实验
+        - 将科研成果转化为产业应用
+      career_outlook: 生物工程在医药、农业、环保等领域应用广泛，未来发展潜力巨大。
+      development_path:
+        - 助理研究员
+        - 生物工程师
+        - 高级工程师
+        - 技术专家/研发主管
+
+    competency_requirements:
+      core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 4, "innovative_ability": 4, "task_execution": 3}
+      knowledge_background:
+        education_requirements: 本科及以上
+        industry_knowledge: 了解医药/食品/环保等产业链条（上游原料与试剂、中游工艺开发与放大、下游质控与注册申报）；具备从研发到中试/产业化的项目实践认知（工艺验证、GMP 合规、技术转移）。
+        professional_knowledge: 分子与细胞工程（基因编辑、表达与纯化）、发酵与生物反应器设计、分离纯化与质量分析、生物信息学与数据建模、法规与注册路径基础。
+        professional_requirements: ["生物工程", "生物技术", "制药工程"]
+
+    salary_and_distribution:
+      salary_level: {"初级": 13000, "中级": 20000, "高级": 27000}
+      distribution_of_popular_cities: {"北京": 520, "上海": 600, "广州": 380, "深圳": 480, "杭州": 420, "成都": 400}
+
+    skill_map:
+      skills_snapshot:
+        - 分子生物学实验
+        - 生物工艺设计
+        - 数据分析与建模
+      related_courses:
+        - 分子生物学
+        - 生物化学
+        - 生物工艺学
+        - 生物信息学
 
   drug_development_specialist:
     name: 药物研发专家
-    description: 药物研发专家负责新药的发现、设计、临床前研究与临床试验，确保药物的安全性与有效性。他们需要掌握药理学、化学合成、临床试验设计等知识。
-    planet_image_url: /static/career_planets/drug_development_specialist.webp
-    holland_dimensions: ["I", "C", "R"]
     galaxy: 巨构星系
-    salary_min: 16000
-    salary_max: 35000
-    skills_snapshot:
-      - 药物筛选
-      - 临床试验设计
-      - 药理与毒理分析
-    core_competency_model: {"basic_ability": 5, "self_management": 3, "social_ability": 3, "team_collaboration": 4, "innovative_ability": 4, "task_execution": 4}
-    work_contents:
-      - 进行药物分子设计与筛选
-      - 开展临床前实验与动物实验
-      - 设计并监督临床试验
-    career_outlook: 随着医药产业升级，药物研发专家需求旺盛，未来可发展为首席科学家或研发总监。
-    development_path:
-      - 研究助理
-      - 药物研发工程师
-      - 高级研发专家
-      - 首席科学家/研发总监
-    required_skills:
-      - 掌握药理学与药物化学
-      - 熟悉临床试验流程与法规
-      - 具备科研创新能力
-    related_courses:
-      - 药理学
-      - 药物化学
-      - 临床试验设计
-      - 生物统计学
-    knowledge_background:
-      industry_knowledge: 熟悉创新药/仿制药从发现到临床各阶段（靶点筛选、先导优化、CMC、IND、I-III 期临床、注册与上市后再评价）；理解药企、CRO/SMO、医院与监管的协作模式与里程碑管理。
-      professional_knowledge: 药理与毒理、药代动力学与暴露-反应分析、临床试验设计与数据管理、GxP 规范与药品注册法规、统计方法与不良事件评价。
+    planet_image_url: /static/career_planets/drug_development_specialist.webp
+    career_header_image: /static/career_headers/drug_development_specialist_header.webp
+    holland_dimensions: ["I", "C", "R"]
+
+    overview:
+      description: 药物研发专家负责新药的发现、设计、临床前研究与临床试验，确保药物的安全性与有效性。他们需要掌握药理学、化学合成、临床试验设计等知识。
+      work_contents:
+        - 进行药物分子设计与筛选
+        - 开展临床前实验与动物实验
+        - 设计并监督临床试验
+      career_outlook: 随着医药产业升级，药物研发专家需求旺盛，未来可发展为首席科学家或研发总监。
+      development_path:
+        - 研究助理
+        - 药物研发工程师
+        - 高级研发专家
+        - 首席科学家/研发总监
+
+    competency_requirements:
+      core_competency_model: {"basic_ability": 5, "self_management": 3, "social_ability": 3, "team_collaboration": 4, "innovative_ability": 4, "task_execution": 4}
+      knowledge_background:
+        education_requirements: 硕士及以上优先
+        industry_knowledge: 熟悉创新药/仿制药从发现到临床各阶段（靶点筛选、先导优化、CMC、IND、I-III 期临床、注册与上市后再评价）；理解药企、CRO/SMO、医院与监管的协作模式与里程碑管理。
+        professional_knowledge: 药理与毒理、药代动力学与暴露-反应分析、临床试验设计与数据管理、GxP 规范与药品注册法规、统计方法与不良事件评价。
+        professional_requirements: ["药学", "药物化学", "生物技术", "临床药理学"]
+
+    salary_and_distribution:
+      salary_level: {"初级": 16000, "中级": 25500, "高级": 35000}
+      distribution_of_popular_cities: {"北京": 700, "上海": 720, "广州": 420, "深圳": 520, "杭州": 480, "成都": 460}
+
+    skill_map:
+      skills_snapshot:
+        - 药物筛选
+        - 临床试验设计
+        - 药理与毒理分析
+      related_courses:
+        - 药理学
+        - 药物化学
+        - 临床试验设计
+        - 生物统计学
 
   agrotechnician:
     name: 农艺师
-    description: 农艺师负责农作物的种植、培育与改良，研究农业生产技术，提升作物产量与质量。他们需要掌握植物学、土壤学和农业工程知识。
-    planet_image_url: /static/career_planets/agrotechnician.webp
-    holland_dimensions: ["R", "I", "C"]
     galaxy: 生命星系
-    salary_min: 9000
-    salary_max: 18000
-    skills_snapshot:
-      - 作物栽培技术
-      - 土壤与肥料管理
-      - 农业实验设计
-    core_competency_model: {"basic_ability": 3, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 4}
-    work_contents:
-      - 指导农作物种植与管理
-      - 研究作物改良与抗病性
-      - 推广农业新技术
-    career_outlook: 随着现代农业发展，农艺师在粮食安全和农业可持续发展中作用突出。
-    development_path:
-      - 助理农艺师
-      - 农艺师
-      - 高级农艺师
-      - 农业专家/研究员
-    required_skills:
-      - 掌握植物学与农学
-      - 熟悉农业机械与技术
-      - 具备田间试验与推广能力
-    related_courses:
-      - 植物学
-      - 土壤学
-      - 作物栽培学
-      - 农业工程
-    knowledge_background:
-      industry_knowledge: 了解农业产业链与种业/农资/加工/流通协同，熟悉示范田、农技推广与农机社会化服务等典型项目实践，关注绿色与可持续种植、智慧农业与物联网应用。
-      professional_knowledge: 作物生理与遗传育种、栽培与病虫害综合治理、土壤与养分管理、农业信息化与遥感监测、试验设计与数据分析。
+    planet_image_url: /static/career_planets/agrotechnician.webp
+    career_header_image: /static/career_headers/agrotechnician_header.webp
+    holland_dimensions: ["R", "I", "C"]
+
+    overview:
+      description: 农艺师负责农作物的种植、培育与改良，研究农业生产技术，提升作物产量与质量。他们需要掌握植物学、土壤学和农业工程知识。
+      work_contents:
+        - 指导农作物种植与管理
+        - 研究作物改良与抗病性
+        - 推广农业新技术
+      career_outlook: 随着现代农业发展，农艺师在粮食安全和农业可持续发展中作用突出。
+      development_path:
+        - 助理农艺师
+        - 农艺师
+        - 高级农艺师
+        - 农业专家/研究员
+
+    competency_requirements:
+      core_competency_model: {"basic_ability": 3, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 4}
+      knowledge_background:
+        education_requirements: 本科及以上
+        industry_knowledge: 了解农业产业链与种业/农资/加工/流通协同，熟悉示范田、农技推广与农机社会化服务等典型项目实践，关注绿色与可持续种植、智慧农业与物联网应用。
+        professional_knowledge: 作物生理与遗传育种、栽培与病虫害综合治理、土壤与养分管理、农业信息化与遥感监测、试验设计与数据分析。
+        professional_requirements: ["农学", "植物生产类", "农业资源与环境"]
+
+    salary_and_distribution:
+      salary_level: {"初级": 9000, "中级": 13500, "高级": 18000}
+      distribution_of_popular_cities: {"北京": 300, "上海": 320, "广州": 280, "深圳": 260, "杭州": 250, "成都": 300}
+
+    skill_map:
+      skills_snapshot:
+        - 作物栽培技术
+        - 土壤与肥料管理
+        - 农业实验设计
+      related_courses:
+        - 植物学
+        - 土壤学
+        - 作物栽培学
+        - 农业工程
 
   animal_husbandry_and_veterinary_medicine:
     name: 畜牧兽医
-    description: 畜牧兽医负责家畜的饲养管理、疾病防治和繁殖改良，保障畜牧业健康发展。他们需要掌握动物医学、营养学和养殖技术。
-    planet_image_url: /static/career_planets/animal_husbandry_and_veterinary_medicine.webp
-    holland_dimensions: ["R", "S", "I"]
     galaxy: 生命星系
-    salary_min: 10000
-    salary_max: 20000
-    skills_snapshot:
-      - 动物疾病诊疗
-      - 饲养与繁殖管理
-      - 动物营养学
-    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 4, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 4}
-    work_contents:
-      - 诊断与治疗动物疾病
-      - 指导养殖场饲养与防疫
-      - 研究动物繁殖与改良
-    career_outlook: 畜牧业规模化发展推动兽医需求，未来可发展为畜牧专家或动物医学研究员。
-    development_path:
-      - 助理兽医
-      - 兽医师
-      - 高级兽医师
-      - 畜牧专家/研究员
-    required_skills:
-      - 掌握动物解剖与病理学
-      - 熟悉动物营养与繁殖
-      - 具备临床诊疗与防疫能力
-    related_courses:
-      - 动物解剖学
-      - 动物营养学
-      - 兽医学
-      - 畜牧学
-    knowledge_background:
-      industry_knowledge: 熟悉规模化养殖场运营与防疫体系，上下游包括饲料/疫苗/兽药/设备供应与冷链/屠宰/加工环节；理解监管要求与生物安全标准，具备产地检疫与应急处置意识。
-      professional_knowledge: 动物疾病诊断与治疗、免疫与流行病学、繁殖与遗传改良、营养配方与饲养管理、动物福利与临床操作规范。
+    planet_image_url: /static/career_planets/animal_husbandry_and_veterinary_medicine.webp
+    career_header_image: /static/career_headers/animal_husbandry_and_veterinary_medicine_header.webp
+    holland_dimensions: ["R", "S", "I"]
+
+    overview:
+      description: 畜牧兽医负责家畜的饲养管理、疾病防治和繁殖改良，保障畜牧业健康发展。他们需要掌握动物医学、营养学和养殖技术。
+      work_contents:
+        - 诊断与治疗动物疾病
+        - 指导养殖场饲养与防疫
+        - 研究动物繁殖与改良
+      career_outlook: 畜牧业规模化发展推动兽医需求，未来可发展为畜牧专家或动物医学研究员。
+      development_path:
+        - 助理兽医
+        - 兽医师
+        - 高级兽医师
+        - 畜牧专家/研究员
+
+    competency_requirements:
+      core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 4, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 4}
+      knowledge_background:
+        education_requirements: 本科及以上
+        industry_knowledge: 熟悉规模化养殖场运营与防疫体系，上下游包括饲料/疫苗/兽药/设备供应与冷链/屠宰/加工环节；理解监管要求与生物安全标准，具备产地检疫与应急处置意识。
+        professional_knowledge: 动物疾病诊断与治疗、免疫与流行病学、繁殖与遗传改良、营养配方与饲养管理、动物福利与临床操作规范。
+        professional_requirements: ["动物医学", "动物科学", "兽医学"]
+
+    salary_and_distribution:
+      salary_level: {"初级": 10000, "中级": 15000, "高级": 20000}
+      distribution_of_popular_cities: {"北京": 350, "上海": 360, "广州": 320, "深圳": 300, "杭州": 280, "成都": 340}
+
+    skill_map:
+      skills_snapshot:
+        - 动物疾病诊疗
+        - 饲养与繁殖管理
+        - 动物营养学
+      related_courses:
+        - 动物解剖学
+        - 动物营养学
+        - 兽医学
+        - 畜牧学
 
   agricultural_economic_analyst:
     name: 农业经济分析师
-    description: 农业经济分析师研究农业生产、市场和政策，分析农业经济运行规律，为政府、企业和农户提供决策支持。他们需要掌握经济学、统计学和农业政策知识。
-    planet_image_url: /static/career_planets/agricultural_economic_analyst.webp
-    holland_dimensions: ["I", "C", "E"]
     galaxy: 生命星系
-    salary_min: 11000
-    salary_max: 23000
-    skills_snapshot:
-      - 数据建模与统计分析
-      - 农业政策研究
-      - 市场预测
-    core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 4}
-    work_contents:
-      - 收集与分析农业经济数据
-      - 研究农业市场与价格波动
-      - 提供政策与投资建议
-    career_outlook: 农业现代化推动经济分析需求，未来可发展为高级经济师或政策顾问。
-    development_path:
-      - 助理经济分析师
-      - 经济分析师
-      - 高级经济分析师
-      - 高级经济师/政策顾问
-    required_skills:
-      - 掌握经济学与统计学原理
-      - 熟悉农业政策与市场
-      - 具备数据分析与建模能力
-    related_courses:
-      - 微观经济学
-      - 统计学
-      - 农业经济学
-    knowledge_background:
-      industry_knowledge: 了解农产品从生产到流通的价值链与价格形成机制，熟悉补贴政策、期现市场与风险管理；具备产业调研与政策评估实践，对涉农企业经营指标与现金流特征有基本认识。
-      professional_knowledge: 微观与计量经济学、农业经济学与区域发展、投入产出与供需模型、时间序列与面板数据分析、政策评估方法（DID、RDD 等）。
+    planet_image_url: /static/career_planets/agricultural_economic_analyst.webp
+    career_header_image: /static/career_headers/agricultural_economic_analyst_header.webp
+    holland_dimensions: ["I", "C", "E"]
+
+    overview:
+      description: 农业经济分析师研究农业生产、市场和政策，分析农业经济运行规律，为政府、企业和农户提供决策支持。他们需要掌握经济学、统计学和农业政策知识。
+      work_contents:
+        - 收集与分析农业经济数据
+        - 研究农业市场与价格波动
+        - 提供政策与投资建议
+      career_outlook: 农业现代化推动经济分析需求，未来可发展为高级经济师或政策顾问。
+      development_path:
+        - 助理经济分析师
+        - 经济分析师
+        - 高级经济分析师
+        - 高级经济师/政策顾问
+
+    competency_requirements:
+      core_competency_model: {"basic_ability": 4, "self_management": 3, "social_ability": 3, "team_collaboration": 3, "innovative_ability": 3, "task_execution": 4}
+      knowledge_background:
+        education_requirements: 本科及以上
+        industry_knowledge: 了解农产品从生产到流通的价值链与价格形成机制，熟悉补贴政策、期现市场与风险管理；具备产业调研与政策评估实践，对涉农企业经营指标与现金流特征有基本认识。
+        professional_knowledge: 微观与计量经济学、农业经济学与区域发展、投入产出与供需模型、时间序列与面板数据分析、政策评估方法（DID、RDD 等）。
+        professional_requirements: ["经济学", "统计学", "农业经济管理"]
+
+    salary_and_distribution:
+      salary_level: {"初级": 11000, "中级": 17000, "高级": 23000}
+      distribution_of_popular_cities: {"北京": 420, "上海": 430, "广州": 320, "深圳": 350, "杭州": 330, "成都": 340}
+
+    skill_map:
+      skills_snapshot:
+        - 数据建模与统计分析
+        - 农业政策研究
+        - 市场预测
+      related_courses:
+        - 微观经济学
+        - 统计学
+        - 农业经济学
 
   product_manager:
     name: 产品经理
-    description: 产品经理基于用户与业务目标进行问题定义与价值判断，完成需求洞察与优先级排序、方案设计与原型产出、跨部门推进与项目落地、指标体系与 A/B 实验设计、上线后的数据分析与持续迭代。需要在用户体验、商业目标与技术可行性之间做权衡，并对产品全生命周期负责。
-    planet_image_url: /static/career_planets/product_manager.webp
-    holland_dimensions: ["E", "C", "R"]
     galaxy: 硅基星系
-    salary_min: 14000
-    salary_max: 30000
-    skills_snapshot:
-      - 产品规划
-      - 用户研究
-      - 项目管理
-    core_competency_model: {"basic_ability": 4, "self_management": 4, "social_ability": 4, "team_collaboration": 4, "innovative_ability": 4, "task_execution": 4}
-    work_contents:
-      - 主要进行移动端和 web 端两个平台的方案策划和产品设计
-      - 主要针对具体的产品找出需要改进的地方和可能存在的需求，并针对这些内容设计对应的方案
-      - 为确保产品的正常上线进行推动，与各方面人员进行沟通，确保产品能按既定思路完成
-      - 产品最后测试、走查、运营、推广等等需要进行持续的跟踪，直到下一个产品迭代
-    career_outlook: 互联网近几年比较火热，行业这几年发展也较好。行业入职的门槛相对较低，因此从业者近几年较多,导致了这一行业的竞争较为激烈。所以新人在入职之后可能会面临较大的压力，但职业的提升空间较大，每个公司著名的人物大部分是产品经理出身。目前成熟的产品经理的需求市场还比较大，竞争较为激烈，淘汰率较高。
-    development_path:
-      - 产品助理
-      - 初级产品经理
-      - 中级产品经理
-      - 高级产品经理
-      - 产品总监
-    required_skills:
-      - 掌握产品管理流程与工具
-      - 熟悉市场分析与用户研究方法
-      - 具备跨部门协调与沟通能力
-    related_courses:
-      - 产品管理
-      - 市场营销
-      - 用户体验设计
-      - 项目管理
-    knowledge_background:
-      industry_knowledge: 理解所处行业的商业模式与价值链（如平台撮合、订阅、广告、交易抽佣等），熟悉从立项到上线的端到端流程（需求—方案—评审—研发—测试—灰度—运营—复盘），明确上下游协作（用户研究/设计/研发/测试/运营/法务与合规/数据），关注竞品与行业趋势并形成策略对比与定位。
-      professional_knowledge: 用户研究与需求分析、产品策略与路线图、信息架构与交互设计、指标体系与实验设计（A/B 与因果评估）、项目管理与风险控制（Scrum/Kanban）、商业分析与增长方法、数据分析与可视化能力；能够将业务目标拆解为可度量的产品指标并闭环验证。
+    planet_image_url: /static/career_planets/product_manager.webp
+    career_header_image: /static/career_headers/product_manager_header.webp
+    holland_dimensions: ["E", "C", "R"]
+
+    overview:
+      description: 产品经理基于用户与业务目标进行问题定义与价值判断，完成需求洞察与优先级排序、方案设计与原型产出、跨部门推进与项目落地、指标体系与 A/B 实验设计、上线后的数据分析与持续迭代。需要在用户体验、商业目标与技术可行性之间做权衡，并对产品全生命周期负责。
+      work_contents:
+        - 主要进行移动端和 web 端两个平台的方案策划和产品设计
+        - 主要针对具体的产品找出需要改进的地方和可能存在的需求，并针对这些内容设计对应的方案
+        - 为确保产品的正常上线进行推动，与各方面人员进行沟通，确保产品能按既定思路完成
+        - 产品最后测试、走查、运营、推广等等需要进行持续的跟踪，直到下一个产品迭代
+      career_outlook: 互联网近几年比较火热，行业这几年发展也较好。行业入职的门槛相对较低，因此从业者近几年较多,导致了这一行业的竞争较为激烈。所以新人在入职之后可能会面临较大的压力，但职业的提升空间较大，每个公司著名的人物大部分是产品经理出身。目前成熟的产品经理的需求市场还比较大，竞争较为激烈，淘汰率较高。
+      development_path:
+        - 产品助理
+        - 初级产品经理
+        - 中级产品经理
+        - 高级产品经理
+        - 产品总监
+
+    competency_requirements:
+      core_competency_model: {"basic_ability": 4, "self_management": 4, "social_ability": 4, "team_collaboration": 4, "innovative_ability": 4, "task_execution": 4}
+      knowledge_background:
+        education_requirements: 本科及以上
+        industry_knowledge: 理解所处行业的商业模式与价值链（如平台撮合、订阅、广告、交易抽佣等），熟悉从立项到上线的端到端流程（需求—方案—评审—研发—测试—灰度—运营—复盘），明确上下游协作（用户研究/设计/研发/测试/运营/法务与合规/数据），关注竞品与行业趋势并形成策略对比与定位。
+        professional_knowledge: 用户研究与需求分析、产品策略与路线图、信息架构与交互设计、指标体系与实验设计（A/B 与因果评估）、项目管理与风险控制（Scrum/Kanban）、商业分析与增长方法、数据分析与可视化能力；能够将业务目标拆解为可度量的产品指标并闭环验证。
+        professional_requirements: ["信息管理与信息系统", "软件工程", "市场营销"]
+
+    salary_and_distribution:
+      salary_level: {"初级": 14000, "中级": 22000, "高级": 30000}
+      distribution_of_popular_cities: {"北京": 1100, "上海": 1000, "广州": 750, "深圳": 950, "杭州": 850, "成都": 700}
+
+    skill_map:
+      skills_snapshot:
+        - 产品规划
+        - 用户研究
+        - 项目管理
+      related_courses:
+        - 产品管理
+        - 市场营销
+        - 用户体验设计
+        - 项目管理
 
 galaxies:
   silicon:
