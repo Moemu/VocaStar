@@ -359,3 +359,8 @@ FinancialCareerCommunity/
 ## 📝 许可证
 
 本项目采用 [MIT License](./LICENSE) 许可证。
+
+数据来源:
+
+- 职业数据: [O*Net Web Services](https://services-beta.onetcenter.org/), [学职平台](https://xz.chsi.com.cn/home.action)
+- 职业头图: [Pexels](https://www.pexels.com/zh-cn/)
