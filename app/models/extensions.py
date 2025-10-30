@@ -324,3 +324,34 @@ class ExplorationProgress(Base):
     user: Mapped["User"] = relationship("User", backref="exploration_progress")
 
     __table_args__ = (Index("idx_explore_user_career", "user_id", "career_id", unique=True),)
+
+
+class CosplayWrongbook(Base):
+    """Cosplay 错题本记录。
+
+    当用户在某个剧本的某个场景中选择了错误选项时，记录一条错题，
+    用于在个人中心展示正确选项与解析。
+    """
+
+    __tablename__ = "cosplay_wrongbook"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    script_id: Mapped[int] = mapped_column(Integer, ForeignKey("cosplay_scripts.id", ondelete="CASCADE"), index=True)
+    scene_id: Mapped[str] = mapped_column(String(100), index=True)
+    script_title: Mapped[str] = mapped_column(String(200), comment="剧本标题")
+    scene_title: Mapped[str] = mapped_column(String(200), comment="场景标题")
+    selected_option_text: Mapped[str] = mapped_column(String(500), comment="用户选择的错误选项文本")
+    correct_option_text: Mapped[str] = mapped_column(String(500), comment="正确选项文本")
+    analysis: Mapped[Optional[str]] = mapped_column(Text, nullable=True, comment="解析/说明")
+
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=False, server_default=sqlalchemy.func.now(), index=True
+    )
+
+    user: Mapped["User"] = relationship("User", backref="cosplay_wrongbooks")
+
+    __table_args__ = (
+        Index("idx_wrongbook_user_script_scene", "user_id", "script_id", "scene_id", unique=True),
+        Index("idx_wrongbook_created_at", "created_at"),
+    )

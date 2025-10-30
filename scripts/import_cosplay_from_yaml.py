@@ -78,6 +78,8 @@ def _coerce_legacy_content(data: dict[str, Any]) -> dict[str, Any]:
                 outcome = opt.get("outcome")
                 if outcome is None and "description" in opt:
                     outcome = opt.get("description")
+                if outcome is None and "feedback" in opt:
+                    outcome = opt.get("feedback")
                 opts.append(
                     {
                         "id": opt.get("id"),
@@ -92,6 +94,9 @@ def _coerce_legacy_content(data: dict[str, Any]) -> dict[str, Any]:
                 "text": scene.get("narrative", ""),
                 "options": opts,
                 "is_end": bool(scene.get("is_end", False)),
+                # 透传扩展字段（用于错题本）：
+                "correct_option_id": scene.get("correct_option_id"),
+                "explanation": scene.get("explanation"),
             }
         payload["scenes"] = scenes_dict
 

@@ -152,6 +152,42 @@ class CosplayService:
         if option_def is None:
             raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="选项不存在")
 
+        # 错题本记录：若存在正确答案且用户选择错误，则记录
+        try:
+            raw_scenes = script.content.get("scenes") if isinstance(script.content, dict) else None  # type: ignore[union-attr]  # noqa: E501
+            raw_scene_obj: dict[str, Any] | None = None
+            if isinstance(raw_scenes, dict):
+                raw_scene_obj = raw_scenes.get(scene_def.id)
+            elif isinstance(raw_scenes, list):
+                for s in raw_scenes:
+                    if isinstance(s, dict) and s.get("id") == scene_def.id:
+                        raw_scene_obj = s
+                        break
+            correct_id = None
+            explanation = None
+            if isinstance(raw_scene_obj, dict):
+                correct_id = raw_scene_obj.get("correct_option_id")
+                explanation = raw_scene_obj.get("explanation")
+            if correct_id and correct_id != option_def.id:
+                # 找到正确选项文本
+                correct_opt = self._find_option(scene_def, correct_id)
+                correct_text = correct_opt.text if correct_opt else str(correct_id)
+                await self.repo.upsert_wrongbook(
+                    user_id=user.id,
+                    script_id=record.script_id,
+                    scene_id=scene_def.id,
+                    script_title=script.title if hasattr(script, "title") else "",
+                    scene_title=scene_def.title,
+                    selected_option_text=option_def.text,
+                    correct_option_text=correct_text,
+                    analysis=str(explanation) if explanation is not None else None,
+                )
+        except Exception as e:
+            # 错题本记录失败不影响主流程，但记录异常以便调试
+            import logging
+
+            logging.exception("Failed to record wrongbook entry: %s", e)
+
         previous_scores = state_payload["scores"].copy()
         updated_scores, score_changes = self._apply_effects(
             previous_scores,
@@ -220,7 +256,8 @@ class CosplayService:
                 raise ValueError(f"剧本内容格式错误: {e}") from e
 
     def _coerce_legacy_content(self, data: dict[str, Any]) -> dict[str, Any]:
-        """将旧版或不规范的剧本内容转换为当前 schema 期望的结构。
+        """
+        将旧版或不规范的剧本内容转换为当前 schema 期望的结构。
 
         处理要点：
         - scenes: 允许 list，转换为以 id 为键的 dict
@@ -250,6 +287,8 @@ class CosplayService:
                     outcome = opt.get("outcome")
                     if outcome is None and "description" in opt:
                         outcome = opt.get("description")
+                    if outcome is None and "feedback" in opt:
+                        outcome = opt.get("feedback")
                     options.append(
                         {
                             "id": opt.get("id"),
@@ -270,6 +309,9 @@ class CosplayService:
                     "text": raw_text or "",
                     "options": options,
                     "is_end": bool(scene.get("is_end", False)),
+                    # 透传扩展字段（用于错题本）：
+                    "correct_option_id": scene.get("correct_option_id"),
+                    "explanation": scene.get("explanation"),
                 }
             payload["scenes"] = scenes_dict
 

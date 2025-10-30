@@ -104,12 +104,12 @@ async def list_favorites(
     return await svc.list_favorites(current_user)
 
 
-# ------- 错题本（占位） -------
+# ------- 错题本 -------
 
 
 @router.get("/wrongbook", response_model=WrongbookListResponse)
 async def list_wrongbook(
     db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)
 ) -> WrongbookListResponse:
-    # 先返回空列表，后续接入 Cosplay 错题逻辑
-    return WrongbookListResponse(items=[])
+    svc = get_service(db)
+    return await svc.list_wrongbook(current_user)

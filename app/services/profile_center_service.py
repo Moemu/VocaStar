@@ -17,6 +17,8 @@ from app.schemas.profile_center import (
     FavoriteListResponse,
     FavoriteRecord,
     HollandPortrait,
+    WrongbookItem,
+    WrongbookListResponse,
 )
 from app.schemas.user import UserProfileSummary, UserSetProfileRequest
 
@@ -147,5 +149,19 @@ class ProfileCenterService:
             )
         return FavoriteListResponse(items=items)
 
-    # ---- Wrongbook (placeholder) ----
-    # 目前返回空数组，后续接入 Cosplay 错题计算逻辑
+    # ---- Wrongbook ----
+    async def list_wrongbook(self, user: User) -> WrongbookListResponse:
+        rows = await self.repo.list_wrongbook(user.id)
+        items: list[WrongbookItem] = []
+        for r in rows:
+            items.append(
+                WrongbookItem(
+                    script_title=r.script_title,
+                    scene_title=r.scene_title,
+                    selected_option_text=r.selected_option_text or "",
+                    correct_option_text=r.correct_option_text,
+                    analysis=r.analysis or "",
+                    occurred_at=r.created_at,
+                )
+            )
+        return WrongbookListResponse(items=items)

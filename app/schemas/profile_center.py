@@ -60,6 +60,7 @@ class ExplorationListResponse(BaseModel):
 class WrongbookItem(BaseModel):
     script_title: str = Field(..., description="剧本标题")
     scene_title: str = Field(..., description="场景标题")
+    selected_option_text: str = Field(..., description="用户当时选择的错误选项文本")
     correct_option_text: str = Field(..., description="正确选项文本")
     analysis: str = Field(..., description="解析说明")
     occurred_at: datetime = Field(..., description="发生时间")

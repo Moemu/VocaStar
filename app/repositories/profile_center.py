@@ -8,6 +8,7 @@ from sqlalchemy.orm import selectinload
 
 from app.models.career import Career, CareerRecommendation
 from app.models.extensions import (
+    CosplayWrongbook,
     ExplorationProgress,
     Favorite,
     FavoriteItemType,
@@ -124,3 +125,13 @@ class ProfileCenterRepository:
             result2 = await self.session.execute(select(Career).where(Career.id.in_(tuple(set(career_ids)))))
             career_map = {c.id: c for c in result2.scalars().all()}
         return [(f, (career_map.get(f.item_id) if f.item_type == FavoriteItemType.career else None)) for f in favs]
+
+    # --- Wrongbook ---
+    async def list_wrongbook(self, user_id: int) -> list[CosplayWrongbook]:
+        stmt = (
+            select(CosplayWrongbook)
+            .where(CosplayWrongbook.user_id == user_id)
+            .order_by(CosplayWrongbook.created_at.desc(), CosplayWrongbook.id.desc())
+        )
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
