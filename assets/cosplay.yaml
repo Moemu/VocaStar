@@ -48,6 +48,8 @@ scripts:
               T: 1
               P: -1
             feedback: "你的方案很扎实，但花费了额外时间，产品经理有些担心进度。"
+        correct_option_id: option_2
+        explanation: "主动沟通能明确需求边界，避免后期返工，体现专业素养。"
 
       - id: scene_2
         title: 腐烂的代码
@@ -76,6 +78,8 @@ scripts:
               S: 2
               P: 1
             feedback: "导师帮你评估风险，一起制定了更稳妥的修改计划。"
+        correct_option_id: option_3
+        explanation: "遇到复杂技术问题时求助资深同事，是高效且安全的问题解决方式。"
 
       - id: scene_3
         title: 突如其来的线上事故
@@ -104,6 +108,8 @@ scripts:
               P: 1
               S: 1
             feedback: "你高效定位问题，在最小影响范围内完成修复，团队对你更信任。"
+        correct_option_id: option_3
+        explanation: "平衡快速恢复与问题定位，体现应急处理能力和系统性思维。"
 
       - id: scene_4
         title: 团队的分歧
@@ -131,6 +137,8 @@ scripts:
               T: 2
               P: 1
             feedback: "新方案汲取众长，团队凝聚力更强，大家对你刮目相看。"
+        correct_option_id: option_3
+        explanation: "寻求共赢方案化解冲突，促进团队协作，达成更优技术决策。"
 
     evaluation_rules:
       - key: T+Q
@@ -209,6 +217,8 @@ scripts:
               U: 1
               C: 1
             feedback: "你的方案平衡双方诉求，专业思考获得认可。"
+        correct_option_id: option_3
+        explanation: "主动协调矛盾，明确目标并提供可配置方案，平衡双方诉求。"
 
       - id: scene_2
         title: 紧迫的排期
@@ -235,6 +245,8 @@ scripts:
               Q: 1
               S: 2
             feedback: "项目顺利启动，你持续沟通确保最终效果统一。"
+        correct_option_id: option_3
+        explanation: "先交付核心与基础规范并同步推进，兼顾进度与最终质量。"
 
       - id: scene_3
         title: 设计的妥协
@@ -263,6 +275,8 @@ scripts:
               C: 1
               U: 1
             feedback: "你们找到性价比高的方案，保住体验也赢得尊重。"
+        correct_option_id: option_3
+        explanation: "与开发共创替代方案，兼顾体验价值与实现成本。"
 
       - id: scene_4
         title: 设计系统的传承
@@ -293,6 +307,8 @@ scripts:
               C: 1
               Q: 1
             feedback: "团队创新热情与系统生命力同步提升，你展现资深格局。"
+        correct_option_id: option_3
+        explanation: "肯定创意并抽象为可复用模式，既维护规范又促进创新。"
 
     evaluation_rules:
       - key: U+C
@@ -372,6 +388,8 @@ scripts:
               D: 1
               S: 1
             feedback: "你提出弹性方案，安抚销售也增强产品架构灵活性。"
+        correct_option_id: option_3
+        explanation: "判断通用性并配置化改造，兼顾大客户与主流用户，体现战略思维。"
 
       - id: scene_2
         title: 突如其来的变更
@@ -399,6 +417,8 @@ scripts:
               P: 1
               D: 1
             feedback: "老板接受你的专业建议，团队目标清晰。"
+        correct_option_id: option_3
+        explanation: "分阶段策略以数据与资源约束落地，既拥抱变化又保证交付。"
 
       - id: scene_3
         title: 上线的抉择
@@ -426,6 +446,8 @@ scripts:
               S: 1
               P: 1
             feedback: "基于充分数据做出最合理决策，团队对风险了然于胸。"
+        correct_option_id: option_3
+        explanation: "评估影响面与触发条件，联合决策并预案，平衡时机与质量。"
 
       - id: scene_4
         title: 商业伦理的抉择
@@ -455,6 +477,168 @@ scripts:
               S: 2
               D: 1
             feedback: "续费率稳定增长，品牌口碑提升，你赢得团队与用户尊重。"
+        correct_option_id: option_3
+        explanation: "在商业目标与用户价值间求平衡，保护口碑并促成长期收益。"
+
+  accountant:
+    title: 会计师
+    career_name: 会计师
+    summary: "你是清源会计师事务所的新人会计师，受派参与上市公司年度审计。"
+    setting: "你正在参与某上市公司的年度审计，时间紧、要求高，需要在规范与效率中取得平衡。"
+    base_score: 50
+    point_step: 10
+    abilities:
+      - code: D
+        name: 数据思维
+        description: 基于会计准则与证据做决策的能力
+      - code: Q
+        name: 工匠精神
+        description: 对流程规范与细节完美的追求
+      - code: S
+        name: 沟通协作
+        description: 与客户、团队进行高效沟通与协作的能力
+      - code: T
+        name: 技术决策
+        description: 分析解决复杂财务问题与合规场景的能力
+
+    scenes:
+      - id: scene_1
+        title: 发现的差异
+        narrative: "审计中你发现客户一笔重要账目存在计算错误，导致利润虚高。"
+        options:
+          - id: option_1
+            text: "【立即在底稿中更正，并通知客户财务负责人。】"
+            description: "基于证据及时更正并沟通。"
+            effects:
+              D: 2
+              Q: 1
+            feedback: "客户感谢你的专业，及时调整了报表。"
+          - id: option_2
+            text: "【先不声张，继续其他工作。】"
+            description: "暂不处理，计划后续再看。"
+            effects:
+              D: -1
+              Q: -1
+            feedback: "后来被项目经理发现，团队信誉受损。"
+          - id: option_3
+            text: "【告诉同事，让他们决定。】"
+            description: "把问题转交他人，自己不做判断。"
+            effects:
+              T: -1
+              S: -1
+            feedback: "问题被拖延，最后匆忙处理。"
+        correct_option_id: option_1
+        explanation: "基于数据证据主动纠错，体现审计独立与专业操守。"
+
+      - id: scene_2
+        title: 同事的请求
+        narrative: "项目时间紧张，同事请你跳过某个‘不重要’的复核步骤。"
+        options:
+          - id: option_1
+            text: "【拒绝，必须按流程完成。】"
+            description: "严格按流程执行。"
+            effects:
+              Q: 2
+              S: -1
+            feedback: "保证了质量，但同事关系紧张。"
+          - id: option_2
+            text: "【同意跳过，毕竟时间紧。】"
+            description: "牺牲流程换取时间。"
+            effects:
+              Q: -2
+              D: -1
+            feedback: "复核环节后来暴露问题，导致返工。"
+          - id: option_3
+            text: "【解释该步骤的重要性，并提出高效完成的方法。】"
+            description: "在坚持原则的同时提供更高效的执行方案。"
+            effects:
+              Q: 1
+              S: 2
+            feedback: "既坚持质量也帮助团队提效，获得尊重。"
+        correct_option_id: option_3
+        explanation: "坚持质量底线并通过沟通协作提升执行效率，双赢。"
+
+      - id: scene_3
+        title: 时间的压力
+        narrative: "距报告截止只剩 2 天，你发现一笔交易的凭证不全。"
+        options:
+          - id: option_1
+            text: "【先按现有资料处理，后续补充。】"
+            description: "先行结论，资料后补。"
+            effects:
+              D: -2
+              Q: -1
+            feedback: "后续无法补全凭证，留下审计隐患。"
+          - id: option_2
+            text: "【坚持要求客户立即提供完整凭证。】"
+            description: "按制度要求立即补齐证据链。"
+            effects:
+              D: 2
+              Q: 1
+            feedback: "虽然时间紧张，但确保了报告的准确性与可追溯性。"
+          - id: option_3
+            text: "【模仿类似交易补个说明。】"
+            description: "以类推方式补说明。"
+            effects:
+              T: -2
+              Q: -2
+            feedback: "被质监部门发现，受到处分。"
+        correct_option_id: option_2
+        explanation: "以证据为准的审计原则不可妥协，须补齐凭证确保可核查性。"
+
+      - id: scene_4
+        title: 客户的暗示
+        narrative: "客户负责人暗示‘如果报告好看些’，明年会继续合作。"
+        options:
+          - id: option_1
+            text: "【适当调整某些非关键数据。】"
+            description: "对部分数据进行人为美化。"
+            effects:
+              D: -2
+              T: -2
+            feedback: "短期保住客户，长期面临监管与声誉风险。"
+          - id: option_2
+            text: "【婉拒并解释审计的独立性要求。】"
+            description: "阐明原则并坚持独立审计立场。"
+            effects:
+              D: 2
+              S: 1
+            feedback: "可能失去客户，但维护了事务所声誉与行业公信力。"
+          - id: option_3
+            text: "【答应会‘酌情处理’。】"
+            description: "以模糊承诺回避当下压力。"
+            effects:
+              T: -1
+              Q: -1
+            feedback: "陷入道德与合规困境，后续难以收场。"
+        correct_option_id: option_2
+        explanation: "坚守职业道德与独立性，用专业沟通维护长期信任与公信力。"
+
+    evaluation_rules:
+      - key: D+Q
+        route: 审计专家
+        summary: "你追求数据绝对准确，注重流程规范。"
+        advice: "考取 CPA/ACCA，深耕特定行业审计标准，成为质控骨干。"
+      - key: D+S
+        route: 财务顾问
+        summary: "你善于用数据沟通并推动客户价值实现。"
+        advice: "加强商业洞察，学习企业战略分析，形成方法论。"
+      - key: D+T
+        route: 税务专家
+        summary: "你精通税法与复杂场景判定，能解决疑难问题。"
+        advice: "深入研究税收政策与跨境税务，提升合规与筹划能力。"
+      - key: Q+S
+        route: 内控总监
+        summary: "你既坚持规范又善于协作，能建立完善的内控体系。"
+        advice: "学习 COSO 框架与风险管理方法，构建高标准内控。"
+      - key: Q+T
+        route: 财务系统专家
+        summary: "你注重流程优化，能用技术提升财务效率。"
+        advice: "掌握 ERP/流程再造，推进财务数字化转型。"
+      - key: S+T
+        route: 财务分析师
+        summary: "你沟通出色且分析能力强，能有效支持业务决策。"
+        advice: "加强业务理解，学习财务建模与预测分析，成为业务伙伴。"
 
     evaluation_rules:
       - key: U+D
