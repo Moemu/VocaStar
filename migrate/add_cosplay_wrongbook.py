@@ -11,11 +11,18 @@ Usage:
 from __future__ import annotations
 
 import asyncio
+import sys
+from pathlib import Path
 
+from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import create_async_engine
 
-from app.core.config import config
+ROOT_PATH = Path(__file__).resolve().parents[1]
+if str(ROOT_PATH) not in sys.path:
+    sys.path.insert(0, str(ROOT_PATH))
+
+from app.core.config import config  # noqa: E402
 
 TABLE_NAME = "cosplay_wrongbook"
 COLUMN_SELECTED = "selected_option_text"
@@ -26,11 +33,11 @@ async def table_exists(conn, table_name: str) -> bool:
         dialect_name = sync_conn.dialect.name
         if dialect_name == "sqlite":
             res = sync_conn.execute(
-                "SELECT name FROM sqlite_master WHERE type='table' AND name=:name", {"name": table_name}
+                text("SELECT name FROM sqlite_master WHERE type='table' AND name=:name"), {"name": table_name}
             )
             return res.fetchone() is not None
         # PostgreSQL
-        res = sync_conn.execute("SELECT to_regclass(:name)", {"name": table_name})
+        res = sync_conn.execute(text("SELECT to_regclass(:name)"), {"name": table_name})
         row = res.fetchone()
         return bool(row and row[0])
 
@@ -41,7 +48,7 @@ async def create_table(conn) -> None:
     def _create(sync_conn) -> None:
         dialect_name = sync_conn.dialect.name
         if dialect_name == "sqlite":
-            sync_conn.execute(
+            sync_conn.exec_driver_sql(
                 f"""
                 CREATE TABLE IF NOT EXISTS {TABLE_NAME} (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -58,14 +65,16 @@ async def create_table(conn) -> None:
                 """
             )
             # Indexes and unique constraint
-            sync_conn.execute(
+            sync_conn.exec_driver_sql(
                 f"CREATE UNIQUE INDEX IF NOT EXISTS idx_wrongbook_user_script_scene ON {TABLE_NAME}"
                 "(user_id, script_id, scene_id)"
             )
-            sync_conn.execute(f"CREATE INDEX IF NOT EXISTS idx_wrongbook_created_at ON {TABLE_NAME}(created_at)")
+            sync_conn.exec_driver_sql(
+                f"CREATE INDEX IF NOT EXISTS idx_wrongbook_created_at ON {TABLE_NAME}(created_at)"
+            )
         else:
             # PostgreSQL
-            sync_conn.execute(
+            sync_conn.exec_driver_sql(
                 f"""
                 CREATE TABLE IF NOT EXISTS {TABLE_NAME} (
                     id SERIAL PRIMARY KEY,
@@ -81,11 +90,13 @@ async def create_table(conn) -> None:
                 )
                 """
             )
-            sync_conn.execute(
+            sync_conn.exec_driver_sql(
                 f"CREATE UNIQUE INDEX IF NOT EXISTS idx_wrongbook_user_script_scene ON {TABLE_NAME}"
                 "(user_id, script_id, scene_id)"
             )
-            sync_conn.execute(f"CREATE INDEX IF NOT EXISTS idx_wrongbook_created_at ON {TABLE_NAME}(created_at)")
+            sync_conn.exec_driver_sql(
+                f"CREATE INDEX IF NOT EXISTS idx_wrongbook_created_at ON {TABLE_NAME}(created_at)"
+            )
 
     await conn.run_sync(_create)
 
@@ -94,7 +105,7 @@ async def column_exists(conn, table_name: str, column_name: str) -> bool:
     def _exists(sync_conn) -> bool:
         dialect_name = sync_conn.dialect.name
         if dialect_name == "sqlite":
-            res = sync_conn.execute(f"PRAGMA table_info({table_name})")
+            res = sync_conn.exec_driver_sql(f"PRAGMA table_info({table_name})")
             for row in res.fetchall():
                 # row[1] is column name
                 if len(row) > 1 and str(row[1]).lower() == column_name.lower():
@@ -102,11 +113,13 @@ async def column_exists(conn, table_name: str, column_name: str) -> bool:
             return False
         # PostgreSQL
         res = sync_conn.execute(
-            """
-            SELECT 1
-            FROM information_schema.columns
-            WHERE table_name = :table AND column_name = :column
-            """,
+            text(
+                """
+                SELECT 1
+                FROM information_schema.columns
+                WHERE table_name = :table AND column_name = :column
+                """
+            ),
             {"table": table_name, "column": column_name},
         )
         return res.fetchone() is not None
@@ -119,9 +132,11 @@ async def add_selected_option_column(conn) -> None:
         dialect_name = sync_conn.dialect.name
         if dialect_name == "sqlite":
             # SQLite 不支持在 ALTER TABLE ADD COLUMN 语句中使用 IF NOT EXISTS，这里在检查后再执行
-            sync_conn.execute(f"ALTER TABLE {TABLE_NAME} ADD COLUMN {COLUMN_SELECTED} VARCHAR(500)")
+            sync_conn.exec_driver_sql(f"ALTER TABLE {TABLE_NAME} ADD COLUMN {COLUMN_SELECTED} VARCHAR(500)")
         else:
-            sync_conn.execute(f"ALTER TABLE {TABLE_NAME} ADD COLUMN IF NOT EXISTS {COLUMN_SELECTED} VARCHAR(500)")
+            sync_conn.exec_driver_sql(
+                f"ALTER TABLE {TABLE_NAME} ADD COLUMN IF NOT EXISTS {COLUMN_SELECTED} VARCHAR(500)"
+            )
 
     await conn.run_sync(_add)
 
