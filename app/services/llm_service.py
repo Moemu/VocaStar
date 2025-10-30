@@ -27,10 +27,11 @@ class LLMService:
         timeout: Optional[float] = None,
         client: Optional[AsyncOpenAI] = None,
     ) -> None:
-        raw_base = api_base or config.llm_api_base_url
+        # Respect explicit empty strings in tests as "missing"; only fall back to config if None
+        raw_base = api_base if api_base is not None else config.llm_api_base_url
         self.api_base = raw_base.rstrip("/") if raw_base else ""
-        self.api_key = api_key or config.llm_api_key
-        self.default_model = default_model or config.llm_default_model
+        self.api_key = config.llm_api_key if api_key is None else api_key
+        self.default_model = config.llm_default_model if default_model is None else default_model
         self.timeout = timeout or config.llm_request_timeout
         self._client = client or self._get_client()
 
