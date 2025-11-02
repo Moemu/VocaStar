@@ -14,7 +14,8 @@ VocaStar 是一个基于 FastAPI 的职业规划与测评平台后端服务。�
 - 📊 **智能测评系统**：个性化职业测评、答题会话管理、自动生成分析报告
 - 💼 **职业探索**：职业列表、详情查询、多维度筛选、推荐职业
 - 🎭 **Cosplay 剧本**：互动式职业体验、场景选择、总结报告
-- 🚀 **高性能架构**：异步数据库操作、Redis 缓存、RESTful API 设计
+- � **学习社区**：小组分类/搜索/详情、成员加入/退出、动态/评论/点赞、资料库聚合
+- �🚀 **高性能架构**：异步数据库操作、Redis 缓存、RESTful API 设计
 
 ## 📋 目录
 
@@ -69,6 +70,10 @@ uv run python scripts/import_cosplay_from_yaml.py
 python scripts/import_careers_from_yaml.py
 python scripts/import_quiz_from_yaml.py
 python scripts/import_cosplay_from_yaml.py
+
+# 初始化社区模块（可重复执行，安全幂等）
+python migrate/add_community_tables.py
+python migrate/add_community_posts.py
 ```
 
 **4. 启动服务**
@@ -190,6 +195,38 @@ docker-compose down
 | `/api/cosplay/sessions/{sessionId}/report`    | GET  | 获取已完成会话的总结报告              |
 
 **首页聚合相关**
+**社区（Community）相关**（已拆分为 3 个子路由）
+
+子路由：`/api/community/groups`
+
+| API                                              | 方法   | 说明                                        |
+| ------------------------------------------------ | ------ | ------------------------------------------- |
+| `/api/community/groups/categories`               | GET    | 获取学习小组分类列表                         |
+| `/api/community/groups`                          | GET    | 小组搜索/筛选（分页）                        |
+| `/api/community/groups/{groupId}`                | GET    | 小组详情（含组规/拥有者/是否加入/是否点赞）   |
+| `/api/community/groups/{groupId}/join`           | POST   | 加入小组（幂等）                              |
+| `/api/community/groups/{groupId}/membership`     | DELETE | 退出小组（幂等）                              |
+| `/api/community/groups/{groupId}/members`        | GET    | 小组成员列表（分页，组长优先）                |
+| `/api/community/groups/{groupId}/like`           | POST   | 点赞小组（幂等）                              |
+| `/api/community/groups/{groupId}/like`           | DELETE | 取消点赞小组（幂等）                          |
+| `/api/community/groups/my`                       | GET    | 我加入的小组（分页）                          |
+| `/api/community/groups/feed`                     | GET    | 社区动态（分页，最新/最热）                   |
+| `/api/community/groups/posts`                    | POST   | 发布动态（支持图片/URL/文档类附件）           |
+| `/api/community/groups/posts/{postId}/like`      | POST   | 给动态点赞（幂等）                            |
+| `/api/community/groups/posts/{postId}/comments`  | POST   | 在动态下发布评论                              |
+| `/api/community/groups/repository`               | GET    | 资料库（分页，按 文档/视频/PDF/代码 分类）     |
+
+子路由：`/api/community/partners`（预留）
+
+- 伙伴列表：`GET /api/community/partners`
+
+子路由：`/api/community/mentors`（预留）
+
+- 导师列表：`GET /api/community/mentors`
+
+说明：
+- 动态附件中的 URL 会在发布时尝试解析网页 `<title>` 作为标题（失败则为空，不阻塞发布）。
+- 资料库是对动态中“文档/视频/PDF/代码”类型附件的聚合，不单独提供上传接口。
 
 | API                 | 方法 | 说明                   |
 | ------------------- | ---- | ---------------------- |
@@ -239,7 +276,13 @@ rm database.db
 
 ### 数据迁移
 
-如需进行数据库迁移，请参考 `scripts/migrate_*.py` 脚本。
+如需进行数据库迁移，请参考 `migrate/*.py` 脚本：
+
+```powershell
+# 初始化/升级社区表结构（幂等，多次执行安全）
+python migrate/add_community_tables.py
+python migrate/add_community_posts.py
+```
 
 ## ⚙️ 常见配置
 
