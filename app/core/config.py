@@ -71,6 +71,12 @@ class Config(BaseSettings):
     """头像访问 URL 前缀"""
     max_avatar_size: int = 2 * 1024 * 1024
     """头像文件大小限制，默认 2MB"""
+    uploads_subdir: str = "uploads"
+    """通用附件上传子目录"""
+    uploads_url_prefix: str = "/static/uploads"
+    """通用附件访问 URL 前缀"""
+    max_upload_size: int = 20 * 1024 * 1024
+    """通用附件大小限制，默认 20MB"""
 
     # LLM 配置
     llm_api_base_url: str = ""
@@ -87,7 +93,13 @@ class Config(BaseSettings):
         """头像实际存储路径"""
         return self.static_dir / self.avatar_subdir
 
+    @property
+    def uploads_dir(self) -> Path:
+        """通用附件实际存储路径"""
+        return self.static_dir / self.uploads_subdir
+
 
 config = Config()
 config.static_dir.mkdir(parents=True, exist_ok=True)
 config.avatar_dir.mkdir(parents=True, exist_ok=True)
+config.uploads_dir.mkdir(parents=True, exist_ok=True)

@@ -7,6 +7,17 @@ from app.models.career import (
     CareerGalaxy,
     CareerRecommendation,
 )
+from app.models.community import (
+    CommunityCategory,
+    CommunityCommentLike,
+    CommunityGroup,
+    CommunityGroupLike,
+    CommunityGroupMember,
+    CommunityPost,
+    CommunityPostAttachment,
+    CommunityPostComment,
+    CommunityPostLike,
+)
 
 # Cosplay剧本
 from app.models.cosplay import (
@@ -76,4 +87,14 @@ __all__ = [
     "Feedback",
     "FeedbackStatus",
     "FeedbackType",
+    # 社区模块
+    "CommunityCategory",
+    "CommunityGroup",
+    "CommunityGroupMember",
+    "CommunityGroupLike",
+    "CommunityPost",
+    "CommunityPostAttachment",
+    "CommunityPostLike",
+    "CommunityPostComment",
+    "CommunityCommentLike",
 ]

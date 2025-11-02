@@ -4,7 +4,18 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.api import auth, career, cosplay, home, profile_center, quiz, user
+from app.api import (
+    auth,
+    career,
+    community_groups,
+    community_mentors,
+    community_partners,
+    cosplay,
+    home,
+    profile_center,
+    quiz,
+    user,
+)
 from app.core.config import config
 from app.core.logger import logger
 from app.core.sql import close_db, load_db
@@ -44,6 +55,9 @@ app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(user.router, prefix="/api/user", tags=["user"])
 app.include_router(quiz.router, prefix="/api/quiz", tags=["quiz"])
 app.include_router(career.router, prefix="/api/career", tags=["career"])
+app.include_router(community_groups.router, prefix="/api/community/groups", tags=["community:groups"])
+app.include_router(community_partners.router, prefix="/api/community/partners", tags=["community:partners"])
+app.include_router(community_mentors.router, prefix="/api/community/mentors", tags=["community:mentors"])
 app.include_router(cosplay.router, prefix="/api/cosplay", tags=["cosplay"])
 app.include_router(home.router, prefix="/api/home", tags=["home"])
 app.include_router(profile_center.router, prefix="/api/profile", tags=["profile"])
