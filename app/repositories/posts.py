@@ -64,11 +64,15 @@ class PostsRepository:
     async def post_authors(self, user_ids: Iterable[int]) -> dict[int, tuple[str, Optional[str]]]:
         if not user_ids:
             return {}
-        stmt = select(User.id, User.username, User.avatar_url).where(User.id.in_(list(user_ids)))
+        stmt = select(
+            User.id,
+            func.coalesce(User.nickname, User.username).label("display_name"),
+            User.avatar_url,
+        ).where(User.id.in_(list(user_ids)))
         res = await self.session.execute(stmt)
         m: dict[int, tuple[str, Optional[str]]] = {}
-        for uid, username, avatar in res.all():
-            m[int(uid)] = (str(username), avatar)
+        for uid, display_name, avatar in res.all():
+            m[int(uid)] = (str(display_name), avatar)
         return m
 
     async def post_preview_comments(

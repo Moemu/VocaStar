@@ -169,7 +169,9 @@ class CommunityRepository:
         from app.models.user import User  # local import to avoid circulars
 
         stmt = (
-            select(CommunityGroupMember, User.username, User.avatar_url)
+            select(
+                CommunityGroupMember, func.coalesce(User.nickname, User.username).label("display_name"), User.avatar_url
+            )
             .join(User, User.id == CommunityGroupMember.user_id)
             .where(CommunityGroupMember.group_id == group_id)
             .order_by(leader_first.asc(), CommunityGroupMember.joined_at.desc())
@@ -179,3 +181,24 @@ class CommunityRepository:
         res = await self.session.execute(stmt)
         rows = res.all()
         return [(row[0], row[1], row[2]) for row in rows], total
+
+    async def get_group_leader(self, group_id: int) -> Optional[tuple[str, Optional[str]]]:
+        """获取小组组长的展示名与头像（若存在）。
+
+        返回: (display_name, avatar_url) 或 None
+        """
+        from app.models.user import User  # local import to avoid circulars
+
+        stmt = (
+            select(func.coalesce(User.nickname, User.username).label("display_name"), User.avatar_url)
+            .select_from(CommunityGroupMember)
+            .join(User, User.id == CommunityGroupMember.user_id)
+            .where(CommunityGroupMember.group_id == group_id, CommunityGroupMember.role == "leader")
+            .order_by(CommunityGroupMember.joined_at.asc())
+            .limit(1)
+        )
+        res = await self.session.execute(stmt)
+        row = res.first()
+        if not row:
+            return None
+        return str(row[0]), row[1]

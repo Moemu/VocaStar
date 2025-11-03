@@ -145,6 +145,12 @@ class CommunityService:
         owner = None
         if getattr(g, "owner_name", None) or getattr(g, "owner_avatar_url", None):
             owner = OwnerInfo(name=g.owner_name or "", avatar_url=getattr(g, "owner_avatar_url", None))
+        else:
+            # fallback: if group has a leader membership, use leader's user info as owner display
+            leader = await self.repo.get_group_leader(group_id)
+            if leader:
+                leader_name, leader_avatar = leader
+                owner = OwnerInfo(name=leader_name, avatar_url=leader_avatar)
 
         return GroupDetailResponse(
             id=g.id,
