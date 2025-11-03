@@ -151,3 +151,4 @@ Pages/
 *.db
 .vscode/
 app/static/uploads/
+app/static/avatars/
