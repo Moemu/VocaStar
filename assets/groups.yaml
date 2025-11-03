@@ -1,0 +1,47 @@
+groups:
+  - title: 前端开发学习小组
+    summary: 专注于前端技术学习与交流，包括HTML、CSS、JavaScript、React等
+    cover_url: /static/groups/frontend.webp
+    owner_name: 张小明
+    owner_avatar_url: /static/groups/chengxiaoming.webp
+    rules_json: ["尊重每位成员，禁止发布不文明言论", "分享有价值的技术内容，积极参与讨论", "禁止发布广告或与主题无关的内容", "保护个人隐私，不随意泄露个人信息", "定期参与小组活动，保持活跃状态"]
+    category: 前端
+    members_count: 128
+    last_activity_at: "2025.11.03 09:22:26"
+
+  - title: 产品经理实战圈
+    summary: 分享产品经理工作经验，学习产品设计与用户体验知识
+    cover_url: /static/groups/product.webp
+    rules_json: ["尊重每位成员，禁止发布不文明言论", "分享有价值的技术内容，积极参与讨论", "禁止发布广告或与主题无关的内容", "保护个人隐私，不随意泄露个人信息", "定期参与小组活动，保持活跃状态"]
+    category: 产品
+    members_count: 95
+    last_activity_at: "2025.11.03 05:00:00"
+
+  - title: UI/UX设计交流群
+    summary: 探讨界面设计与用户体验，分享设计资源和创作灵感
+    cover_url: /static/groups/design.webp
+    rules_json: ["尊重每位成员，禁止发布不文明言论", "分享有价值的技术内容，积极参与讨论", "禁止发布广告或与主题无关的内容", "保护个人隐私，不随意泄露个人信息", "定期参与小组活动，保持活跃状态"]
+    category: 设计
+    members_count: 76
+
+  - title: 后端技术研讨组
+    summary: 讨论后端开发技术，包括Java、Python、Node.js等编程语言和框架
+    cover_url: /static/groups/backend.webp
+    rules_json: ["尊重每位成员，禁止发布不文明言论", "分享有价值的技术内容，积极参与讨论", "禁止发布广告或与主题无关的内容", "保护个人隐私，不随意泄露个人信息", "定期参与小组活动，保持活跃状态"]
+    category: 后端
+    members_count: 103
+
+  - title: 数据分析与可视化
+    summary: 学习数据分析方法和可视化技术，提升数据解读能力
+    cover_url: /static/groups/data.webp
+    rules_json: ["尊重每位成员，禁止发布不文明言论", "分享有价值的技术内容，积极参与讨论", "禁止发布广告或与主题无关的内容", "保护个人隐私，不随意泄露个人信息", "定期参与小组活动，保持活跃状态"]
+    category: 数据
+    members_count: 68
+
+  - title: 人工智能学习社
+    summary: 探索人工智能和机器学习领域的知识与应用案例
+    cover_url: /static/groups/ai.webp
+    rules_json: ["尊重每位成员，禁止发布不文明言论", "分享有价值的技术内容，积极参与讨论", "禁止发布广告或与主题无关的内容", "保护个人隐私，不随意泄露个人信息", "定期参与小组活动，保持活跃状态"]
+    category: AI
+    members_count: 152
+
