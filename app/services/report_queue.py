@@ -39,8 +39,8 @@ class ReportTaskQueue:
         self._worker.cancel()
         try:
             await self._worker
-        except asyncio.CancelledError:  # pragma: no cover - 任务取消兜底
-            raise
+        except asyncio.CancelledError:  # pragma: no cover - 任务取消兜底（优雅吞掉）
+            logger.debug("report-queue-worker 已被取消并正常退出")
         self._worker = None
         logger.info("HollandReport 任务队列已停止")
 
@@ -49,14 +49,19 @@ class ReportTaskQueue:
         logger.info("HollandReport 任务入队 report_id=%s", job.report_id)
 
     async def _run(self) -> None:
-        while True:
-            job = await self._queue.get()
-            try:
-                await self._process(job)
-            except Exception as exc:  # pragma: no cover - 防止单个任务导致协程退出
-                logger.exception("处理 HollandReport 任务失败 report_id=%s: %s", job.report_id, exc)
-            finally:
-                self._queue.task_done()
+        try:
+            while True:
+                job = await self._queue.get()
+                try:
+                    await self._process(job)
+                except Exception as exc:  # pragma: no cover - 防止单个任务导致协程退出
+                    logger.exception("处理 HollandReport 任务失败 report_id=%s: %s", job.report_id, exc)
+                finally:
+                    self._queue.task_done()
+        except asyncio.CancelledError:  # 在停止时可能发生，优雅退出
+            logger.debug("report-queue-worker 收到取消信号，准备退出")
+            # 不再抛出，直接结束循环
+            return
 
     async def _process(self, job: ReportJob) -> None:
         async with async_session() as session:
