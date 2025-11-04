@@ -1,0 +1,42 @@
+partners:
+  - name: 张明
+    avatar_url: /static/partners/zhangming.webp
+    profession: 前端开发工程师
+    learning_progress: 75
+    skills: ["HTML", "CSS", "JavaScript", "React"]
+
+  - name: 李娜
+    avatar_url: /static/partners/lina.webp
+    profession: 产品经理
+    learning_progress: 60
+    skills: ["产品设计", "用户体验", "市场分析", "项目管理"]
+
+  - name: 赵琳
+    avatar_url: /static/partners/zhaolin.webp
+    profession: 后端开发工程师
+    learning_progress: 68
+    skills: ["Java", "Spring Boot", "MySQL", "Docker"]
+
+  - name: 王强
+    avatar_url: /static/partners/wangqiang.webp
+    profession: UI/UX 设计师
+    learning_progress: 90
+    skills: ["Figma", "Sketch", "Adobe XD", "用户研究"]
+
+  - name: 刘洋
+    avatar_url: /static/partners/liuyang.webp
+    profession: DevOps工程师
+    learning_progress: 77
+    skills: ["Kubernetes", "CI/CD", "AWS", "Terraform"]
+
+  - name: 陈杰
+    avatar_url: /static/partners/chenjie.webp
+    profession: 数据分析师
+    learning_progress: 82
+    skills: ["Python", "R", "Tableau", "SQL"]
+
+  - name: 孙怡
+    avatar_url: /static/partners/sunyi.webp
+    profession: UX研究员
+    learning_progress: 65
+    skills: ["用户访谈", "可用性测试", "数据分析", "信息架构"]
