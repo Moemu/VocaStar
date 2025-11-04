@@ -40,6 +40,11 @@ from app.models.extensions import (
     UserAchievement,
     UserPoints,
 )
+from app.models.partners import (
+    CommunityPartner,
+    CommunityPartnerSkill,
+    UserPartnerBinding,
+)
 
 # 测评系统
 from app.models.quiz import (
@@ -97,4 +102,8 @@ __all__ = [
     "CommunityPostLike",
     "CommunityPostComment",
     "CommunityCommentLike",
+    # 社区：职业伙伴
+    "CommunityPartner",
+    "CommunityPartnerSkill",
+    "UserPartnerBinding",
 ]
