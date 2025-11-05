@@ -1,0 +1,80 @@
+mentors:
+  - name: 陈教授
+    avatar_url:
+    profession: 资深前端架构师
+    company: 阿里巴巴
+    fee_per_hour: 399
+    rating: 4.9
+    rating_count: 128
+    skills: ["前端架构", "React", "性能优化", "工程化"]
+    domains: ["frontend"]
+
+  - name: 林老师
+    avatar_url:
+    profession: 产品总监
+    company: 腾讯
+    fee_per_hour: 499
+    rating: 4.8
+    rating_count: 95
+    skills: ["产品战略", "用户增长", "需求分析", "项目管理"]
+    domains: ["product"]
+
+  - name: 王老师
+    avatar_url:
+    profession: 设计总监
+    company: 字节跳动
+    fee_per_hour: 459
+    rating: 4.7
+    rating_count: 76
+    skills: ["UI设计", "UX研究", "品牌设计", "设计系统"]
+    domains: ["design"]
+
+  - name: 张教授
+    avatar_url:
+    profession: 技术总监
+    company: 百度
+    fee_per_hour: 599
+    rating: 4.9
+    rating_count: 156
+    skills: ["后端架构", "AI应用", "大数据", "云计算"]
+    domains: ["backend", "ai", "data"]
+
+  - name: 刘老师
+    avatar_url:
+    profession: iOS技术专家
+    company: 苹果中国
+    fee_per_hour: 450
+    rating: 4.8
+    rating_count: 87
+    skills: ["iOS开发", "Swift", "移动架构", "性能优化"]
+    domains: ["mobile"]
+
+  - name: 赵老师
+    avatar_url:
+    profession: 市场营销总监
+    company: 字节跳动
+    fee_per_hour: 420
+    rating: 4.7
+    rating_count: 65
+    skills: ["数字营销", "品牌建设", "内容营销", "社交媒体"]
+    domains: ["marketing"]
+
+  - name: 孙老师
+    avatar_url:
+    profession: DevOps架构师
+    company: 亚马逊
+    fee_per_hour: 550
+    rating: 4.9
+    rating_count: 102
+    skills: ["Docker", "Kubernetes", "CI/CD", "云架构"]
+    domains: ["devops"]
+
+  - name: 郑老师
+    avatar_url:
+    profession: 数据科学家
+    company: 美团
+    fee_per_hour: 500
+    rating: 4.8
+    rating_count: 93
+    skills: ["机器学习", "数据挖掘", "统计分析", "Python"]
+    domains: ["data", "ai"]
