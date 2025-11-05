@@ -40,6 +40,13 @@ from app.models.extensions import (
     UserAchievement,
     UserPoints,
 )
+from app.models.mentors import (
+    CommunityMentor,
+    CommunityMentorSkill,
+    MentorDomain,
+    MentorDomainMap,
+    MentorRequest,
+)
 from app.models.partners import (
     CommunityPartner,
     CommunityPartnerSkill,
@@ -106,4 +113,10 @@ __all__ = [
     "CommunityPartner",
     "CommunityPartnerSkill",
     "UserPartnerBinding",
+    # 社区：职业导师
+    "CommunityMentor",
+    "CommunityMentorSkill",
+    "MentorDomain",
+    "MentorDomainMap",
+    "MentorRequest",
 ]
