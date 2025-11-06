@@ -41,7 +41,6 @@ class QuizRepository:
             select(Quiz)
             .where(Quiz.is_published.is_(True))
             .where(Quiz.config.isnot(None))
-            .where(Quiz.config.has_key("slug"))  # type: ignore
             .where(Quiz.config["slug"].as_string() == slug)
             .limit(1)
         )
