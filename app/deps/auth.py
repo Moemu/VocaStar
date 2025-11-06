@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Annotated, Callable, Coroutine, Optional
 
 import jwt
@@ -27,6 +27,12 @@ async def _resolve_user_from_token(
     redis: Redis,
     token: str,
 ) -> User:
+    """Resolve and validate the current user from a bearer JWT token.
+
+    Notes:
+        - Uses UTC to compare expiration to avoid local-time drift.
+        - Returns detailed 401s via a common credentials_exception.
+    """
     logger.debug("尝试鉴权已登录用户...")
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -39,7 +45,7 @@ async def _resolve_user_from_token(
         payload = Payload(**payload_dict)
         if (
             (payload.sub is None or payload.exp is None)
-            or payload.exp < datetime.timestamp(datetime.now())
+            or payload.exp < datetime.now(timezone.utc).timestamp()
             or await is_token_blacklisted(redis, payload.jti)
         ):
             logger.warning("用户鉴权失败，用户可能没有设置密钥体或密钥过期")

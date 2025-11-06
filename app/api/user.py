@@ -189,6 +189,10 @@ async def upload_avatar(
 
 
 @router.get("/profile", response_model=UserInfoResponse, tags=["user"])
-async def get_current_user_info(current_user: Annotated[User, Depends(get_current_user)]):
-    """获取当前登录用户信息"""
-    return current_user
+async def get_current_user_info(current_user: Annotated[User, Depends(get_current_user)]) -> UserInfoResponse:
+    """获取当前登录用户信息。
+
+    FastAPI will serialize the ORM model into the response model thanks to
+    `UserInfoResponse`'s `from_attributes=True` config.
+    """
+    return UserInfoResponse.model_validate(current_user)

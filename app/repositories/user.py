@@ -8,6 +8,13 @@ from app.models.user import User, UserRole
 
 
 class UserRepository:
+    """Data access layer for user entities.
+
+    Keeps write methods explicit and small; avoids leaking ORM details to
+    service & API layers. All methods return domain objects or simple
+    primitives to aid testing.
+    """
+
     def __init__(self, session: AsyncSession):
         self.session = session
 
@@ -26,10 +33,12 @@ class UserRepository:
         return result.scalar_one_or_none()
 
     async def get_addition_order(self, prefix: str) -> int:
-        """
-        获取当前的添加顺序
+        """Return next numeric order for auto-generated usernames.
 
-        :param prefix: 账号前缀
+        Args:
+            prefix: Username prefix to count existing rows.
+        Returns:
+            The next sequence number (1-based). Safe if none exist.
         """
         user = await self.session.execute(select(func.count(User.id)).where(User.username.startswith(prefix)))
         total_users = user.scalar() or 0
@@ -82,14 +91,14 @@ class UserRepository:
         email: Optional[str] = None,
         avatar_url: Optional[str] = None,
     ) -> bool:
-        """
-        编辑用户信息
+        """Edit mutable user fields in-place.
 
-        :param user: 用户对象
-        :param nickname: 昵称
-        :param role: 用户角色(user/admin)
-        :param is_active: 用户状态(激活/禁用)
-        :param email: 邮箱
+        Only provided (non-None) arguments update the entity. Commit is
+        attempted immediately to minimize inconsistent session state.
+
+        Returns:
+            True if committed successfully; False when an IntegrityError
+            (duplicate email/username) occurs.
         """
         if nickname is not None:
             user.nickname = nickname
@@ -120,8 +129,10 @@ class UserRepository:
         await self.session.commit()
 
     def _term_filter(self, course_date_column, term: str):
-        """
-        term json 对象过滤器
+        """Internal helper producing a JSON term filter expression.
+
+        Supports MySQL & SQLite; falls back to generic json path access for
+        other dialects.
         """
         bind = self.session.get_bind()
         if bind.dialect.name == "mysql":

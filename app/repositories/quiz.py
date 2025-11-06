@@ -29,17 +29,24 @@ class QuizRepository:
         return result.scalars().first()
 
     async def get_published_quiz_by_slug(self, slug: str) -> Optional[Quiz]:
+        """Fetch a published quiz by its config.slug using a JSON filter.
+
+        This avoids loading all published quizzes into Python and improves
+        performance once the table grows.
+        """
         if not slug:
             return None
 
-        stmt = select(Quiz).where(Quiz.is_published.is_(True))
+        stmt = (
+            select(Quiz)
+            .where(Quiz.is_published.is_(True))
+            .where(Quiz.config.isnot(None))
+            .where(Quiz.config.has_key("slug"))  # type: ignore
+            .where(Quiz.config["slug"].as_string() == slug)
+            .limit(1)
+        )
         result = await self.session.execute(stmt)
-        quizzes = result.scalars().unique().all()
-        for quiz in quizzes:
-            config = quiz.config or {}
-            if isinstance(config, dict) and config.get("slug") == slug:
-                return quiz
-        return None
+        return result.scalars().first()
 
     async def get_submission_by_token(self, token: str) -> Optional[QuizSubmission]:
         stmt = (
