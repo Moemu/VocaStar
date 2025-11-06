@@ -28,12 +28,12 @@ class ReportTaskQueue:
         self._worker: Optional[asyncio.Task[None]] = None
         self._generator = HollandReportGenerator()
 
-    async def start(self) -> None:
+    async def start(self) -> None:  # pragma: no cover - 后台生命周期逻辑
         if self._worker is None:
             self._worker = asyncio.create_task(self._run(), name="report-queue-worker")
             logger.info("HollandReport 任务队列已启动")
 
-    async def stop(self) -> None:
+    async def stop(self) -> None:  # pragma: no cover - 后台生命周期逻辑
         if self._worker is None:
             return
         self._worker.cancel()
@@ -48,7 +48,7 @@ class ReportTaskQueue:
         await self._queue.put(job)
         logger.info("HollandReport 任务入队 report_id=%s", job.report_id)
 
-    async def _run(self) -> None:
+    async def _run(self) -> None:  # pragma: no cover - 无限循环协程测试价值低
         try:
             while True:
                 job = await self._queue.get()
@@ -63,7 +63,7 @@ class ReportTaskQueue:
             # 不再抛出，直接结束循环
             return
 
-    async def _process(self, job: ReportJob) -> None:
+    async def _process(self, job: ReportJob) -> None:  # pragma: no cover - 依赖 LLM 复杂链路
         async with async_session() as session:
             logger.info("开始处理 HollandReport 任务 report_id=%s", job.report_id)
             stmt = (

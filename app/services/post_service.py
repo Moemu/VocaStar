@@ -30,7 +30,7 @@ from app.schemas.community_posts import (
 TITLE_RE = re.compile(r"<title[^>]*>(.*?)</title>", re.IGNORECASE | re.DOTALL)
 
 
-async def _fetch_url_title(url: str, timeout: float = 3.0) -> Optional[str]:
+async def _fetch_url_title(url: str, timeout: float = 3.0) -> Optional[str]:  # pragma: no cover - 依赖外部网络，不稳定
     try:
         async with httpx.AsyncClient(timeout=timeout, follow_redirects=True) as client:
             resp = await client.get(url)
