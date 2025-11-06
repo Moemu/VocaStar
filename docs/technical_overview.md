@@ -83,6 +83,35 @@
 - `migrate_add_state_payload.py` 迁移脚本新增 `state_payload` 并回填默认模版，确保流程可继续。
 - 服务层根据用户选择在 `cosplay_sessions` 中维护剧情进度与历史分支。
 
+### 4.6 社区模块（群组/帖子/附件仓库）
+
+- 领域拆分：`community_groups`（分类、群组、成员、点赞）、`community_posts`（帖子、评论、点赞、附件）、`repository`（资源库聚合视图）。
+- 服务层：`PostService` 负责帖子流、附件聚合、URL 标题抓取与附件上传（类型白名单/大小限制/目录分区）。
+- 关键约束：
+  - 附件类型白名单：{image, document, video, pdf, code}
+  - 文件大小：`config.max_upload_size`
+  - 存储路径：`static/uploads/YYYY/MM/<uuid>.<ext>`；外链前缀 `config.uploads_url_prefix`
+- 仓库视图：基于 `CommunityPostAttachment` 联合 `CommunityPost` 的发布时间构建资源仓库，支持按类型与群组筛选、分页；仅统计可下载类附件（document/video/pdf/code）。
+- 网络不确定性隔离：URL 标题抓取 `_fetch_url_title` 依赖外部网络，已用 `# pragma: no cover` 标记排除覆盖率。
+
+### 4.7 职业导师 与 学习伙伴
+
+- 职业导师:
+  - 搜索支持关键词 `q` 与技能 `skill` 过滤；
+  - 领域（domain）按需自动创建/确保存在（idempotent）；
+  - 返回导师基本资料与技能/领域标签。
+- 学习伙伴:
+  - 支持搜索/分页、绑定与解绑（用户-伙伴关系）；
+  - 推荐列表结合基础规则与去重策略；
+  - “我的伙伴”返回当前用户已绑定对象。
+
+### 4.8 个人中心
+
+- 汇总：最近测评、推荐、收藏与积分概览。
+- Explorations：探索记录 upsert，避免重复；
+- Favorites：职业/帖子收藏管理；
+- Wrongbook：错题本记录与检索（便于复习与成长跟踪）。
+
 ## 5. 数据与存储
 
 - 关系模型集中于 `app/models`：
@@ -91,6 +120,15 @@
   - 职业生态通过 `career_galaxies` → `careers` → `career_recommendations` 联动。
 - 数据导入脚本（`scripts/import_*.py`）从 YAML 初始化职业、测评与 Cosplay 数据。
 - Redis 支持会话缓存、黑名单与潜在的排行榜等实时数据诉求。
+
+### 5.1 上传与静态资源
+
+- 配置项：
+  - `uploads_dir`：本地写入根目录（默认 `app/static/uploads`）。
+  - `uploads_url_prefix`：对外可访问的 URL 前缀（默认 `/static/uploads`）。
+  - `max_upload_size`：最大上传大小（字节）。
+- 安全性：对扩展名做保留处理但文件名统一使用 UUID；拒绝不在白名单类型中的上传；超过大小返回错误。
+- 目录分区：按年/月分桶，降低单目录文件数。
 
 ## 6. 配置与运维
 
@@ -101,6 +139,17 @@
   1. 首选 Alembic（如 FAQ 所述）或使用提供的脚本执行增量变更。
   2. 积分与签到逻辑事务性更新，确保数据一致性。
 
+### 6.1 LLM 配置与降级
+
+- `LLMService` 采用 OpenAI 兼容接口；当未配置或开关关闭时，相关功能自动降级为禁用模式（返回占位或跳过调用），避免对外部依赖的硬性耦合。
+
+### 6.2 背景任务与报告队列
+
+- Holland 报告生成可由后台队列异步处理，避免阻塞请求线程；
+- 队列 worker 的生命周期循环、阻塞等待与处理流程标记为 `no-cover`，原因是：
+  - 与 I/O、时间调度强相关，单测 ROI 低且易产生异步竞态；
+  - 建议以集成/端到端方式验证。
+
 ## 7. 质量保障
 
 - 测试框架：`pytest` + `pytest-asyncio`。`tests/database.py` 使用内存 SQLite 初始化 schema。
@@ -109,6 +158,17 @@
   - 同日重复访问不会重复奖励。
 - Pipeline：GitHub Actions 运行 `pytest` 与覆盖率统计（见 README 徽章）。
 - 类型与风格：`mypy`、`black`、`isort`、`flake8` 通过 pre-commit 管理。
+
+### 7.1 覆盖率策略与排除项
+
+- 优先覆盖：
+  - 业务关键路径（鉴权、测评评分、职业推荐、社区流转、上传校验）。
+  - 边界/异常路径（无权限、参数校验失败、空数据、分页越界）。
+- 排除（no-cover 合理性）：
+  - 依赖外部网络或不稳定源（如 `_fetch_url_title`）。
+  - 无限循环/守护线程（队列 worker 生命周期）。
+  - 与框架强耦合且回归价值有限的启动管线。
+- 原则：排除项须在代码与文档中显式标注，保持最小化与可审计。
 
 ## 8. 安全与合规
 
@@ -123,6 +183,12 @@
 - 数据访问集中在 service 层，可针对高频接口加入 Redis 缓存或异步任务处理。
 - 积分、推荐等功能抽象成独立服务，易于拆分为微服务或接入消息队列。
 - 预留 LLM 配置（`llm_api_*`），可无缝对接 OpenAI 兼容模型优化职业推荐说明。
+
+### 9.1 社区时间线与资源库性能
+
+- 时间线查询采用轻量聚合 + 批量查询作者/附件/评论预览，控制 N+1；
+- 资源库基于 Attachment + Post 的连接查询，按创建时间倒序与类型过滤，分页限制避免大响应；
+- 附件列表在渲染时做上限保护（如每帖最多显示前 50 个附件）。
 
 ## 10. 未来规划
 

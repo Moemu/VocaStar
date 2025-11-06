@@ -215,18 +215,45 @@ docker-compose down
 | `/api/community/groups/posts/{postId}/like`      | POST   | 给动态点赞（幂等）                            |
 | `/api/community/groups/posts/{postId}/comments`  | POST   | 在动态下发布评论                              |
 | `/api/community/groups/repository`               | GET    | 资料库（分页，按 文档/视频/PDF/代码 分类）     |
+| `/api/community/groups/attachments/upload`       | POST   | 上传附件（image/document/video/pdf/code），返回可用 URL |
 
-子路由：`/api/community/partners`（预留）
+子路由：`/api/community/partners`
 
-- 伙伴列表：`GET /api/community/partners`
+| API                                            | 方法   | 说明                                   |
+| ---------------------------------------------- | ------ | -------------------------------------- |
+| `/api/community/partners/search`               | GET    | 搜索伙伴（关键词/技能，分页）            |
+| `/api/community/partners/hot-skills`           | GET    | 热门技能标签 Top-N                      |
+| `/api/community/partners/recommended`          | GET    | 推荐伙伴（登录时排除已绑定，隐藏进度）     |
+| `/api/community/partners/{partnerId}/bind`     | POST   | 绑定伙伴（幂等）                         |
+| `/api/community/partners/{partnerId}/bind`     | DELETE | 解绑伙伴（幂等）                         |
+| `/api/community/partners/my`                   | GET    | 我的伙伴（分页，隐藏技术栈）              |
 
-子路由：`/api/community/mentors`（预留）
+子路由：`/api/community/mentors`
 
-- 导师列表：`GET /api/community/mentors`
+| API                                            | 方法   | 说明                                   |
+| ---------------------------------------------- | ------ | -------------------------------------- |
+| `/api/community/mentors/domains`               | GET    | 导师领域列表（自动补全默认领域）          |
+| `/api/community/mentors/search`                | GET    | 搜索导师（关键词/技能/领域，分页）        |
+| `/api/community/mentors/{mentorId}/request`    | POST   | 创建导师咨询/提问申请（需登录）           |
 
 说明：
 - 动态附件中的 URL 会在发布时尝试解析网页 `<title>` 作为标题（失败则为空，不阻塞发布）。
 - 资料库是对动态中“文档/视频/PDF/代码”类型附件的聚合，不单独提供上传接口。
+
+**个人中心（Profile Center）相关**
+
+子路由：`/api/profile`
+
+| API                            | 方法 | 说明                               |
+| ------------------------------ | ---- | ---------------------------------- |
+| `/api/profile/me`              | GET  | 获取我的资料（头像/昵称/简介/积分） |
+| `/api/profile/me`              | POST | 设置我的资料（头像/昵称/简介）       |
+| `/api/profile/dashboard`       | GET  | 我的首页看板（最近测评画像与推荐）   |
+| `/api/profile/explorations`    | POST | 批量写入职业探索进度（幂等 upsert）   |
+| `/api/profile/explorations`    | GET  | 获取职业探索进度列表                 |
+| `/api/profile/favorites`       | POST | 添加收藏（支持 career 等条目）       |
+| `/api/profile/favorites`       | GET  | 收藏列表                             |
+| `/api/profile/wrongbook`       | GET  | 错题本（剧本练习错题记录）           |
 
 | API                 | 方法 | 说明                   |
 | ------------------- | ---- | ---------------------- |
@@ -302,6 +329,9 @@ python migrate/add_community_posts.py
 | static_dir        | `STATIC_DIR`           | `app/static`                     | 静态资源目录（可覆盖） |
 | avatar_url_prefix | `AVATAR_URL_PREFIX`    | `/static/avatars`                | 头像访问前缀，用于拼接 URL |
 | max_avatar_size   | `MAX_AVATAR_SIZE`      | `2097152`                        | 头像大小上限（字节） |
+| uploads_subdir    | `UPLOADS_SUBDIR`       | `uploads`                        | 通用附件子目录（相对 `static_dir`） |
+| uploads_url_prefix| `UPLOADS_URL_PREFIX`   | `/static/uploads`                | 通用附件 URL 前缀 |
+| max_upload_size   | `MAX_UPLOAD_SIZE`      | `20971520`                       | 通用附件大小上限（字节，默认 20MB） |
 | jwxt_encryption_key | `JWXT_ENCRYPTION_KEY`| 自动生成的示例密钥               | 教务系统密码加密密钥 |
 | jwxt_sync_interval_days | `JWXT_SYNC_INTERVAL_DAYS` | `90`                  | 教务数据自动同步间隔 |
 | llm_api_base_url  | `LLM_API_BASE_URL`     | 空字符串                         | OpenAI 兼容接口地址 |
@@ -338,14 +368,14 @@ python migrate/add_community_posts.py
 
 ### 运行测试
 
-```shell
-# 安装测试依赖
+```powershell
+# 使用 uv 运行（推荐）
+uv run pytest -q
+uv run coverage run -m pytest
+uv run coverage html  # 生成 html 覆盖率报告
+
+# 或使用 pip/pytest 运行
 pip install .[test]
-
-# 运行所有测试
-pytest
-
-# 运行测试并生成覆盖率报告
 pytest --cov=app --cov-report=html
 
 # 查看覆盖率报告
