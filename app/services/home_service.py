@@ -21,6 +21,7 @@ from app.schemas.home import (
     TodayPointsSummary,
 )
 from app.schemas.quiz import QuizReportData
+from app.services.achievement_service import AchievementService
 from app.services.quiz_service import DIMENSION_LABELS
 
 _REFRESH_REASON = "适合探索者"
@@ -139,6 +140,8 @@ class HomeService:
         self.session.add(transaction)
         logger.info("用户 %s 完成每日签到，奖励积分 %s", user.id, _SIGN_IN_POINTS)
         await self.session.commit()
+        # 成就：签到事件触发
+        await AchievementService(self.session).evaluate_and_award(user.id, events=["sign_in"])
 
     async def _get_today_points(self, user: User) -> TodayPointsSummary:
         """统计用户当日的积分情况。"""

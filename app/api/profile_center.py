@@ -1,13 +1,15 @@
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.deps.auth import get_current_user
 from app.deps.sql import get_db
 from app.models.extensions import FavoriteItemType
 from app.models.user import User
-from app.schemas.profile_center import (
+from app.schemas.profile_center import (  # 新增：成就查询响应将动态构造，不需要预定义复杂模型，这里后续可加 Pydantic Schema
+    AchievementItem,
+    AchievementListResponse,
     AddFavoriteRequest,
     DashboardResponse,
     ExplorationListResponse,
@@ -75,10 +77,26 @@ async def upsert_explorations(
 
 @router.get("/explorations", response_model=ExplorationListResponse)
 async def list_explorations(
-    db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+    limit: int = Query(4, ge=1, le=20, description="返回的最大探索项数量，默认4，范围1-20"),
 ) -> ExplorationListResponse:
     svc = get_service(db)
-    return await svc.list_explorations(current_user)
+    return await svc.list_explorations(current_user, limit=limit)
+
+
+# ------- 成就 -------
+
+
+@router.get("/achievements", response_model=AchievementListResponse)
+async def list_achievements(
+    db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)
+) -> AchievementListResponse:
+    from app.services.achievement_service import AchievementService
+
+    svc = AchievementService(db)
+    items = await svc.list_with_progress(current_user.id)
+    return AchievementListResponse(items=[AchievementItem(**it) for it in items])
 
 
 # ------- 收藏夹 -------

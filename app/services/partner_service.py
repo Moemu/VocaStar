@@ -84,6 +84,10 @@ class PartnerService:
         """绑定伙伴（幂等）。"""
         await self.repo.bind_partner(user_id=current_user.id, partner_id=partner_id)
         # 可按需更新受欢迎度/统计，这里先保持简单
+        # 成就：伙伴绑定事件
+        from app.services.achievement_service import AchievementService
+
+        await AchievementService(self.session).evaluate_and_award(current_user.id, events=["partner_bind"])
         return BindState(bound=True)
 
     async def unbind(self, *, current_user: User, partner_id: int) -> BindState:

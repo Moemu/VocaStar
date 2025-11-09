@@ -21,6 +21,7 @@ from app.schemas.profile_center import (
     WrongbookListResponse,
 )
 from app.schemas.user import UserProfileSummary, UserSetProfileRequest
+from app.services.achievement_service import AchievementService
 
 HOLLAND_DESCRIPTIONS = {
     "R": "现实型：动手实践，坚韧可靠",
@@ -80,11 +81,15 @@ class ProfileCenterService:
             payload = report.result_json
             code = payload.get("holland_code") or ""
             dim_scores = payload.get("dimension_scores") or {}
+            # 只保留 unique_advantage；若为空则回退到基于 code 的分析文案
+            ua = payload.get("unique_advantage")
+            if not ua:
+                ua = _analysis_for_code(code)
             holland = HollandPortrait(
+                report_id=report.id,  # 关联的测评报告ID
                 code=code,
                 dimension_scores=dim_scores,
-                analysis=_analysis_for_code(code),
-                unique_advantage=payload.get("unique_advantage"),
+                unique_advantage=ua,
             )
             # 推荐结果可直接使用测评时生成的推荐
             recs = payload.get("recommendations") or []
@@ -108,13 +113,25 @@ class ProfileCenterService:
         pairs = [(it.career_id, it.explored_blocks) for it in items]
         await self.repo.upsert_explorations(user.id, pairs)
         await self.session.commit()
+        # 成就：探索进度更新后触发
+        await AchievementService(self.session).evaluate_and_award(user.id, events=["exploration"])
 
-    async def list_explorations(self, user: User) -> ExplorationListResponse:
+    async def list_explorations(self, user: User, *, limit: int = 4) -> ExplorationListResponse:
+        """列出探索进度，并填充不足 limit 的其余推荐位为“未开始”。
+
+        逻辑：
+        1. 查询用户已存在的探索记录并构造进度。
+        2. 若记录数 < limit，则从职业表中补充尚未探索的职业，直到达到 limit 或无更多可补。
+        3. 未开始的条目 explored_blocks=0, progress_percent=0, updated_at=None。
+        """
+        limit = max(1, min(20, limit))  # 安全上限，避免一次性返回过大
         rows = await self.repo.list_explorations(user.id)
         records: list[ExplorationRecord] = []
+        explored_ids: set[int] = set()
         for progress, career in rows:
             explored = max(0, min(4, progress.explored_blocks))
             percent = int(explored / 4 * 100) if explored else 0
+            explored_ids.add(progress.career_id)
             records.append(
                 ExplorationRecord(
                     career_id=progress.career_id,
@@ -125,7 +142,36 @@ class ProfileCenterService:
                     updated_at=progress.updated_at,
                 )
             )
-        return ExplorationListResponse(items=records)
+
+        # 若不足 limit，补全未探索职业
+        if len(records) < limit:
+            # 直接拉取部分职业表（按 ID 升序）补位
+            from sqlalchemy import select
+
+            from app.models.career import Career
+
+            need = limit - len(records)
+            stmt = (
+                select(Career)
+                .where(~Career.id.in_(explored_ids) if explored_ids else True)
+                .order_by(Career.id.asc())
+                .limit(need)
+            )
+            res = await self.session.execute(stmt)
+            for c in res.scalars().all():
+                records.append(
+                    ExplorationRecord(
+                        career_id=c.id,
+                        career_name=c.name,
+                        explored_blocks=0,
+                        total_blocks=4,
+                        progress_percent=0,
+                        updated_at=None,
+                    )
+                )
+
+        # 截断到 limit（如果用户已有记录超过 limit）
+        return ExplorationListResponse(items=records[:limit])
 
     # ---- Favorites ----
     async def add_favorite(self, user: User, item_type: FavoriteItemType, item_id: int) -> None:

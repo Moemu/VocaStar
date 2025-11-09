@@ -210,6 +210,10 @@ class CosplayService:
             record.state = SessionState.completed
             record.finished_at = datetime.now(timezone.utc)
             await self._ensure_report(record, content, state_payload)
+            # 成就：Cosplay 完成事件
+            from app.services.achievement_service import AchievementService
+
+            await AchievementService(self.session).evaluate_and_award(record.user_id, events=["cosplay_completed"])
 
         await self.session.commit()
         await self.session.refresh(record, attribute_names=["report"])

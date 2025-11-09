@@ -9,9 +9,9 @@ from pydantic import BaseModel, Field
 
 
 class HollandPortrait(BaseModel):
+    report_id: int = Field(..., description="关联的测评报告ID")
     code: str = Field(..., description="霍兰德三字母代码，如 ASE")
     dimension_scores: dict[str, int] = Field(..., description="各维度分数 R/I/A/S/E/C")
-    analysis: str = Field(..., description="个性化分析文案")
     unique_advantage: Optional[str] = Field(
         None,
         description="基于霍兰德组合的核心优势文案",
@@ -47,7 +47,7 @@ class ExplorationRecord(BaseModel):
     explored_blocks: int = Field(..., description="已探索区块数")
     total_blocks: int = Field(4, description="区块总数(固定为4)")
     progress_percent: int = Field(..., description="进度百分比(0-100)")
-    updated_at: datetime = Field(..., description="最近更新时间")
+    updated_at: datetime | None = Field(None, description="最近更新时间，未开始可为空")
 
 
 class ExplorationListResponse(BaseModel):
@@ -89,3 +89,22 @@ class FavoriteRecord(BaseModel):
 
 class FavoriteListResponse(BaseModel):
     items: list[FavoriteRecord] = Field(..., description="收藏记录列表")
+
+
+# -------- 成就 --------
+
+
+class AchievementItem(BaseModel):
+    code: str = Field(..., description="成就代码")
+    name: str = Field(..., description="成就名称")
+    description: str = Field(..., description="成就描述")
+    points: int = Field(0, description="成就积分")
+    progress: int = Field(0, description="当前进度值")
+    threshold: int = Field(0, description="达成阈值")
+    progress_percent: int = Field(0, ge=0, le=100, description="进度百分比(0-100)")
+    achieved: bool = Field(False, description="是否已达成")
+    achieved_at: datetime | None = Field(None, description="达成时间，未达成为空")
+
+
+class AchievementListResponse(BaseModel):
+    items: list[AchievementItem] = Field(default_factory=list, description="成就列表")

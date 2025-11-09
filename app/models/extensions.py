@@ -222,10 +222,13 @@ class Achievement(Base):
     __tablename__ = "achievements"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True, autoincrement=True, comment="主键ID")
+    code: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, comment="成就代码，用于逻辑匹配")
     name: Mapped[str] = mapped_column(String(100), nullable=False, comment="成就名称")
     description: Mapped[str] = mapped_column(Text, nullable=False, comment="成就描述")
     badge_url: Mapped[Optional[str]] = mapped_column(String(500), nullable=True, comment="徽章图片URL")
     points: Mapped[int] = mapped_column(Integer, nullable=False, default=0, comment="成就积分")
+    condition_type: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, comment="条件类型(简化版本)")
+    threshold: Mapped[Optional[int]] = mapped_column(Integer, nullable=True, comment="达成阈值")
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
