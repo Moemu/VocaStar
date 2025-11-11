@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.schemas.community import Pagination
@@ -75,6 +77,7 @@ class PartnerMyItem(BaseModel):
     avatar_url: str | None = Field(None, description="头像 URL，可为空")
     profession: str = Field(..., description="职业/岗位")
     learning_progress: int = Field(0, ge=0, le=100, description="学习进度百分比（0-100）")
+    updated_at: datetime = Field(..., description="最后更新时间")
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -84,6 +87,7 @@ class PartnerMyItem(BaseModel):
                 "avatar_url": "/static/avatars/u103.png",
                 "profession": "产品经理",
                 "learning_progress": 40,
+                "updated_at": "2024-06-01T12:34:56Z",
             }
         }
     )

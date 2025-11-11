@@ -13,6 +13,7 @@ from app.schemas.mentors import (
     MentorListResponse,
     MentorRequestCreate,
     MentorRequestItem,
+    MyMentorListResponse,
 )
 from app.services.mentor_service import MentorService
 
@@ -59,3 +60,16 @@ async def create_request(
 ):
     service = MentorService(db)
     return await service.create_request(current_user=current_user, mentor_id=mentor_id, payload=payload)
+
+
+@router.get(
+    "/my",
+    summary="我的职业导师（曾申请过的导师）",
+    response_model=MyMentorListResponse,
+)
+async def my_mentors(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
+):
+    service = MentorService(db)
+    return await service.my_mentors(current_user=current_user)

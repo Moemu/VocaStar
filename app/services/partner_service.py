@@ -107,6 +107,7 @@ class PartnerService:
                 avatar_url=p.avatar_url,
                 profession=p.profession,
                 learning_progress=p.learning_progress,
+                updated_at=p.updated_at,
             )
             for p in partners
         ]

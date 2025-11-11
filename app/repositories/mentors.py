@@ -154,5 +154,21 @@ class MentorsRepository:
             # duration_min=duration_min,
         )
         self.session.add(obj)
-        await self.session.flush()
+        await self.session.commit()
+        await self.session.refresh(obj)
         return obj
+
+    async def my_mentors(self, *, user_id: int) -> list[CommunityMentor]:
+        """返回用户已提交过申请的导师（去重）。
+
+        逻辑：找到 MentorRequest 中 user_id 匹配的所有 mentor_id，去重后取导师基本信息。
+        """
+        sub = select(MentorRequest.mentor_id).where(MentorRequest.user_id == user_id).distinct()
+        stmt = (
+            select(CommunityMentor)
+            .where(CommunityMentor.id.in_(sub))
+            .where(CommunityMentor.is_active.is_(True))
+            .order_by(CommunityMentor.popularity.desc(), CommunityMentor.id.asc())
+        )
+        mentors = list((await self.session.execute(stmt)).scalars().all())
+        return mentors

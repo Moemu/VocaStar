@@ -62,3 +62,18 @@ class MentorRequestCreate(BaseModel):
 class MentorRequestItem(BaseModel):
     id: int
     status: str = Field(..., description="pending/accepted/rejected/cancelled")
+
+
+class MyMentorItem(BaseModel):
+    """我的职业导师列表项：只展示基本公开信息。"""
+
+    id: int = Field(..., description="导师ID")
+    name: str = Field(..., description="导师姓名/展示名")
+    avatar_url: str | None = Field(None, description="头像URL")
+    profession: str = Field(..., description="导师职业/职能")
+    company: str | None = Field(None, description="所在公司")
+    rating: float = Field(0, ge=0, le=5, description="评分 0-5")
+
+
+class MyMentorListResponse(BaseModel):
+    items: list[MyMentorItem] = Field(default_factory=list, description="已申请（视为我的）导师列表")

@@ -14,6 +14,8 @@ from app.schemas.mentors import (
     MentorListResponse,
     MentorRequestCreate,
     MentorRequestItem,
+    MyMentorItem,
+    MyMentorListResponse,
 )
 
 
@@ -82,3 +84,19 @@ class MentorService:
             # duration_min=payload.duration_min,
         )
         return MentorRequestItem(id=o.id, status=o.status)
+
+    async def my_mentors(self, *, current_user: User) -> MyMentorListResponse:
+        """我的职业导师：凡提交过申请的，都视作“我的导师”。"""
+        rows = await self.repo.my_mentors(user_id=current_user.id)
+        items = [
+            MyMentorItem(
+                id=m.id,
+                name=m.name,
+                avatar_url=m.avatar_url,
+                profession=m.profession,
+                company=m.company,
+                rating=float(m.rating or 0),
+            )
+            for m in rows
+        ]
+        return MyMentorListResponse(items=items)
