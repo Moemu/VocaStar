@@ -1,6 +1,6 @@
 mentors:
   - name: 陈教授
-    avatar_url:
+    avatar_url: /static/mentors/chen.webp
     profession: 资深前端架构师
     company: 阿里巴巴
     fee_per_hour: 399
@@ -10,7 +10,7 @@ mentors:
     domains: ["frontend"]
 
   - name: 林老师
-    avatar_url:
+    avatar_url: /static/mentors/lin.webp
     profession: 产品总监
     company: 腾讯
     fee_per_hour: 499
@@ -20,7 +20,7 @@ mentors:
     domains: ["product"]
 
   - name: 王老师
-    avatar_url:
+    avatar_url: /static/mentors/wang.webp
     profession: 设计总监
     company: 字节跳动
     fee_per_hour: 459
@@ -30,7 +30,7 @@ mentors:
     domains: ["design"]
 
   - name: 张教授
-    avatar_url:
+    avatar_url: /static/mentors/zhang.webp
     profession: 技术总监
     company: 百度
     fee_per_hour: 599
@@ -40,7 +40,7 @@ mentors:
     domains: ["backend", "ai", "data"]
 
   - name: 刘老师
-    avatar_url:
+    avatar_url: /static/mentors/liu.webp
     profession: iOS技术专家
     company: 苹果中国
     fee_per_hour: 450
@@ -50,7 +50,7 @@ mentors:
     domains: ["mobile"]
 
   - name: 赵老师
-    avatar_url:
+    avatar_url: /static/mentors/zhao.webp
     profession: 市场营销总监
     company: 字节跳动
     fee_per_hour: 420
@@ -60,7 +60,7 @@ mentors:
     domains: ["marketing"]
 
   - name: 孙老师
-    avatar_url:
+    avatar_url: /static/mentors/sun.webp
     profession: DevOps架构师
     company: 亚马逊
     fee_per_hour: 550
@@ -70,7 +70,7 @@ mentors:
     domains: ["devops"]
 
   - name: 郑老师
-    avatar_url:
+    avatar_url: /static/mentors/zheng.webp
     profession: 数据科学家
     company: 美团
     fee_per_hour: 500
