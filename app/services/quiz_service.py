@@ -24,6 +24,7 @@ from app.models.quiz import (
 )
 from app.models.user import User
 from app.repositories.quiz import QuizRepository
+from app.schemas.notifications import NotificationTypeEnum
 from app.schemas.quiz import (
     QuestionSettings,
     QuestionSettingsModel,
@@ -52,6 +53,7 @@ from app.schemas.quiz import (
     QuizValueBalanceAnswer,
     QuizWordChoiceAnswer,
 )
+from app.services.notification_service import NotificationService
 from app.services.quiz_constants import (
     DIMENSION_ADVANTAGE_BENEFITS,
     DIMENSION_ADVANTAGE_KEYWORDS,
@@ -398,8 +400,22 @@ class QuizService:
         await self._award_points(user.id, REWARD_POINTS, reason="完成职业兴趣测评")
         await self.session.commit()
 
+        # 定义报告完成后的回调函数，用于发送通知
+        async def on_report_complete(user_id: int, report_id: int) -> None:
+            """报告生成完成后的回调，用于发送通知。"""
+            try:
+                notification_svc = NotificationService(self.session)
+                await notification_svc.create_notification(
+                    user_id=user_id,
+                    title="你的职业测评报告已生成",
+                    notification_type=NotificationTypeEnum.achievement,
+                    content="您已完成职业兴趣测评，请查看详细报告了解职业方向建议。",
+                )
+            except Exception as exc:  # pragma: no cover
+                logger.warning("创建职业测评通知失败 user_id=%s report_id=%s: %s", user_id, report_id, exc)
+
         try:
-            await report_task_queue.enqueue(ReportJob(report_id=report.id))
+            await report_task_queue.enqueue(ReportJob(report_id=report.id, on_complete=on_report_complete))
         except Exception as exc:  # pragma: no cover - 队列异常兜底
             logger.warning("HollandReport 任务入队失败 report_id=%s: %s", report.id, exc)
 

@@ -12,6 +12,7 @@ from app.api import (
     community_partners,
     cosplay,
     home,
+    notifications,
     profile_center,
     quiz,
     user,
@@ -61,6 +62,7 @@ app.include_router(community_mentors.router, prefix="/api/community/mentors", ta
 app.include_router(cosplay.router, prefix="/api/cosplay", tags=["cosplay"])
 app.include_router(home.router, prefix="/api/home", tags=["home"])
 app.include_router(profile_center.router, prefix="/api/profile", tags=["profile"])
+app.include_router(notifications.router, prefix="/api/notifications", tags=["notifications"])
 
 if __name__ == "__main__":
     import uvicorn

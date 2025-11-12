@@ -7,6 +7,7 @@ from typing import Iterable
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.logger import logger
 from app.models.cosplay import CosplaySession, SessionState
 from app.models.extensions import (
     Achievement,
@@ -167,6 +168,23 @@ class AchievementService:
                 newly_awarded.append(ach.code)
         if newly_awarded:
             await self.session.commit()
+            # 为每个新授予的成就创建通知
+            try:
+                from app.schemas.notifications import NotificationTypeEnum
+                from app.services.notification_service import NotificationService
+
+                notification_svc = NotificationService(self.session)
+                for code in newly_awarded:
+                    ach = next((a for a in achievements if a.code == code), None)
+                    if ach:
+                        await notification_svc.create_notification(
+                            user_id=user_id,
+                            title=f"解锁成就：{ach.name}",
+                            notification_type=NotificationTypeEnum.achievement,
+                            content=f"恭喜！你已解锁成就 {ach.name}，获得 {ach.points} 积分。",
+                        )
+            except Exception as exc:  # pragma: no cover
+                logger.warning("创建成就解锁通知失败 user_id=%s codes=%s: %s", user_id, newly_awarded, exc)
         return newly_awarded
 
     async def _current_progress(self, user_id: int, condition_type: str) -> int:

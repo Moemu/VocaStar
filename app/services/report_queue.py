@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import Optional, cast
+from typing import Any, Callable, Coroutine, Optional, cast
 
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -18,6 +18,8 @@ from app.services.holland_report_generator import HollandReportGenerator
 @dataclass(slots=True)
 class ReportJob:
     report_id: int
+    # 回调应返回一个可等待的协程（而非 Task），以便由调用方通过 create_task 调度
+    on_complete: Optional[Callable[[int, int], Coroutine[Any, Any, None]]] = None
 
 
 class ReportTaskQueue:
@@ -84,6 +86,9 @@ class ReportTaskQueue:
             report_data = QuizReportData.model_validate(report_payload)
             if report_data.holland_report is not None:
                 logger.info("报告已包含 HollandReport，跳过调用 LLM report_id=%s", report.id)
+                # 即使报告已存在，也要调用完成回调
+                if job.on_complete and report.submission:
+                    asyncio.create_task(job.on_complete(report.submission.user_id, job.report_id))
                 return
 
             submission = report.submission
@@ -124,6 +129,10 @@ class ReportTaskQueue:
             report.result_json = cast(QuizReportPayload, updated.model_dump(mode="json"))
             await session.commit()
             logger.info("HollandReport 生成完成 report_id=%s submission_id=%s", report.id, submission.id)
+
+            # 报告生成完成后，调用完成回调发送通知
+            if job.on_complete:
+                asyncio.create_task(job.on_complete(submission.user_id, job.report_id))
 
 
 report_task_queue = ReportTaskQueue()
