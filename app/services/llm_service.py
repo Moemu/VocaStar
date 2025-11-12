@@ -132,6 +132,7 @@ class LLMService:
         system: Optional[str] = None,
         model: Optional[str] = None,
         temperature: float = 0.7,
+        top_p: float = 0.2,
         max_tokens: Optional[int] = None,
         extra_body: Optional[dict[str, Any]] = None,
     ) -> TModel:
@@ -147,6 +148,7 @@ class LLMService:
                 model=model,
                 messages=messages,
                 temperature=temperature,
+                top_p=top_p,
                 max_tokens=max_tokens,
                 response_format=response_model,
                 extra_body=extra_body,

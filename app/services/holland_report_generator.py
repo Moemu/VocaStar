@@ -14,6 +14,7 @@ from app.core.logger import logger
 from app.models.quiz import QuizSubmission, UserProfile
 from app.models.user import User
 from app.schemas.quiz import HollandReport, QuizProfileResponse, QuizReportData
+from app.services.json_repair import JSONRepair
 from app.services.llm_service import LLMService
 from app.services.quiz_constants import (
     DIMENSION_LABELS,
@@ -24,10 +25,12 @@ from app.services.quiz_constants import (
 LLM_SYSTEM_PROMPT = (
     "你是一名资深职业规划师，需要根据霍兰德职业兴趣测评结果，为中文用户撰写结构化的个性化测评总结。"
     "请使用积极、务实的语气，以简体中文输出，严格遵循提供的 Pydantic 模型结构。"
+    "重点强调：你必须仅输出有效的 JSON，不要包含任何额外文本、解释、代码块标记或格式化。"
+    "所有字段名必须使用英文双引号，不要有任何转义错误。"
 )
 
 LLM_MAX_TOKENS = 1200
-LLM_TEMPERATURE = 0.35
+LLM_TEMPERATURE = 0.2  # 降低 temperature 以获得更一致的格式
 LLM_MAX_RETRIES = 3
 LLM_RETRY_DELAY_SECONDS = 1.5
 
@@ -82,17 +85,22 @@ class HollandReportGenerator:
         }
 
         instructions = (
-            "请根据以下用户背景和霍兰德测评数据生成结构化报告，严格输出 JSON 字符串，不要包含多余文本或代码块。"
-            "JSON 结构必须与下列示例字段完全一致："
-            '{"career_directions":[{"career":"...","description":"...","recommended_action":["...","...","..."]},'
-            '{"career":"...","description":"...","recommended_action":["...","...","..."]},'
-            '{"career":"...","description":"...","recommended_action":["...","...","..."]}],'  # noqa: E501
-            '"action_roadmap":{"small_goals":[{"title":"...","content":"..."},'
-            '{"title":"...","content":"..."},{"title":"...","content":"..."}],"need_attention":"...","conclusion":"..."}}'  # noqa: E501
+            "请根据以下用户背景和霍兰德测评数据生成结构化报告。"
+            "必须仅输出以下 JSON 格式的数据，不要包含任何代码块标记、解释文字或额外内容："
+            "{"
+            '"career_directions":['
+            '{"career":"职业名称","description":"简短描述（不超过100字）","recommended_action":["行动1","行动2","行动3"]},'
+            "略...3个职业],"
+            '"action_roadmap":{"small_goals":[{"title":"目标名称","content":"详细内容"},...3个目标],'
+            '"need_attention":"重点提示（不超过120字）","conclusion":"总结结论（不超过120字)"}}'
             "。"
-            "每个 career_directions.description 不超过 100 字，recommended_action 严格输出 3 条，单条不超过 40 字；"
-            "small_goals 只输出 3 个，title 不超过 15 字，content 不超过 50 字；need_attention 与 conclusion 各不超过 120 字。"
-            "若信息缺失请结合测评数据合理补充，不要输出 null 或空字符串。"
+            "严格要求："
+            "- 每个 career_directions 元素包含 career、description、recommended_action 三个字段"
+            "- description 不超过 100 字，recommended_action 固定 3 条，每条不超过 40 字"
+            "- action_roadmap 包含 small_goals（3个）、need_attention、conclusion 三个字段"
+            "- small_goals 中 title 不超过 15 字，content 不超过 50 字"
+            "- 所有字段值不能为 null 或空字符串"
+            "- 不要在 JSON 前后添加任何说明文字或 Markdown 标记"
         )
 
         payload_text = json.dumps(context, ensure_ascii=False, separators=(",", ":"))
@@ -158,18 +166,42 @@ class HollandReportGenerator:
             try:
                 payload = json.loads(json_text)
             except json.JSONDecodeError as exc:
-                preview = textwrap.shorten(json_text, width=180, placeholder="...")
-                logger.warning(
-                    "LLM 返回内容无法解析为 JSON submission_id=%s attempt=%s error=%s preview=%s",
-                    submission.id,
-                    attempt,
-                    exc,
-                    preview,
-                )
-                if attempt >= LLM_MAX_RETRIES:
-                    return None
-                await asyncio.sleep(LLM_RETRY_DELAY_SECONDS)
-                continue
+                # 尝试修复 JSON
+                repaired_text = JSONRepair.attempt_repair(json_text)
+                if repaired_text:
+                    try:
+                        payload = json.loads(repaired_text)
+                        logger.info(
+                            "LLM 返回的 JSON 已自动修复 submission_id=%s attempt=%s",
+                            submission.id,
+                            attempt,
+                        )
+                    except json.JSONDecodeError as repair_exc:
+                        preview = textwrap.shorten(json_text, width=360, placeholder="...")
+                        logger.warning(
+                            "LLM 返回 JSON 无法修复 submission_id=%s attempt=%s error=%s preview=%s",
+                            submission.id,
+                            attempt,
+                            repair_exc,
+                            preview,
+                        )
+                        if attempt >= LLM_MAX_RETRIES:
+                            return None
+                        await asyncio.sleep(LLM_RETRY_DELAY_SECONDS)
+                        continue
+                else:
+                    preview = textwrap.shorten(json_text, width=360, placeholder="...")
+                    logger.warning(
+                        "LLM 返回内容无法解析为 JSON submission_id=%s attempt=%s error=%s preview=%s",
+                        submission.id,
+                        attempt,
+                        exc,
+                        preview,
+                    )
+                    if attempt >= LLM_MAX_RETRIES:
+                        return None
+                    await asyncio.sleep(LLM_RETRY_DELAY_SECONDS)
+                    continue
 
             try:
                 return HollandReport.model_validate(payload)
