@@ -39,16 +39,16 @@ from app.models.user import User, UserRole  # noqa: E402
 from app.services.auth_service import get_password_hash  # noqa: E402
 
 AVATAR_POOL = [
-    "/static/placeholders/placeholder_01.png",
-    "/static/placeholders/placeholder_02.png",
-    "/static/placeholders/placeholder_03.png",
-    "/static/placeholders/placeholder_04.png",
-    "/static/placeholders/placeholder_05.png",
-    "/static/placeholders/placeholder_06.png",
-    "/static/placeholders/placeholder_07.png",
-    "/static/placeholders/placeholder_08.png",
-    "/static/placeholders/placeholder_09.png",
-    "/static/placeholders/placeholder_10.png",
+    "/static/placeholders/01.png",
+    "/static/placeholders/02.png",
+    "/static/placeholders/03.png",
+    "/static/placeholders/04.png",
+    "/static/placeholders/05.png",
+    "/static/placeholders/06.png",
+    "/static/placeholders/07.png",
+    "/static/placeholders/08.png",
+    "/static/placeholders/09.png",
+    "/static/placeholders/10.png",
 ]
 
 # ---------------- internal nickname pool helpers ----------------
