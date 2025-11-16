@@ -1,3 +1,5 @@
+本项目作为学校软件设计大赛的决赛作品（后端实现），已于 2025/11/16 光荣完成它的使命并荣获二等奖，本仓库即日进入存档状态
+
 # VocaStar
 
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
