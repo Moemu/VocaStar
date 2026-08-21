@@ -24,11 +24,17 @@ VocaStar 使用 [gitmoji](https://gitmoji.dev/) 作为主 commit 规范
 
 ## Pull Request
 
+本仓库为全栈项目：后端（FastAPI）位于 [`backend/`](./backend/README.md)，前端（Vue 3）位于 [`frontend/`](./frontend/README.md)。请先阅读对应目录下的 README 了解开发环境搭建方式。
+
+> 📌 后端 Python 命令（`uv sync`、`pytest`、数据导入脚本等）默认在 `backend/` 目录下执行；前端命令（`pnpm install`、`pnpm dev` 等）在 `frontend/` 目录下执行；`pre-commit` 在仓库根目录执行。
+
 VocaStar 使用 pre-commit 进行代码规范管理，因此在提交代码前，我们推荐安装 pre-commit 并通过代码检查：
 
 ```shell
+# 在 backend/ 目录下执行
 pip install .[test]
 
+# 在仓库根目录执行
 pre-commit install
 ```
 

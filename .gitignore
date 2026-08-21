@@ -147,8 +147,7 @@ dist/
 doc_build/
 
 # App
-Pages/
 *.db
-.vscode/
-app/static/uploads/
-app/static/avatars/
+/.vscode/
+backend/app/static/uploads/
+backend/app/static/avatars/
