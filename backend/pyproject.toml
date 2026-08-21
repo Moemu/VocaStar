@@ -28,6 +28,10 @@ dependencies = [
     "openai>=2.2.0",
 ]
 
+[tool.setuptools.packages.find]
+# 仅安装 app 包；assets/scripts/migrate 是运行时数据与脚本，不作为分发包
+include = ["app*"]
+
 [project.optional-dependencies]
 test = [
     "coverage>=7.10.6",
