@@ -7,8 +7,8 @@ WORKDIR /app
 # Upgrade pip and install dependencies
 RUN pip install --upgrade pip
 
-# Copy pyproject.toml
-COPY pyproject.toml ./
+# Copy pyproject.toml and README.md (required by the [project] readme field)
+COPY pyproject.toml README.md ./
 
 # Install dependencies
 RUN pip install --no-cache-dir .

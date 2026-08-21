@@ -5,11 +5,16 @@ __pycache__/
 *.pyd
 .Python
 env/
+.venv/
 pip-selfcheck.json
 
 # VS Code
 .vscode/
 .history/
+
+# Caches
+.mypy_cache/
+.pytest_cache/
 
 # Build artifacts
 build/
@@ -44,3 +49,10 @@ logs/
 *.user
 *.sln
 *.userprefs
+
+# Local data & non-runtime dirs (image only ships app/ assets/ scripts/)
+database.db
+.env
+tests/
+docs/
+migrate/

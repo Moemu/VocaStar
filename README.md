@@ -1,14 +1,18 @@
-本项目作为学校软件设计大赛的决赛作品（后端实现），已于 2025/11/16 光荣完成它的使命并荣获二等奖，本仓库即日进入存档状态
-
 # VocaStar
 
 ![Python](https://img.shields.io/badge/Python-3.12-blue)
+![Vue](https://img.shields.io/badge/Vue-3.5-42b883)
 ![Black CodeStyle](https://img.shields.io/badge/Code%20Style-Black-121110.svg)
 ![wakatime](https://wakatime.com/badge/user/637d5886-8b47-4b82-9264-3b3b9d6add67/project/d6391b48-7f4e-46ad-94f1-34221f72a2ed.svg)
 [![Test and Coverage](https://github.com/Moemu/VocaStar/actions/workflows/pytest.yaml/badge.svg)](https://github.com/Moemu/VocaStar/actions/workflows/pytest.yaml)
-![coverage](./src/coverage.svg)
+![coverage](./.github/badges/coverage.svg)
 
-VocaStar 是一个基于 FastAPI 的职业规划与测评平台后端服务。提供用户认证、职业探索、个性化测评、Cosplay 剧本体验等功能，帮助用户发现和规划职业发展路径。
+VocaStar 是一个职业规划与测评平台，本仓库包含完整的前后端代码：
+
+- **[`backend/`](./backend/README.md)** — 后端服务 VocaStar：基于 FastAPI，提供用户认证、职业探索、个性化测评、Cosplay 剧本体验、学习社区等功能
+- **[`frontend/`](./frontend/README.md)** — Web 前端 CareerVoyage：基于 Vue 3 + Vite 的单页应用
+
+> 🏅 本项目为学校软件设计大赛决赛作品，荣获二等奖（2025/11）。
 
 ## ✨ 主要特性
 
@@ -23,7 +27,8 @@ VocaStar 是一个基于 FastAPI 的职业规划与测评平台后端服务。�
 
 - [快速开始](#快速开始)
   - [环境要求](#环境要求)
-  - [本地开发](#本地开发)
+  - [启动后端](#启动后端)
+  - [启动前端](#启动前端)
   - [Docker 部署](#Docker-部署)
 - [API 文档](#api-文档)
 - [数据导入](#导入数据)
@@ -38,8 +43,9 @@ VocaStar 是一个基于 FastAPI 的职业规划与测评平台后端服务。�
 - Python >= 3.12
 - [uv](https://docs.astral.sh/uv/) (推荐) 或 pip
 - Redis >= 6.0
+- Node.js `^20.19.0 || >=22.12.0` 与 [pnpm](https://pnpm.io/)（仅前端开发需要）
 
-### 本地开发
+### 启动后端
 
 **1. 克隆仓库**
 
@@ -48,19 +54,17 @@ git clone https://github.com/Moemu/VocaStar.git
 cd VocaStar
 ```
 
-**2. 安装依赖**
+**2. 安装依赖并导入初始数据**（以下命令均在 `backend/` 目录下执行）
 
-使用 uv (推荐):
 ```shell
+cd backend
+
+# 使用 uv (推荐)
 uv sync
-```
 
-或使用 pip:
-```shell
+# 或使用 pip
 pip install .
 ```
-
-**3. 导入初始数据**
 
 ```shell
 # 使用 uv
@@ -78,7 +82,7 @@ python migrate/add_community_tables.py
 python migrate/add_community_posts.py
 ```
 
-**4. 启动服务**
+**3. 启动服务**
 
 ```shell
 # 使用 uv
@@ -88,21 +92,30 @@ uv run python -m app.main
 python -m app.main
 ```
 
-服务将在 <http://127.0.0.1:8080> 启动
+服务将在 <http://127.0.0.1:8080> 启动。
+
+### 启动前端
+
+前端详见 [`frontend/README.md`](./frontend/README.md)，简要步骤：
+
+```shell
+cd frontend
+pnpm install
+cp .env.example .env   # 默认留空即可
+pnpm dev
+```
+
+打开 <http://localhost:5173>，开发模式下 `/api` 与 `/static` 请求自动代理到 `http://127.0.0.1:8080`。
 
 ### Docker 部署
 
-**1. 准备数据目录和配置文件**
+**1. 准备配置文件**
+
+数据库通过 docker compose 命名卷持久化，无需手动创建数据目录。在 `backend/` 目录下创建 `.env` 文件（compose 的 `env_file` 为必填项，缺失会启动失败）：
 
 ```shell
-# 创建数据持久化目录
-mkdir -p app/data
-
-# 创建 .env 文件
-# 参考上方环境变量配置，至少需要配置：
+cd backend
 ```
-
-创建 `.env` 文件：
 
 ```env
 ENV=prod
@@ -112,7 +125,7 @@ SECRET_KEY=your-production-secret-key
 OPENAI_API_KEY=your-openai-api-key
 ```
 
-**2. 启动容器**
+**2. 启动容器**（在仓库根目录执行）
 
 ```shell
 docker-compose up --build -d
@@ -120,8 +133,8 @@ docker-compose up --build -d
 
 **3. 访问服务**
 
-- API 服务：<http://localhost:8000>
-- API 文档：<http://localhost:8000/docs>
+- API 服务：<http://localhost:8080>
+- API 文档：<http://localhost:8080/docs>
 
 **4. 查看日志**
 
@@ -267,11 +280,11 @@ docker-compose down
 
 ## 📦 导入数据
 
-测评题库数据与职业信息分别存放于 `assets/quizzes.yaml`、`assets/careers.yaml`、`assets/cosplay.yaml`，可根据需要修改。
+测评题库数据与职业信息分别存放于 `backend/assets/quizzes.yaml`、`backend/assets/careers.yaml`、`backend/assets/cosplay.yaml`，可根据需要修改。
 
 > ⚠️ **注意**：首次启动服务前必须导入数据，否则 API 将无法正常工作。
 
-运行以下脚本以导入对应数据：
+在 `backend/` 目录下运行以下脚本以导入对应数据：
 
 ```shell
 # 使用 uv
@@ -291,14 +304,14 @@ python scripts/import_cosplay_from_yaml.py
 
 ### 重置数据库
 
-删除项目根目录下的 `database.db` 文件即可重置数据库：
+删除 `backend/` 目录下的 `database.db` 文件即可重置数据库：
 
 ```shell
 # Windows
-del database.db
+del backend\database.db
 
 # Linux/Mac
-rm database.db
+rm backend/database.db
 ```
 
 然后重新导入数据。
@@ -370,6 +383,8 @@ python migrate/add_community_posts.py
 
 ### 运行测试
 
+以下命令均在 `backend/` 目录下执行：
+
 ```powershell
 # 使用 uv 运行（推荐）
 uv run pytest -q
@@ -401,7 +416,7 @@ pip install pre-commit
 pre-commit install
 ```
 
-手动运行代码检查：
+手动运行代码检查（在仓库根目录执行）：
 
 ```shell
 pre-commit run --all-files
@@ -411,20 +426,28 @@ pre-commit run --all-files
 
 ```
 FinancialCareerCommunity/
-├── app/                    # 应用主目录
-│   ├── api/               # API 路由
-│   ├── core/              # 核心配置
-│   ├── models/            # 数据库模型
-│   ├── repositories/      # 数据访问层
-│   ├── schemas/           # Pydantic 模型
-│   ├── services/          # 业务逻辑层
-│   └── main.py            # 应用入口
-├── assets/                # 静态数据文件
-├── scripts/               # 工具脚本
-├── tests/                 # 测试文件
-├── docker-compose.yml     # Docker 编排
-├── Dockerfile            # Docker 镜像
-└── pyproject.toml        # 项目配置
+├── backend/                # 后端 VocaStar（FastAPI）
+│   ├── app/                # 应用主目录
+│   │   ├── api/            # API 路由
+│   │   ├── core/           # 核心配置
+│   │   ├── models/         # 数据库模型
+│   │   ├── repositories/   # 数据访问层
+│   │   ├── schemas/        # Pydantic 模型
+│   │   ├── services/       # 业务逻辑层
+│   │   └── main.py         # 应用入口
+│   ├── assets/             # 静态数据文件
+│   ├── scripts/            # 工具脚本
+│   ├── migrate/            # 数据库迁移脚本
+│   ├── tests/              # 测试文件
+│   ├── docs/               # 后端文档
+│   ├── Dockerfile          # 后端 Docker 镜像
+│   └── pyproject.toml      # Python 项目配置
+├── frontend/               # 前端 CareerVoyage（Vue 3 + Vite）
+│   ├── src/                # 前端源码
+│   ├── public/             # 静态资源
+│   └── vite.config.js      # Vite 配置
+├── docker-compose.yml      # Docker 编排
+└── README.md
 ```
 
 ## 🤝 贡献
